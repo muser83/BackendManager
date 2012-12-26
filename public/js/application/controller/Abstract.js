@@ -1,3 +1,11 @@
+/**
+ * Abstract.js
+ * Created on Dec 27, 2012 12:17:48 AM
+ *
+ * @author    Boy van Moorsel <development@wittestier.nl>
+ * @license   -
+ * @copyright 2012 witteStier.nl
+ */
 Ext.define('App.controller.Abstract', {
     extend: 'Ext.app.Controller',
     refs: [{
@@ -16,11 +24,10 @@ Ext.define('App.controller.Abstract', {
      */
     addToCenter: function(centerView)
     {
+        centerView = this.injectToolbar(centerView);
         var centerRegion = this.getCenterRegion();
         centerRegion.removeAll();
-        centerRegion.add(
-            this.injectToolbar(centerView)
-            );
+        centerRegion.add(centerView);
 
         // End.
         return true;
@@ -33,17 +40,12 @@ Ext.define('App.controller.Abstract', {
      */
     injectToolbar: function(view)
     {
-        var allToolbarConfig = this.application.systemInfo.toolbarConfig;
+        var allToolbarConfig = this.application.systemModel.get('toolbar');
         var toolbarName = this.self.getName().replace(/\.|App.controller/g, '');
-
-        if (undefined === allToolbarConfig[toolbarName]) {
-            this.application.debug(
-                'No toolbar config found for controller `' + toolbarName + '`.'
-                );
-        }
+        var toolbarConfig = allToolbarConfig[toolbarName] || {};
 
         view.addDocked(
-            this.getView('Toolbar').create(allToolbarConfig[toolbarName])
+            Ext.create('Ext.toolbar.Toolbar', allToolbarConfig[toolbarName])
             );
 
         // End.

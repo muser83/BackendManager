@@ -1,13 +1,4 @@
 /**
- * Picker.js
- * Created on Dec 17, 2012 8:29:42 PM
- *
- * @author    Boy van Moorsel <development@wittestier.nl>
- * @license   -
- * @copyright 2012 witteStier.nl
- */
-
-/**
  * HIERARCHY:
  * Ext.Base
  * - Ext.AbstractComponent

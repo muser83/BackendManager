@@ -1,5 +1,5 @@
 /**
- * AccountForm.js
+ * Account.js
  * Created on Nov 7, 2012 11:24:20 PM
  *
  * @author    Boy van Moorsel <development@wittestier.nl>

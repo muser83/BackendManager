@@ -1,5 +1,5 @@
 /**
- * SettingsForm.js
+ * Settings.js
  * Created on Nov 7, 2012 11:24:35 PM
  *
  * @author    Boy van Moorsel <development@wittestier.nl>

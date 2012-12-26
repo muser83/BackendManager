@@ -1,18 +1,18 @@
 /**
- * System.js
+ * Users.js
  * Created on Dec 27, 2012 12:17:48 AM
  *
  * @author    Boy van Moorsel <development@wittestier.nl>
  * @license   -
  * @copyright 2012 witteStier.nl
  */
-Ext.define('App.model.application.System', {
+Ext.define('App.model.Users', {
     extend: 'Ext.data.Model',
     uses: [
-//        'App.model.application.User',
-//        'App.model.application.Person',
-//        'App.model.application.Settings'
+//        'associated_model_name'
     ],
+//    idProperty: 'id',
+//    persistenceProperty: 'data',
 //    hasMany: [{
 //            model: 'associated_model_name',
 //            name: 'getAssociatedModelStore', // GetModelStore ?
@@ -41,38 +41,47 @@ Ext.define('App.model.application.System', {
 //        }],
 //    validations: [],
     fields: [{
-            name: 'bootTime',
-            type: 'date',
-            defaultValue: 0
+            name: 'identity',
+            type: 'string'
         }, {
-            name: 'logonTime',
-            type: 'date',
-            defaultValue: 0
+            name: 'credential',
+            type: 'string'
         }, {
-            name: 'logoffTime',
-            type: 'date',
-            defaultValue: 0
+            name: 'salt',
+            type: 'string'
         }, {
-            name: 'navigation',
-            type: 'string',
-            persist: false,
-            defaultValue: ''
+            name: 'verifyToken',
+            type: 'string'
         }, {
-            name: 'toolbar',
-            type: 'object', // auto, string, int, float, boolean, date
-            persist: false,
-            defaultValue: {}
+            name: 'isVerified',
+            type: 'boolean',
+            defaultValue: false
         }, {
-            name: 'bebug',
-            type: 'object',
-            defaultValue: {}
+            name: 'isActive',
+            type: 'boolean',
+            defaultValue: false
         }],
-    proxy: {
+//    listners: {},
+    /*
+     * Proxy types:
+     * Server
+     * _Ajax
+     * __Rest
+     * _Direct
+     * _JsonP
+     * Client
+     * _WebStorage
+     * __LocalStorage
+     * __SessionStorage
+     * _Memory
+     * __Rest
+     */
+    proxy: {// Server proxy.
         type: 'ajax',
-        url: '~system',
-        reader: {
+        url: '',
+        reader: {// Json reader defaults.
             type: 'json',
-            root: 'system',
+            root: 'user',
             messageProperty: 'message'
         },
         writer: {
@@ -81,7 +90,7 @@ Ext.define('App.model.application.System', {
             writeAllFields: true,
             allowSingle: true,
             encode: false,
-            root: 'system',
+            root: 'user',
             getRecordData: function(record) {
                 Ext.apply(record.data, record.getAssociatedData());
                 return record.data;

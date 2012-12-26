@@ -1,12 +1,12 @@
 /**
- * Person.js
- * Created on Oct 31, 2012 9:06:45 PM
+ * Persons.js
+ * Created on Dec 27, 2012 12:17:48 AM
  *
  * @author    Boy van Moorsel <development@wittestier.nl>
  * @license   -
  * @copyright 2012 witteStier.nl
  */
-Ext.define('App.model.Person', {
+Ext.define('App.model.Persons', {
     extend: 'Ext.data.Model',
 //    hasOne: [{
 //        model: 'associated_model_name',

@@ -69,9 +69,12 @@ Ext.require([
 Ext.application({
     /**
      * Whatever this application is in development.
-     * Remove this flag for production, do not set to false.
      */
     inDevelopment: true,
+    /**
+     * Whatever the user is logged on and the system config is initialized.
+     */
+    isLoggedon: false,
     /**
      * Define the application folder, here the application will search for all
      * needed classes.
@@ -105,8 +108,7 @@ Ext.application({
         'admin.Locales',
         'admin.Roles',
         'admin.Translate',
-        'admin.Users',
-        'account.Settings'
+        'admin.Users'
     ],
     /**
      * Array of models to require from AppName.model namespace.
@@ -114,7 +116,7 @@ Ext.application({
     models: [
 //        'application.authentication.User',
 //        'application.additional.System',
-//        'application.System'
+        'application.System'
     ],
     /**
      * App.view.Viewport Viewport class.
@@ -126,6 +128,14 @@ Ext.application({
      * @see App.navigation.Navigation
      */
     navigation: undefined,
+    /**
+     * This model will contain all system data like toolbar and navigation
+     * config, boot and log times and assiciations with ...
+     * COMMENTME
+     *
+     * App.model.System
+     */
+    systemModel: undefined,
     /**
      * Contains all system information like event time, data models or debug
      * messages. This info object will be submited to the server when the logoff
@@ -156,16 +166,15 @@ Ext.application({
      */
     launch: function()
     {
-        this.debug('Application launch.');
-
-        // Define the system bootTime.
-        Ext.apply(this.systemInfo, {
-            bootTime: Ext.Date.now()
-        });
+        this.systemModel = this.getApplicationSystemModel().create();
 
         this.viewport = Ext.create('App.view.Viewport');
 
         this.navigation = Ext.create('App.navigation.Navigation');
+
+        this.debug('Application launch.');
+
+        this.systemModel.set('bootTime', Ext.Date.now());
 
         this.initErrorHandler();
 
@@ -176,8 +185,6 @@ Ext.application({
         this.initTasks();
 
         this.logon();
-
-        this.saveSystemInfo();
 
         // End.
         return false;
@@ -190,7 +197,7 @@ Ext.application({
      */
     initErrorHandler: function()
     {
-        var me = this;
+        var self = this;
         // Define error defaults.
         var errorDefault = {
             scope: this,
@@ -236,7 +243,7 @@ Ext.application({
 
             if (!error.showError || false !== error.showError) {
 
-                me.debug('New error throwed:', {
+                self.debug('New error throwed:', {
                     errorMsg: error.msg
                 });
 
@@ -400,7 +407,10 @@ The server didn\'t answered with the expected data.'
             return false;
         }
 
-        action = this.systemInfo.settingsModel.get('action');
+// TODO Get the default action from the systemModel.
+//        action = this.systemInfo.settingsModel.get('action');
+
+//        console.log(action);
 
         if (uri) {
             Ext.History.add(uri, true);
@@ -528,12 +538,13 @@ The server didn\'t answered with the expected data.'
         };
 
         Ext.Ajax.abortAll();
-
+        // TODO SystemInfo Use.
         // TODO Submit systemInfo to the server.
         console.log('systemDump', Ext.apply(this.systemInfo, {
             logoffTime: Ext.Date.now()
         }));
 
+        // TODO SystemInfo Use.
         Ext.apply(this.systemInfo, {
             bootTime: 0,
             logonTime: 0,
@@ -614,32 +625,31 @@ The server didn\'t answered with the expected data.'
         {
             this.debug('Application logon.');
 
-            Ext.apply(this.systemInfo, {
-                logonTime: Ext.Date.now(),
-                isLoggedOn: true
-            });
+            this.systemModel.set('logonTime', Ext.Date.now());
 
             this.buildNavigation();
 
             this.buildUserInfo();
 
+            this.isLoggedOn = true;
+
+            // TODO get the logonAction from the systemInfo and dispatch it.
             this.doRequest(
                 Ext.History.getToken()
                 );
         };
 
-        if (true === this.systemInfo.isAuthenticated) {
-            logon.call(this);
-        }
-
         this.loadSystemInfo(function()
         {
-            logon.call(this);
+            if (this.isAuthenticated()) {
+                logon.call(this);
+            } else {
+                this.logoff();
+            }
+
         });
 
         this.resetLogoffTimer();
-
-        this.saveSystemInfo();
 
         // End.
         return true;
@@ -652,7 +662,7 @@ The server didn\'t answered with the expected data.'
      */
     buildNavigation: function()
     {
-        var nagigationHTML = this.systemInfo.navigationHtml;
+        var nagigationHTML = this.systemModel.get('navigation');
 
         this.getNavigationDOM().setHTML(nagigationHTML);
 
@@ -674,7 +684,8 @@ The server didn\'t answered with the expected data.'
         var fullnameId = Ext.id();
         var logoffId = Ext.id();
         var settingsId = Ext.id();
-        var personModel = this.systemInfo.personModel;
+        // TODO SystemInfo Use.
+//        var personModel = this.systemInfo.personModel;
         var userInfo = new Ext.Template(
             '<img src="{src}" alt="{fullname}" id={imageId} height="41" width="41" />' +
             '<p id="{fullnameId}">{fullname}</p>' +
@@ -682,33 +693,33 @@ The server didn\'t answered with the expected data.'
             '<span id="{settingsId}"><span class="application-icon icon-settings"></span>Settings</span>'
             );
 
-        userInfo = userInfo.apply({
-            src: personModel.get('image'),
-            fullname: personModel.get('fullname'),
-            imageId: imageId,
-            fullnameId: fullnameId,
-            logoffId: logoffId,
-            settingsId: settingsId
-        });
+//        userInfo = userInfo.apply({
+//            src: personModel.get('image'),
+//            fullname: personModel.get('fullname'),
+//            imageId: imageId,
+//            fullnameId: fullnameId,
+//            logoffId: logoffId,
+//            settingsId: settingsId
+//        });
 
         this.getUserInfoDOM().setHTML(userInfo).show(true);
 
         // Define click handlers.
-        Ext.fly(logoffId).on('click', this.logoff, this);
+//        Ext.fly(logoffId).on('click', this.logoff, this);
 
-        Ext.fly(settingsId).on('click', function()
-        {
-            var settingsAction = {
-                module: 'account',
-                controller: 'settings',
-                action: 'startup'
-            };
-
-            this.dispatch(settingsAction);
-
-            // End.
-            return;
-        }, this);
+//        Ext.fly(settingsId).on('click', function()
+//        {
+//            var settingsAction = {
+//                module: 'account',
+//                controller: 'settings',
+//                action: 'startup'
+//            };
+//
+//            this.dispatch(settingsAction);
+//
+//            // End.
+//            return;
+//        }, this);
 
     },
     /**
@@ -721,7 +732,7 @@ The server didn\'t answered with the expected data.'
     debug: function(msg, dump)
     {
         dump = dump || {};
-
+        // TODO SystemInfo Use.
         Ext.Array.insert(this.systemInfo.debug, Ext.Date.now(), [{
                 time: Ext.Date.now(),
                 msg: msg,
@@ -735,35 +746,31 @@ The server didn\'t answered with the expected data.'
     },
     /**
      * Load the system information model, once loaded the given callback method
-     * will be called with the systemModel and operation object as arguments.
+     * will be called with the systemModel as argument.
      *
      * @param {Function} callback
      * @return {Booleand} Void
      */
     loadSystemInfo: function(callback)
     {
-        this.getApplicationAdditionalSystemModel().load(undefined, {
-            scope: this,
-            success: function(systemModel)
-            {
-                var userModel = systemModel.getUserModel();
-
-                Ext.apply(this.systemInfo, {
-                    isAuthenticated: userModel.get('is_authenticated'),
-                    personModel: systemModel.getPersonModel(),
-                    userModel: userModel,
-                    settingsModel: systemModel.getSettingsModel(),
-                    navigationHtml: systemModel.get('navigation'),
-                    toolbarConfig: systemModel.get('toolbar')
-                });
-
-                Ext.callback(callback, this);
-            },
-            failure: function()
-            {
-                this.logoff();
-            }
+        var operation = new Ext.data.Operation({
+            action: 'read'
         });
+
+        this.systemModel.getProxy().read(operation, function(operation)
+        {
+            var systemModel = operation.getRecords()[0];
+            // Copy all event times and debug logs to the new system model.
+            systemModel.set('bootTime', this.systemModel.get('bootTime'));
+            systemModel.set('logonTime', this.systemModel.get('logonTime'));
+            systemModel.set('logoffTime', this.systemModel.get('logoffTime'));
+            systemModel.set('bebug', this.systemModel.get('bebug'));
+
+            this.systemModel = systemModel;
+
+            Ext.callback(callback, this, [this.systemModel]);
+
+        }, this);
 
         // End.
         return true;
@@ -773,21 +780,9 @@ The server didn\'t answered with the expected data.'
      *
      * @returns {Booleand} Void
      */
-    saveSystemInfo: function(systemInfo)
+    saveSystemInfo: function()
     {
-        // TODO Add related models.
-        // CONTINUE
-        var systemModel = this.getApplicationSystemModel().load(undefined, {
-            scope: this,
-            success: function(systemModel)
-            {
-                console.log('sysModel', systemModel);
-            },
-            failure: function()
-            {
-
-            }
-        });
+        this.systemModel.save();
 
         // End.
         return true;
@@ -796,15 +791,6 @@ The server didn\'t answered with the expected data.'
      * Helper methods.
      */
 
-    /**
-     * Reset the system information to its orginal values.
-     *
-     * @returns {Boolean} Void
-     */
-    resetSystemInfo: function()
-    {
-        // TODO
-    },
     /**
      * Cancel and reset the logoff and preLogoff delayed tasks.
      *
@@ -840,21 +826,8 @@ The server didn\'t answered with the expected data.'
     isAuthenticated: function()
     {
         // End.
-        return this.systemInfo.isAuthenticated;
-    },
-    /**
-     * Returns a boolean true if the user is logged on, false otherwise.
-     *
-     * Is logged on is an status that tells the current user is logged on.
-     * This means the application has loaded the user's settings and
-     * configurations.
-     *
-     * @return {Boolean} True If the user is logged on, on this application.
-     */
-    isLoggedon: function()
-    {
-        // End.
-        return (this.systemInfo.isLoggedOn && this.systemInfo.isAuthenticated);
+        // TODO get the isAuthenticated data from the systemModel.
+        return true;
     },
     /**
      * Return a Ext.CompositeElement instance of the application

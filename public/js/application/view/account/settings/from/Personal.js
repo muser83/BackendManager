@@ -1,5 +1,5 @@
 /**
- * PersonalForm.js
+ * Personal.js
  * Created on Nov 5, 2012 11:25:22 PM
  *
  * @author    Boy van Moorsel <development@wittestier.nl>

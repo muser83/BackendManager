@@ -1,13 +1,4 @@
 /**
- * Base.js
- * Created on Dec 17, 2012 8:28:31 PM
- *
- * @author    Boy van Moorsel <development@wittestier.nl>
- * @license   -
- * @copyright 2012 witteStier.nl
- */
-
-/**
  * HIERARCHY:
  * Ext.Base
  * - Ext.AbstractComponent

@@ -1,9 +1,10 @@
 /**
- * Controller.js
- * Created on Oct 3, 2012 12:26:02 PM
+ * Dashboard.js
+ * Created on Dec 27, 2012 12:17:48 AM
  *
- * @author     Boy van Moorsel <boyvanmoorsel@msi.com>
- * @copyright  (c) 2012 MSI EU - Product Marketing.
+ * @author    Boy van Moorsel <development@wittestier.nl>
+ * @license   -
+ * @copyright 2012 witteStier.nl
  */
 Ext.define('App.controller.application.Dashboard', {
     extend: 'App.controller.Abstract',
