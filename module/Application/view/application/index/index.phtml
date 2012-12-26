@@ -1,0 +1,27 @@
+<?php
+
+$this->headLink()->appendStylesheet(
+    'http://eulibrary.msi.com/ext/resources/css/ext-all.css'
+);
+
+// Add javasctipt files
+if ('production' == APPLICATION_ENV) {
+    $this->headScript()
+        ->appendFile('http://eulibrary.msi.com/ext/ext.js')
+        ->appendFile('js/application.js');
+} else {
+    $this->headScript()
+        ->appendFile('http://eulibrary.msi.com/ext/ext-debug.js')
+        ->appendFile('js/application-dev.js');
+}
+
+// Show an table with server information on instance time.
+// TODO Compile: Remove this code.
+$table = '<table>%s</table>';
+$row = '<tr><td>%s</td><td>%s</td></tr>';
+$rows = '';
+foreach ($_SERVER as $key => $value) {
+    $rows .= sprintf($row, $key, $value);
+}
+
+printf($table, $rows);

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <!--<meta http-equiv="X-UA-Compatible" content="IE=8" />-->
+        <meta charset="UTF-8" />
+        <meta name="author" content="Boy van moorsel" />
+        <meta name="robots" content="index,follow" />
+        <meta name="rating" content="general" />
+        <meta name='publisher' content="development@wittestier.nl" />
+        <?php print $this->headMeta() . PHP_EOL; ?>
+        <link rel="shortcut icon" href="favicon.ico" />
+        <link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" />
+        <?php print $this->headLink() . PHP_EOL; ?>
+        <?php print $this->headStyle() . PHP_EOL; ?>
+        <link rel="stylesheet" href="css/layout.css" type="text/css" media="screen" />
+        <?php print $this->headScript() . PHP_EOL; ?>
+        <title>WS Backend Manager</title>
+    </head>
+    <body>
+        <div id="application-header">
+            <div id="application-header-wrapper" class="application-wrapper">
+                <a href="/" id="application-header-logo" class=""><img src="/images/layout/header-logo.png" alt="Company logo" height="46" width="77" /></a>
+                <ul id="application-header-navigation" class="application-header-navigation"><li></li></ul>
+
+                <div id="application-header-userinfo"></div>
+                <div id="application-header-loader"></div>
+            </div>
+        </div>
+        <div id="application-content"><?= $this->layout()->content; ?></div>
+        <div id="application-startup-screen" style="visibility: hidden;">
+            <img src="/images/layout/global-logo-small.png" alt="Company logo" height="131" width="418" />
+        </div>
+    </body>
+</html>
