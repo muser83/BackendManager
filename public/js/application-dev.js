@@ -103,10 +103,10 @@ Ext.application({
 //        'application.Issue',
         'admin.Countries',
         'admin.Locales',
-//        'admin.Roles',
-//        'admin.Translate',
-//        'admin.Users',
-//        'account.Settings'
+        'admin.Roles',
+        'admin.Translate',
+        'admin.Users',
+        'account.Settings'
     ],
     /**
      * Array of models to require from AppName.model namespace.

@@ -1,5 +1,5 @@
 {
-    "hash": "05d83ad4c6e885efe569cb47d6cd24b8",
+    "hash": "0043050006c1b497aa4cbd2a9a2a4455",
     "packages": [
         {
             "name": "doctrine/common",
@@ -7,18 +7,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/common",
-                "reference": "20cb487a5809a42f03020c89fa09eb4458de827f"
+                "reference": "a890fe1b689ed65c52bf4a7e64333a27b3c400d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/doctrine/common/archive/20cb487a5809a42f03020c89fa09eb4458de827f.zip",
-                "reference": "20cb487a5809a42f03020c89fa09eb4458de827f",
+                "url": "https://github.com/doctrine/common/archive/a890fe1b689ed65c52bf4a7e64333a27b3c400d6.zip",
+                "reference": "a890fe1b689ed65c52bf4a7e64333a27b3c400d6",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.2"
             },
-            "time": "1350491397",
+            "time": "2012-12-18 00:45:03",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -31,6 +31,7 @@
                     "Doctrine\\Common\\": "lib/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -56,7 +57,7 @@
                 {
                     "name": "Johannes Schmitt",
                     "email": "schmittjoh@gmail.com",
-                    "homepage": "http://jmsyst.com",
+                    "homepage": "https://github.com/schmittjoh",
                     "role": "Developer of wrapped JMSSerializerBundle"
                 }
             ],
@@ -95,6 +96,7 @@
                     "Doctrine\\Common\\DataFixtures": "lib/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -117,19 +119,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal",
-                "reference": "8c06b7ce92c487cda63ac6c78ee073f3fb0e9232"
+                "reference": "63b7ef12a51fab0df4588dbd21bd1a3613bc0362"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/doctrine/dbal/archive/8c06b7ce92c487cda63ac6c78ee073f3fb0e9232.zip",
-                "reference": "8c06b7ce92c487cda63ac6c78ee073f3fb0e9232",
+                "url": "https://github.com/doctrine/dbal/archive/63b7ef12a51fab0df4588dbd21bd1a3613bc0362.zip",
+                "reference": "63b7ef12a51fab0df4588dbd21bd1a3613bc0362",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.2",
                 "doctrine/common": ">=2.3-dev,<2.5-dev"
             },
-            "time": "1350322364",
+            "time": "2012-12-23 21:25:15",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -142,6 +144,7 @@
                     "Doctrine\\DBAL\\": "lib/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -180,12 +183,12 @@
             "source": {
                 "type": "git",
                 "url": "git://github.com/doctrine/DoctrineModule.git",
-                "reference": "ceef726e2acba3feadfe8b308a1ec4cb2b85cbe8"
+                "reference": "1cd6f814e6f7c1f2b2e7fbc7a7ea0d283bc7c96c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/doctrine/DoctrineModule/archive/ceef726e2acba3feadfe8b308a1ec4cb2b85cbe8.zip",
-                "reference": "ceef726e2acba3feadfe8b308a1ec4cb2b85cbe8",
+                "url": "https://github.com/doctrine/DoctrineModule/archive/1cd6f814e6f7c1f2b2e7fbc7a7ea0d283bc7c96c.zip",
+                "reference": "1cd6f814e6f7c1f2b2e7fbc7a7ea0d283bc7c96c",
                 "shasum": ""
             },
             "require": {
@@ -195,17 +198,23 @@
                 "zendframework/zendframework": "2.*",
                 "doctrine/data-fixtures": "1.*"
             },
-            "time": "1350998063",
+            "time": "2012-12-16 21:40:55",
             "bin": [
                 "bin/doctrine-module"
             ],
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.6.x-dev"
+                }
+            },
             "installation-source": "source",
             "autoload": {
                 "psr-0": {
                     "DoctrineModule\\": "src/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -250,12 +259,12 @@
             "source": {
                 "type": "git",
                 "url": "git://github.com/doctrine/DoctrineORMModule.git",
-                "reference": "d51b5b28746e6114bee912045694f852076c6630"
+                "reference": "b2c9507603d4f4442fa1f3ead87e14abb80b8073"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/doctrine/DoctrineORMModule/archive/d51b5b28746e6114bee912045694f852076c6630.zip",
-                "reference": "d51b5b28746e6114bee912045694f852076c6630",
+                "url": "https://github.com/doctrine/DoctrineORMModule/archive/b2c9507603d4f4442fa1f3ead87e14abb80b8073.zip",
+                "reference": "b2c9507603d4f4442fa1f3ead87e14abb80b8073",
                 "shasum": ""
             },
             "require": {
@@ -272,8 +281,13 @@
             "suggest": {
                 "zendframework/zend-developer-tools": "zend-developer-tools if you want to profile operations executed by the ORM during development"
             },
-            "time": "1351004249",
+            "time": "2012-12-15 23:24:06",
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.6.x-dev"
+                }
+            },
             "installation-source": "source",
             "autoload": {
                 "psr-0": {
@@ -281,6 +295,7 @@
                     "DoctrineORMModuleTest\\": "tests/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -348,6 +363,7 @@
                     "Doctrine\\DBAL\\Migrations": "lib"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "LGPL"
             ],
@@ -375,12 +391,12 @@
             "source": {
                 "type": "git",
                 "url": "git://github.com/doctrine/doctrine2.git",
-                "reference": "182ed07a412c80be42a58d23bfaae777867077ff"
+                "reference": "90b6d5e293147a0268ca005362ff50343bc6dc0f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/doctrine/doctrine2/archive/182ed07a412c80be42a58d23bfaae777867077ff.zip",
-                "reference": "182ed07a412c80be42a58d23bfaae777867077ff",
+                "url": "https://github.com/doctrine/doctrine2/archive/90b6d5e293147a0268ca005362ff50343bc6dc0f.zip",
+                "reference": "90b6d5e293147a0268ca005362ff50343bc6dc0f",
                 "shasum": ""
             },
             "require": {
@@ -392,7 +408,7 @@
             "suggest": {
                 "symfony/yaml": "If you want to use YAML Metadata Mapping Driver"
             },
-            "time": "1352325536",
+            "time": "2012-12-24 09:40:52",
             "bin": [
                 "bin/doctrine",
                 "bin/doctrine.php"
@@ -409,6 +425,7 @@
                     "Doctrine\\ORM\\": "lib/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -445,19 +462,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/kbsali/php-redmine-api.git",
-                "reference": "b3ac148f9577dcc6c3000614af89406433532344"
+                "reference": "0.4.1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/kbsali/php-redmine-api/archive/b3ac148f9577dcc6c3000614af89406433532344.zip",
-                "reference": "b3ac148f9577dcc6c3000614af89406433532344",
+                "url": "https://github.com/kbsali/php-redmine-api/archive/0.4.1.zip",
+                "reference": "0.4.1",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.2",
                 "ext-curl": "*"
             },
-            "time": "1352111567",
+            "time": "2012-11-19 09:27:35",
             "type": "library",
             "installation-source": "source",
             "autoload": {
@@ -465,6 +482,7 @@
                     "Redmine": "lib/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -489,18 +507,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Console",
-                "reference": "fb16385d9301046b519740f273b25bcd7032ed54"
+                "reference": "388ea8dbc1b3e1f96721e2799eb2d037e411a281"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Console/archive/fb16385d9301046b519740f273b25bcd7032ed54.zip",
-                "reference": "fb16385d9301046b519740f273b25bcd7032ed54",
+                "url": "https://github.com/symfony/Console/archive/388ea8dbc1b3e1f96721e2799eb2d037e411a281.zip",
+                "reference": "388ea8dbc1b3e1f96721e2799eb2d037e411a281",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "1352166980",
+            "time": "2012-12-19 07:09:49",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -513,6 +531,7 @@
                     "Symfony\\Component\\Console\\": ""
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -530,17 +549,73 @@
             "homepage": "http://symfony.com"
         },
         {
-            "name": "zendframework/zendframework",
+            "name": "zendframework/zend-developer-tools",
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "git://github.com/zendframework/zf2.git",
-                "reference": "18bce16cdda7c0bb4d95e5d51d014f7ffc66475a"
+                "url": "https://github.com/zendframework/ZendDeveloperTools.git",
+                "reference": "e930bd2feaf13e046e6896d18d4218e31c3ddaf1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/zendframework/zf2/archive/18bce16cdda7c0bb4d95e5d51d014f7ffc66475a.zip",
-                "reference": "18bce16cdda7c0bb4d95e5d51d014f7ffc66475a",
+                "url": "https://github.com/zendframework/ZendDeveloperTools/archive/e930bd2feaf13e046e6896d18d4218e31c3ddaf1.zip",
+                "reference": "e930bd2feaf13e046e6896d18d4218e31c3ddaf1",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3",
+                "zendframework/zendframework": "2.*"
+            },
+            "suggest": {
+                "bjyoungblood/bjy-profiler": "Version: dev-master, allows the usage of the (Zend) Db collector."
+            },
+            "time": "2012-10-28 12:50:39",
+            "type": "zf-module",
+            "installation-source": "source",
+            "autoload": {
+                "psr-0": {
+                    "ZendDeveloperTools": "src/"
+                },
+                "classmap": [
+                    "./Module.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Evan Coury",
+                    "email": "me@evancoury.com",
+                    "homepage": "http://blog.evan.pro/"
+                },
+                {
+                    "name": "Eric Boh",
+                    "email": "cossish@gmail.com"
+                }
+            ],
+            "description": "Module for developer and debug tools for working with the ZF2 MVC layer.",
+            "homepage": "https://github.com/zendframework/ZendDeveloperTools",
+            "keywords": [
+                "debug",
+                "zf2",
+                "module",
+                "developer"
+            ]
+        },
+        {
+            "name": "zendframework/zendframework",
+            "version": "dev-develop",
+            "source": {
+                "type": "git",
+                "url": "git://github.com/zendframework/zf2.git",
+                "reference": "af27c95fd1176c95cd227f5c8e56e28df52c8d25"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/zendframework/zf2/archive/af27c95fd1176c95cd227f5c8e56e28df52c8d25.zip",
+                "reference": "af27c95fd1176c95cd227f5c8e56e28df52c8d25",
                 "shasum": ""
             },
             "require": {
@@ -559,12 +634,14 @@
                 "zendframework/zend-db": "self.version",
                 "zendframework/zend-di": "self.version",
                 "zendframework/zend-dom": "self.version",
+                "zendframework/zend-escaper": "self.version",
                 "zendframework/zend-eventmanager": "self.version",
                 "zendframework/zend-feed": "self.version",
                 "zendframework/zend-file": "self.version",
                 "zendframework/zend-filter": "self.version",
                 "zendframework/zend-form": "self.version",
                 "zendframework/zend-http": "self.version",
+                "zendframework/zend-i18n": "self.version",
                 "zendframework/zend-inputfilter": "self.version",
                 "zendframework/zend-json": "self.version",
                 "zendframework/zend-ldap": "self.version",
@@ -591,9 +668,7 @@
                 "zendframework/zend-uri": "self.version",
                 "zendframework/zend-validator": "self.version",
                 "zendframework/zend-view": "self.version",
-                "zendframework/zend-xmlrpc": "self.version",
-                "zendframework/zend-escaper": "self.version",
-                "zendframework/zend-i18n": "self.version"
+                "zendframework/zend-xmlrpc": "self.version"
             },
             "require-dev": {
                 "doctrine/common": ">=2.1",
@@ -602,18 +677,19 @@
             "suggest": {
                 "doctrine/common": "Doctrine\\Common >=2.1 for annotation features",
                 "ext-intl": "ext/intl for i18n features",
-                "zendframework/zendservice-recaptcha": "ZendService\\ReCaptcha for rendering ReCaptchas in Zend\\Captcha and/or Zend\\Form",
+                "pecl-weakref": "Implementation of weak references for Zend\\Stdlib\\CallbackHandler",
                 "zendframework/zendpdf": "ZendPdf for creating PDF representations of barcodes",
-                "pecl-weakref": "Implementation of weak references for Zend\\Stdlib\\CallbackHandler"
+                "zendframework/zendservice-recaptcha": "ZendService\\ReCaptcha for rendering ReCaptchas in Zend\\Captcha and/or Zend\\Form"
             },
-            "time": "1352323363",
+            "time": "2012-12-19 21:17:19",
             "bin": [
                 "bin/classmap_generator.php"
             ],
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.0-dev"
+                    "dev-master": "2.0-dev",
+                    "dev-develop": "2.1-dev"
                 }
             },
             "installation-source": "source",
@@ -623,6 +699,7 @@
                     "ZendTest\\": "tests/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
             ],
@@ -640,6 +717,7 @@
     ],
     "minimum-stability": "dev",
     "stability-flags": {
+        "zendframework/zend-developer-tools": 20,
         "doctrine/doctrine-orm-module": 20,
         "kbsali/redmine-api": 20
     }

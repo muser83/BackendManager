@@ -7,7 +7,6 @@ return array(
         'DoctrineORMModule',
         // Application modules.
         'Application',
-        'Account',
         'Admin',
     ),
     'module_listener_options' => array(
