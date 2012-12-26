@@ -1,0 +1,389 @@
+/**
+ * layout.css
+ * Created on Sep 7, 2012 12:03:07 AM
+ *
+ * @author    Boy van Moorsel <development@wittestier.nl>
+ * @license   -
+ * @copyright 2012 witteStier.nl
+*/
+body
+{
+    background:#FFFFFF;
+    line-height:1.5;
+}
+
+#application-startup-screen
+{
+    background:#FFFFFF;
+    height:100%;
+    width:100%;
+    left:0;
+    position:absolute;
+    top:0;
+    text-align:center;
+}
+
+#application-startup-screen img
+{
+    height:131px;
+    width:418px;
+    margin-top: -58px;
+    position:absolute;
+    top:50%;
+}
+
+.application-wrapper
+{
+    background:none;
+    height:auto;
+}
+
+#application-header
+{
+    background: #7000FF url('../images/layout/header-bg.png') repeat-x top left;
+    height:46px;
+}
+
+.application-header-navigation
+{
+    font: bold 90% Tahoma, Geneva, sans-serif;
+    margin:0;
+    padding:0;
+    display:inline-block;
+    list-style:none;
+}
+.application-navigation-item
+{
+    margin-right: 3px;
+    float:left;
+    position:relative;
+}
+.application-navigation-tab > a
+{
+    -webkit-border-top-left-radius: 4px;
+    -webkit-border-top-right-radius: 4px;
+    -moz-border-radius-topleft: 4px;
+    -moz-border-radius-topright: 4px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+.application-navigation-anchor
+{
+    background:#067ac1 url('../images/layout/nav-bg.png') repeat-x;
+    border:1px solid;
+    border-top-color:#067ac1;
+    border-right-color:#0067BC;
+    border-bottom:none;
+    border-left-color:#067ac1;
+    padding:11px 20px 12px 18px;
+    display:block;
+    color:#FFFFFF;
+    line-height:11px;
+    text-decoration:none;
+    white-space:nowrap;
+}
+.application-navigation-anchor-last
+{
+    -webkit-border-bottom-right-radius: 4px;
+    -webkit-border-bottom-left-radius: 4px;
+    -moz-border-radius-bottomright: 4px;
+    -moz-border-radius-bottomleft: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+.application-navigation-list
+.application-navigation-item
+.application-navigation-anchor
+{
+    padding-left: 8px;
+    line-height: 16px;
+}
+
+.application-navigation-anchor-active,
+.application-navigation-anchor:hover
+{
+    color:#FFFFFF;
+    background-position: 0 -36px;
+}
+.application-active
+.application-navigation-anchor
+{
+    background-image: none;
+    border-color: #99BCE8;
+    background: -webkit-linear-gradient(top, #ffffff 0%,#dde7f3 57%,#DFE9F5 100%);
+    color: #4C4C4C;
+    z-index:inherit;
+}
+.application-active
+.application-navigation-anchor-active,
+.application-active
+.application-navigation-anchor:hover
+{
+    cursor: default;
+}
+
+/* Sub nav */
+.application-navigation-list
+{
+    border:1px solid #99BCE8;
+    -webkit-border-bottom-right-radius: 4px;
+    -webkit-border-bottom-left-radius: 4px;
+    -moz-border-radius-bottomright: 4px;
+    -moz-border-radius-bottomleft: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    border-top: none;
+    font-weight: normal;
+    list-style:none;
+    padding:0;
+    display:block;
+    left:inherit;
+    position:absolute;
+    top:inherit;
+    z-index:900;
+    -webkit-box-shadow: 5px 5px 5px 0px rgba(00, 00, 00, 0.1);
+    -moz-box-shadow: 5px 5px 5px 0px rgba(00, 00, 00, 0.1);
+    box-shadow: 5px 5px 5px 0px rgba(00, 00, 00, 0.1);
+
+}
+.application-navigation-list
+.application-navigation-item
+{
+    height:auto;
+    width:auto;
+    font:inherit;
+    margin:0;
+    padding:0;
+    float:none;
+}
+.application-navigation-list
+.application-navigation-item
+.application-navigation-anchor
+{
+    background:#0067BC;
+    border: none;
+    margin:auto;
+    padding:11px -18px 12px 18px;
+    position: relative;
+}
+.application-navigation-list
+.application-navigation-item
+.application-navigation-anchor-active,
+.application-navigation-list
+.application-navigation-item
+.application-navigation-anchor:hover
+{
+    background: #CFDEFF;
+    color: #005DAA;
+    outline: 0;
+}
+.application-active
+.application-navigation-list
+.application-navigation-item
+.application-navigation-anchor
+{
+    background: #dfe9f5;
+    cursor: pointer;
+}
+.application-active
+.application-navigation-list
+.application-navigation-item
+.application-navigation-anchor-active,
+.application-active
+.application-navigation-list
+.application-navigation-item
+.application-navigation-anchor:hover
+{
+    background:#CFDEFF;
+}
+
+.application-navigation-list
+.application-navigation-list
+{
+    border-top: 1px solid;
+    top: 0px;
+    -webkit-box-shadow: 0px 0px 5px 3px rgba(00, 00, 00, 0.1);
+    -moz-box-shadow: 0px 0px 5px 3px rgba(00, 00, 00, 0.1);
+    box-shadow: 0px 0px 5px 3px rgba(00, 00, 00, 0.1);
+}
+.application-arrow
+{
+    background:url('../images/layout/arrow-bg.png') no-repeat;
+    display:inline-block;
+}
+.application-header-navigation
+.application-navigation-item
+.application-navigation-anchor
+.application-arrow
+{
+    background-position: 0 0;
+    height:4px;
+    width:8px;
+    position:relative;
+    right:-10px;
+    top:-2px;
+}
+.application-navigation-list
+.application-navigation-item
+.application-navigation-anchor
+.application-arrow
+{
+    background-position: -9px 0px;
+    height:7px;
+    width:5px;
+    position:absolute;
+    right:10px;
+    top:14px;
+}
+.application-header-navigation
+.application-active
+.application-navigation-anchor
+.application-arrow
+{
+    background-position: 0 -6px;
+}
+.application-active
+.application-navigation-list
+.application-navigation-item
+.application-navigation-anchor
+.application-arrow
+{
+    background-position: -14px 0px;
+}
+
+#application-header-userinfo
+{
+    height: 41px;
+    max-width: 250px;
+    min-width:175px;
+    font:inherit;
+    list-style:auto;
+    margin:2px;
+    float:right;
+    color:#FFFFFF;
+    overflow: hidden;
+    white-space: nowrap;
+    line-height:inherit;
+}
+
+#application-header-userinfo img
+{
+    background:#FFFFFF;
+    border: 1px solid #FFFFFF;
+    height:41px;
+    width: 41px;
+    margin-right: 5px;
+    float: left;
+}
+
+#application-header-userinfo a
+{
+    font-size: inherit;
+    color:#FFFFFF;
+    text-decoration: none;
+}
+
+#application-header-userinfo a:hover
+{
+    text-decoration: underline;
+}
+
+#application-header-userinfo a .application-config
+{
+    background: no-repeat;
+    height:16px;
+    width:16px;
+    margin:auto;
+}
+
+#application-header-loader {
+    background:url('../images/layout/header-loader.gif') no-repeat;
+    height:41px;
+    width:41px;
+    margin:2px;
+}
+
+/*******************************************************************************
+ * Application Icons
+ ******************************************************************************/
+
+.application-icon
+{
+    height:16px;
+    width:16px;
+    margin:0 2px;
+    display:inline-block;
+    vertical-align: text-top;
+}
+
+/*******************************************************************************
+ * Navigation Icons
+ ******************************************************************************/
+
+.application-navigation-anchor-icon
+{
+    background: inherit;
+    height: 16px;
+    /*width:16px;*/
+    margin:0px;
+    padding-left:21px;
+}
+
+/*******************************************************************************
+ * Icon paths
+ ******************************************************************************/
+.icon-flag
+{
+    background: url('../images/icons/flag.png') no-repeat;
+}
+.icon-globe
+{
+    background: url('../images/icons/globe.png') no-repeat;
+}
+.icon-group
+{
+    background: url('../images/icons/group.png') no-repeat;
+}
+.icon-key
+{
+    background: url('../images/icons/keys.png') no-repeat;
+}
+.icon-lock,
+a:hover .icon-lock
+{
+    background: url('../images/icons/lock.png') no-repeat;
+}
+a .icon-lock
+{
+    background: url('../images/icons/unlock.png') no-repeat;
+}
+.icon-settings
+{
+    background: url('../images/icons/settings.png') no-repeat;
+}
+
+/*******************************************************************************
+ * Custom style classed
+ ******************************************************************************/
+.logout-message{
+    color: #FF0000;
+}
+
+
+/*******************************************************************************
+ * Css Fixes
+ ******************************************************************************/
+
+.x-fix-msg-msg
+{
+    white-space: pre-line;
+}
+.x-panel,
+.x-panel-body
+{
+    overflow:visible;
+}
+.x-table-layout td {
+    vertical-align:top;
+}
