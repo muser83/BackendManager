@@ -125,31 +125,36 @@ class SystemController
             'loadDefaultActionOnEmptyUri' => true
         );
 
+        $persons = array(
+            'id' => 1,
+            'addressesId' => 0,
+            'communicationsId' => 0,
+            'firstname' => 'Boy',
+            'middlename' => 'van',
+            'lastname' => 'Moorsel',
+            'gender' => 1,
+            'birthday' => ''
+        );
+
+        $users = array(
+            'id' => 1,
+            'localesId' => 1,
+            'personsId' => 1,
+            'identity' => 'WitteStier',
+            'credential' => null,
+            'salt' => null,
+            'verifyToken' => null,
+            'isVerified' => true,
+            'isActive' => true,
+            'persons' => $persons
+        );
+
         $systemData = array(
+            'usersId' => 1,
             'navigation' => $navigation,
             'toolbar' => $toolbar,
             'settings' => $settings,
-            'user' => array(
-                'id' => 1,
-                'localesId' => 1,
-                'personsId' => 1,
-                'identity' => 'WitteStier',
-                'credential' => null,
-                'salt' => null,
-                'verifyToken' => null,
-                'isVerified' => true,
-                'isActive' => true,
-                'persons' => array(
-                    'id' => 1,
-                    'addressesId' => 0,
-                    'communicationsId' => 0,
-                    'firstname' => 'Boy',
-                    'middlename' => 'van',
-                    'lastname' => 'Moorsel',
-                    'gender' => 1,
-                    'birthday' => ''
-                )
-            ),
+            'users' => $users
         );
 
         return new JsonModel(

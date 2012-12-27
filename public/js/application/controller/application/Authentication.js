@@ -7,23 +7,21 @@
  * @copyright 2012 witteStier.nl
  */
 Ext.define('App.controller.application.Authentication', {
-    extend: 'Ext.app.Controller',
+    extend: 'App.controller.Abstract',
     models: [
-        'application.authentication.User'
+        'Users'
     ],
     stores: [],
     views: [
         'application.authentication.Window',
-        'application.authentication.LoginForm'
-    ],
-    refs: [
+        'application.authentication.from.Login'
     ],
     listners: {},
     invalidLoginText: 'The given username or password is invalid.',
     /**
      * COMMENTME
      *
-     * @param Object Ext.app.Application
+     * @param {Ext.app.Application} application
      * @return Boolean Void
      */
     init: function(application)
@@ -35,12 +33,14 @@ Ext.define('App.controller.application.Authentication', {
             'loginWindow textfield': {
                 specialkey: function(field, event)
                 {
-                    if (event.getKey() == event.ENTER) {
+                    if (event.getKey() === event.ENTER) {
                         this.authenticateAction(field);
                     }
                 }
             }
         });
+
+        // End.
         return true;
     },
     /**
@@ -50,6 +50,7 @@ Ext.define('App.controller.application.Authentication', {
      */
     startupAction: function()
     {
+        // End.
         return true;
     },
     /**
@@ -60,9 +61,9 @@ Ext.define('App.controller.application.Authentication', {
     loginAction: function(args)
     {
         var window = this.getApplicationAuthenticationWindowView().create();
-        var loginForm = this.getApplicationAuthenticationLoginFormView()
+        var loginForm = this.getApplicationAuthenticationFromLoginView()
             .create();
-        var userModel = this.getApplicationAuthenticationUserModel().create();
+        var usersModel = this.getUsersModel().create();
 
         if (args.msg) {
             var logoutMessage = 'you are logged off because of the following reason:\n'
@@ -76,7 +77,7 @@ Ext.define('App.controller.application.Authentication', {
             });
         }
 
-        loginForm.loadRecord(userModel);
+        loginForm.loadRecord(usersModel);
 
         window.add(loginForm);
         window.show();
@@ -93,15 +94,15 @@ Ext.define('App.controller.application.Authentication', {
     {
         var window = target.up('window');
         var loginForm = window.down('form').getForm();
-        var userModel = loginForm.getRecord();
+        var usersModel = loginForm.getRecord();
         var credentialField = loginForm.findField('auth_credential');
 
         if (loginForm.isValid()) {
-            loginForm.updateRecord(userModel);
+            loginForm.updateRecord(usersModel);
 
-            userModel.save({
+            usersModel.save({
                 scope: this,
-                callback: function(userModel, operation)
+                callback: function(usersModel, operation)
                 {
                     if (!operation.wasSuccessful()) {
 
@@ -114,14 +115,14 @@ Ext.define('App.controller.application.Authentication', {
                         return false;
                     }
 
-                    if (true !== userModel.get('is_authenticated')) {
+                    if (true !== usersModel.get('isActive')) {
                         this.application.logoff();
 
                         // End.
                         return false;
                     }
 
-                    this.application.logon(userModel);
+                    this.application.logon();
 
                     window.close();
 

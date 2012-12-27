@@ -10,8 +10,6 @@ Ext.define('App.view.application.authentication.Window', {
     extend: 'Ext.window.Window',
     icon: '/images/icons/user.png',
     title: 'Login',
-    animateTarget: null,
-    border: true,
     shrinkWrap: 3,
     constrain: true,
     modal: true,
@@ -51,8 +49,6 @@ Ext.define('App.view.application.authentication.Window', {
                 });
             }
         }],
-    defaultFocus: undefined,
-    items: [],
     buttons: [{
             icon: '/images/icons/unlock.png',
             text: 'Login',

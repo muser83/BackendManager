@@ -6,7 +6,7 @@
  * @license   -
  * @copyright 2012 witteStier.nl
  */
-Ext.define('App.view.application.authentication.LoginForm', {
+Ext.define('App.view.application.authentication.from.Login', {
     extend: 'Ext.form.Panel',
     border: false,
     bodyPadding: 5,

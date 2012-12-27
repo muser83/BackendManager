@@ -428,3 +428,6 @@ public/images/icons/glyphicons_016_bin.png
 /vendor/symfony/
 /vendor/kbsali/
 /vendor/bin/
+vendor/zendframework/zend-developer-tools/
+
+vendor/zendframework/zendframework/

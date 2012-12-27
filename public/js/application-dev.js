@@ -101,14 +101,14 @@ Ext.application({
      * Define controllers as modulename.Controllername.
      */
     controllers: [
-//        'application.Authentication',
+        'application.Authentication',
 //        'application.Dashboard',
 //        'application.Issue',
         'admin.Countries',
         'admin.Locales',
         'admin.Roles',
         'admin.Translate',
-        'admin.Users'
+//        'admin.Users'
     ],
     /**
      * Array of models to require from AppName.model namespace.
@@ -198,7 +198,6 @@ Ext.application({
     initErrorHandler: function()
     {
         var self = this;
-        // Define error defaults.
         var errorDefault = {
             scope: this,
             closable: true,
@@ -219,7 +218,7 @@ Ext.application({
             {
                 if ('yes' === buttonId) {
                     // Reload the application.
-                    window.location.reload();
+                    window.location.replace('/#!');
                 }
 
                 if ('no' === buttonId) {
@@ -394,7 +393,7 @@ The server didn\'t answered with the expected data.'
     {
         var action;
 
-        if (true !== this.isLoggedon()) {
+        if (true !== this.isLoggedon) {
             this.logoff();
 
             // End.
@@ -407,7 +406,7 @@ The server didn\'t answered with the expected data.'
             return false;
         }
 
-// TODO Get the default action from the systemModel.
+        // TODO Get the default action from the systemModel.
 //        action = this.systemInfo.settingsModel.get('action');
 
 //        console.log(action);
@@ -435,8 +434,8 @@ The server didn\'t answered with the expected data.'
      */
     getAction: function(uri)
     {
-        var segments, segment;
-        var segmentsMatchingRegex = new RegExp(/\/([0-9A-Za-z\_]*)/g);
+        var segments, segment,
+            segmentsMatchingRegex = new RegExp(/\/([0-9A-Za-z\_]*)/g);
         var action = {
             module: 'application',
             controller: 'startup',
@@ -457,6 +456,7 @@ The server didn\'t answered with the expected data.'
         Ext.Object.each(action, function(key)
         {
             if ('args' === key) {
+                // End.
                 return false;
             }
 
@@ -488,11 +488,11 @@ The server didn\'t answered with the expected data.'
     {
         this.debug('New action dispatched:', action);
 
-        var moduleName = Ext.String.uncapitalize(action.module);
-        var controllerName = Ext.String.capitalize(action.controller);
-        var moduleControllerName = moduleName + '.' + controllerName;
-        var actionName = Ext.String.uncapitalize(action.action) + 'Action';
-        var controller = this.controllers.get(moduleControllerName);
+        var moduleName = Ext.String.uncapitalize(action.module),
+            controllerName = Ext.String.capitalize(action.controller),
+            moduleControllerName = moduleName + '.' + controllerName,
+            actionName = Ext.String.uncapitalize(action.action) + 'Action',
+            controller = this.controllers.get(moduleControllerName);
 
         if (undefined === controller || undefined === controller[actionName]) {
             Ext.Error.raise({
@@ -521,9 +521,6 @@ The server didn\'t answered with the expected data.'
     {
         this.debug('Application logoff.');
 
-        this.preLogoffTask.cancel();
-        this.logoffTask.cancel();
-
         var openWindows = Ext.ComponentQuery.query('window');
         var loginAction = {
             module: 'application',
@@ -538,25 +535,6 @@ The server didn\'t answered with the expected data.'
         };
 
         Ext.Ajax.abortAll();
-        // TODO SystemInfo Use.
-        // TODO Submit systemInfo to the server.
-        console.log('systemDump', Ext.apply(this.systemInfo, {
-            logoffTime: Ext.Date.now()
-        }));
-
-        // TODO SystemInfo Use.
-        Ext.apply(this.systemInfo, {
-            bootTime: 0,
-            logonTime: 0,
-            logoffTime: Ext.Date.now(),
-            isLoggedOn: false,
-            isAuthenticated: false,
-            userModel: undefined,
-            personModel: undefined,
-            settingsModel: undefined,
-            navigationHtml: '',
-            debug: []
-        });
 
         this.getNavigationDOM()
             .hide()
@@ -573,6 +551,12 @@ The server didn\'t answered with the expected data.'
                 window.close();
             }
         }, this);
+
+        this.systemModel.set('logoffTime', Ext.Date.now());
+        this.systemModel.save();
+
+        this.tasks.preLogoff.cancel();
+        this.tasks.logoff.cancel();
 
         this.dispatch(loginAction);
 
@@ -592,7 +576,7 @@ The server didn\'t answered with the expected data.'
     {
         this.debug('Application preLogoff.');
 
-        this.preLogoffTask.cancel();
+        this.tasks.preLogoff.cancel();
 
         var loginAction = {
             module: 'application',
@@ -604,10 +588,6 @@ The server didn\'t answered with the expected data.'
                     : undefined
             }
         };
-
-        this.saveSystemInfo();
-
-        this.resetSystemInfo();
 
         this.dispatch(loginAction);
 
@@ -631,7 +611,7 @@ The server didn\'t answered with the expected data.'
 
             this.buildUserInfo();
 
-            this.isLoggedOn = true;
+            this.isLoggedon = true;
 
             // TODO get the logonAction from the systemInfo and dispatch it.
             this.doRequest(
@@ -680,10 +660,10 @@ The server didn\'t answered with the expected data.'
      */
     buildUserInfo: function()
     {
-        var imageId = Ext.id();
-        var fullnameId = Ext.id();
-        var logoffId = Ext.id();
-        var settingsId = Ext.id();
+        var imageId = Ext.id(),
+            fullnameId = Ext.id(),
+            logoffId = Ext.id(),
+            settingsId = Ext.id();
         // TODO SystemInfo Use.
 //        var personModel = this.systemInfo.personModel;
         var userInfo = new Ext.Template(
@@ -798,8 +778,8 @@ The server didn\'t answered with the expected data.'
      */
     resetLogoffTimer: function()
     {
-        var preLogoffTime = ((60 * 1000) * 30); // 30 min.
-        var logoffTime = ((60 * 1000) * 45); // 45 min.
+        var preLogoffTime = ((60 * 1000) * 30), // 30 min.
+            logoffTime = ((60 * 1000) * 45); // 45 min.
 
         this.tasks.preLogoff.cancel();
         this.tasks.preLogoff.delay(preLogoffTime);

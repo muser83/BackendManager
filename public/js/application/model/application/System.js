@@ -9,36 +9,16 @@
 Ext.define('App.model.application.System', {
     extend: 'Ext.data.Model',
     uses: [
-//        'App.model.application.User',
-//        'App.model.application.Person',
-//        'App.model.application.Settings'
+        'App.model.Users'
     ],
-//    hasMany: [{
-//            model: 'associated_model_name',
-//            name: 'getAssociatedModelStore', // GetModelStore ?
-//            associationKey: 'associated_data_name',
-//            foreignKey: 'id', // lowercased name of the owner model plus "_id".
-//            primaryKey: 'id', // Associated model primary key.
-//            autoLoad: false,
-//            filterProperty: undefined,
-//            storeConfig: undefined
-//        }],
-//    hasOne: [{
-//            model: 'associated_model_name',
-//            getterName: 'getAssociatedModel',
-//            setterName: 'setAssociatedModel',
-//            associationKey: 'associated_data_name',
-//            foreignKey: 'id', // lowercased name of the owner model plus "_id".
-//            primaryKey: 'id' // Associated model primary key.
-//        }],
-//    belongsTo: [{
-//            model: 'owner_model_name',
-//            getterName: 'getOwnerModel',
-//            setterName: 'setOwnerModel',
-//            associationKey: 'owner_data_name',
-//            foreignKey: 'id', // lowercased name of the owner model plus "_id".
-//            primaryKey: 'id' // Owner model primary key.
-//        }],
+    hasOne: [{
+            model: 'App.model.Users',
+            getterName: 'getUsers',
+            setterName: 'setUsers',
+            associationKey: 'users',
+            foreignKey: 'users_id',
+            primaryKey: 'id'
+        }],
 //    validations: [],
     fields: [{
             name: 'bootTime',
@@ -59,7 +39,7 @@ Ext.define('App.model.application.System', {
             defaultValue: ''
         }, {
             name: 'toolbar',
-            type: 'object', // auto, string, int, float, boolean, date
+            type: 'object',
             persist: false,
             defaultValue: {}
         }, {
