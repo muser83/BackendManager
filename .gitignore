@@ -1,53 +1,3 @@
-
-data/model/BackendManager.mwb
-
-data/model/BackendManager.mwb.bak
-
-data/setup/i18N/01. Continents.sql
-
-data/setup/i18N/02. Currencies.sql
-
-data/setup/i18N/03. Timezones.sql
-
-data/setup/i18N/04. Countries.sql
-
-data/setup/i18N/05. Countries has Timezones.sql
-
-data/setup/i18N/09. Locales.sql
-
-data/setup/i18N/08. Charsets.sql
-
-data/setup/i18N/07. Languages.sql
-
-data/setup/i18N/06. Provinces.sql
-
-public/images/icons/glyphicons_000_glass.png
-
-public/images/icons/glyphicons_001_leaf.png
-
-public/images/icons/glyphicons_002_dog.png
-
-public/images/icons/glyphicons_004_girl.png
-
-public/images/icons/glyphicons_005_car.png
-
-public/images/icons/glyphicons_006_user_add.png
-
-public/images/icons/glyphicons_008_film.png
-
-public/images/icons/glyphicons_012_heart.png
-
-public/images/icons/glyphicons_014_train.png
-
-public/images/icons/glyphicons_013_beach_umbrella.png
-
-public/images/icons/glyphicons_010_envelope.png
-
-public/images/icons/glyphicons_009_magic.png
-
-public/images/icons/glyphicons_018_note.png
-
-public/images/icons/glyphicons_016_bin.png
 /public/images/icons/glyphicons_379_pinboard.png
 /public/images/icons/glyphicons_284_pants.png
 /public/images/icons/glyphicons_236_zoom_in.png
@@ -424,10 +374,9 @@ public/images/icons/glyphicons_016_bin.png
 /public/images/icons/glyphicons_242_google_maps.png
 /public/images/icons/glyphicons_352_nameplate.png
 /public/images/icons/glyphicons_219_circle_arrow_down.png
+/vendor/bin/
 /vendor/doctrine/
 /vendor/symfony/
 /vendor/kbsali/
-/vendor/bin/
-vendor/zendframework/zend-developer-tools/
-
-vendor/zendframework/zendframework/
+/vendor/symfony/
+/vendor/zendframework/
