@@ -111,27 +111,28 @@ class SystemController
         ),
         'loadDefaultActionOnEmptyUri' => true
     );
-    private $persons = array(
+    private $person = array(
         'id' => 1,
         'addressesId' => 0,
         'communicationsId' => 0,
+        'image' => 'https://lh4.googleusercontent.com/-5hmVYhkDcLA/AAAAAAAAAAI/AAAAAAAAALg/mSeImjP68c8/s48-c-k/photo.jpg',
         'firstname' => 'Boy',
         'middlename' => 'van',
         'lastname' => 'Moorsel',
         'gender' => 1,
         'birthday' => ''
     );
-    private $users = array(
+    private $user = array(
         'id' => 1,
         'localesId' => 1,
         'personsId' => 1,
+        'isVerified' => true,
+        'isActive' => true,
         'identity' => 'WitteStier',
         'credential' => null,
         'salt' => null,
         'verifyToken' => null,
-        'isVerified' => true,
-        'isActive' => true,
-        'persons' => array()
+        'person' => array()
     );
 
     /**
@@ -140,7 +141,7 @@ class SystemController
      * @param \Doctrine\ORM\EntityManager $entityManager
      * @return \Album\Controller\AlbumController
      */
-    public function setEntityManager(EntityManager $entityManagerm)
+    public function setEntityManager(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
 
@@ -171,8 +172,8 @@ class SystemController
      */
     public function indexAction()
     {
-        $user = $this->users;
-        $user['persons'] = $this->persons;
+        $user = $this->user;
+        $user['person'] = $this->person;
 
         $systemData = array(
             'userId' => 1,
@@ -196,8 +197,8 @@ class SystemController
      */
     public function getUserAction()
     {
-        $user = $this->users;
-        $user['persons'] = $this->persons;
+        $user = $this->user;
+        $user['person'] = $this->person;
 
         return new JsonModel(
             array(

@@ -42,7 +42,7 @@ class DataController
      * @param \Doctrine\ORM\EntityManager $entityManager
      * @return \Album\Controller\AlbumController
      */
-    public function setEntityManager(EntityManager $entityManagerm)
+    public function setEntityManager(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
 

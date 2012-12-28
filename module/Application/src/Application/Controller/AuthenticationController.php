@@ -12,7 +12,6 @@
 namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController,
-    Zend\View\Model\ViewModel,
     Zend\Json\Json,
     Zend\View\Model\JsonModel,
     Doctrine\ORM\EntityManager;
@@ -40,7 +39,7 @@ class AuthenticationController
      * @param \Doctrine\ORM\EntityManager $entityManager
      * @return \Album\Controller\AlbumController
      */
-    public function setEntityManager(EntityManager $entityManagerm)
+    public function setEntityManager(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
 
@@ -72,7 +71,7 @@ class AuthenticationController
     /**
      *
      */
-    public function loginAction()
+    public function _loginAction()
     {
         $request = $this->getRequest();
 
@@ -109,23 +108,12 @@ class AuthenticationController
      *
      * @return Zend\View\Model\ViewModel
      */
-    public function _loginAction()
+    public function loginAction()
     {
         $user = 'WitteStier';
         $pass = '123456';
 
         $request = $this->getRequest();
-        // User an form to validate the post request.
-        // Use the user Entity to get the default user skeleton.
-        $userModel = array(
-            'id' => 0,
-            'is_authenticated' => false,
-            'is_verified' => false,
-            'auth_identity' => '',
-            'auth_credential' => '',
-            'cdate' => strtotime(date('Y-m-d H:i:d')),
-            'udate' => strtotime(date('Y-m-d H:i:d')),
-        );
 
         if (!$request->isPost() || (null === $request->getPost('user'))) {
             return new JsonModel(
@@ -136,14 +124,11 @@ class AuthenticationController
             );
         }
 
-        $userModel = array_merge(
-            $userModel,
-            Json::decode(
+        $userModel = Json::decode(
                 $request->getPost('user', '{}'), Json::TYPE_ARRAY
-            )
         );
 
-        if (($user != $userModel['auth_identity']) || ($pass != $userModel['auth_credential'])) {
+        if (($user != $userModel['identity']) || ($pass != $userModel['credential'])) {
             return new JsonModel(
                 array(
                 'message' => 'Invalid username or password.',
@@ -152,37 +137,7 @@ class AuthenticationController
             );
         }
 
-        $userModel = array_merge(
-            $userModel,
-            array(
-            'id' => 1,
-            'is_authenticated' => true,
-            'is_verified' => true,
-            'auth_credential' => null,
-            )
-        );
-
-        return new JsonModel(
-            array(
-            'message' => 'Authenticated.',
-            'success' => true,
-            'user' => $userModel
-            )
-        );
-        // Finaly, handle the login request.
-        /**
-         * TODO
-         * Get the authPlugin
-         * Get the auth adapter
-         * Set the credentials
-         * Authenticate.
-         *
-         * _If not authenticated
-         * See Handle invalid todo.
-         * _else
-         * Load the User entity and store this information in an session.
-         * and return the userObject.
-         */
+        return $this->forward()->dispatch('System', array('action' => 'get-user'));
     }
 
     /**
@@ -193,33 +148,6 @@ class AuthenticationController
     public function logoutAction()
     {
         // Remove the session userObject
-    }
-
-    /**
-     * Common action description.
-     *
-     * @return Zend\View\Model\ViewModel
-     */
-    public function getUserInfoAction()
-    {
-        // TODO Get this info from an session.
-        $userModel = array(
-            'id' => 2,
-            'is_authenticated' => true,
-            'is_verified' => true,
-            'auth_identity' => 'WitteStier',
-            'auth_credential' => null,
-            'cdate' => strtotime(date('Y-m-d H:i:d')),
-            'udate' => strtotime(date('Y-m-d H:i:d')),
-        );
-
-        return new JsonModel(
-            array(
-            'message' => 'Authenticated.',
-            'success' => true,
-            'user' => $userModel
-            )
-        );
     }
 
 }

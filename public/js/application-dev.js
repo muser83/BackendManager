@@ -174,8 +174,6 @@ Ext.application({
 
         this.getSystemModel().set('bootTime', Ext.Date.now());
 
-        console.log('s', this.getSystemModel());
-
         this.debug('Application launch.');
 
         this.initErrorHandler();
@@ -267,7 +265,7 @@ Ext.application({
     getPersonModel: function()
     {
         // End.
-        return this.getUserModel(); // .getPerson() Get the person model from the userModel
+        return this.getUserModel().getPerson();
     },
     /**
      * Return a Ext.CompositeElement instance of the application
@@ -625,21 +623,21 @@ Ext.application({
         this.getUserInfoDOM().setHTML(userInfo).show(true);
 
         // Define click handlers.
-//        Ext.fly(logoffId).on('click', this.logoff, this);
+        Ext.fly(logoffId).on('click', this.logoff, this);
 
-//        Ext.fly(settingsId).on('click', function()
-//        {
-//            var settingsAction = {
-//                module: 'account',
-//                controller: 'settings',
-//                action: 'startup'
-//            };
-//
-//            this.dispatch(settingsAction);
-//
-//            // End.
-//            return;
-//        }, this);
+        Ext.fly(settingsId).on('click', function()
+        {
+            var settingsAction = {
+                module: 'account',
+                controller: 'settings',
+                action: 'startup'
+            };
+
+            this.dispatch(settingsAction);
+
+            // End.
+            return;
+        }, this);
 
     },
     /**

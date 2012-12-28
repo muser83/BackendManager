@@ -20,14 +20,14 @@ Ext.define('App.view.application.authentication.from.Login', {
     },
     items: [{
             xtype: 'textfield',
-            name: 'auth_identity',
+            name: 'identity',
             fieldLabel: 'Username',
             allowBlank: false,
             vtype: 'alphanum'
         }, {
             xtype: 'textfield',
             inputType: 'password',
-            name: 'auth_credential',
+            name: 'credential',
             fieldLabel: 'Password',
             allowBlank: false
         }, {

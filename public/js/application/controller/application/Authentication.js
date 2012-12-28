@@ -28,10 +28,10 @@ Ext.define('App.controller.application.Authentication', {
     init: function(application)
     {
         this.control({
-            'loginWindow button[action=authenticate]': {
+            'window button[action=authenticate]': {
                 click: this.authenticateAction
             },
-            'loginWindow textfield': {
+            'window textfield': {
                 specialkey: function(field, event)
                 {
                     if (event.getKey() === event.ENTER) {
@@ -63,12 +63,12 @@ Ext.define('App.controller.application.Authentication', {
     {
         var window = this.getApplicationAuthenticationWindowView().create();
         var loginForm = this.getApplicationAuthenticationFromLoginView()
-                .create();
-        var usersModel = this.getUsersModel().create();
+            .create();
+        var userModel = this.getUserModel().create();
 
         if (args.msg) {
             var logoutMessage = 'you are logged off because of the following reason:\n'
-                    + args.msg;
+                + args.msg;
 
             loginForm.add({
                 xtype: 'panel',
@@ -78,7 +78,7 @@ Ext.define('App.controller.application.Authentication', {
             });
         }
 
-        loginForm.loadRecord(usersModel);
+        loginForm.loadRecord(userModel);
 
         window.add(loginForm);
         window.show();
@@ -95,28 +95,29 @@ Ext.define('App.controller.application.Authentication', {
     {
         var window = target.up('window');
         var loginForm = window.down('form').getForm();
-        var usersModel = loginForm.getRecord();
-        var credentialField = loginForm.findField('auth_credential');
+        var userModel = loginForm.getRecord();
+        var credentialField = loginForm.findField('credential');
 
         if (loginForm.isValid()) {
-            loginForm.updateRecord(usersModel);
+            loginForm.updateRecord(userModel);
 
-            usersModel.save({
+            userModel.getProxy().url = '~authentication/login';
+            userModel.save({
                 scope: this,
-                callback: function(usersModel, operation)
+                callback: function(userModel, operation)
                 {
                     if (!operation.wasSuccessful()) {
 
                         credentialField.reset();
                         credentialField.markInvalid(
-                                operation.getError()
-                                );
+                            operation.getError()
+                            );
 
                         // End.
                         return false;
                     }
 
-                    if (true !== usersModel.get('isActive')) {
+                    if (true !== userModel.get('isActive')) {
                         this.application.logoff();
 
                         // End.

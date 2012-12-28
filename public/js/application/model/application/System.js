@@ -16,7 +16,7 @@ Ext.define('App.model.application.System', {
             getterName: 'getUser',
             setterName: 'setUser',
             associationKey: 'user',
-            foreignKey: 'user_id',
+            foreignKey: 'userId',
             primaryKey: 'id'
         }],
 //    validations: [],

@@ -8,27 +8,15 @@
  */
 Ext.define('App.model.Person', {
     extend: 'Ext.data.Model',
-//    hasOne: [{
-//        model: 'associated_model_name',
-//        getterName: 'getAssociatedModel',
-//        setterName: 'setAssociatedModel',
-//        associationKey: 'associated_data_name',
-//        foreignKey: 'id', // lowercased name of the owner model plus "_id".
-//        primaryKey: 'id' // Associated model primary key.
-//    }],
     fields: [{
             name: 'id',
             type: 'int'
         }, {
-            name: 'users_id',
+            name: 'addressesId',
             type: 'int',
             useNull: true
         }, {
-            name: 'addresses_id',
-            type: 'int',
-            useNull: true
-        }, {
-            name: 'communications_id',
+            name: 'communicationsId',
             type: 'int',
             useNull: true
         }, {
@@ -52,29 +40,31 @@ Ext.define('App.model.Person', {
             convert: function(value, record)
             {
                 var fullname = record.get('firstname') + ' ' +
-                        record.get('middlename') + ' ' +
-                        record.get('lastname');
+                    record.get('middlename') + ' ' +
+                    record.get('lastname');
 
                 return fullname;
             }
-        }]
-//    proxy: {
-//        type: 'ajax',
-//        url: '',
-//        api: {
-//            create: undefined,
-//            read: undefined,
-//            update: undefined,
-//            destroy: undefined
-//        },
-//        reader: {
-//            type: 'json',
-//            root: 'person',
-//            messageProperty: 'message'
-//        },
-//        writer: {
-//            type: 'json',
-//            root: 'person'
-//        }
-//    }
+        }],
+    proxy: {
+        type: 'ajax',
+        url: '~system/get-person',
+        reader: {
+            type: 'json',
+            root: 'person',
+            messageProperty: 'message'
+        },
+        writer: {
+            type: 'json',
+            nameProperty: 'name',
+            writeAllFields: true,
+            allowSingle: true,
+            encode: false,
+            root: 'person',
+            getRecordData: function(record) {
+                Ext.apply(record.data, record.getAssociatedData());
+                return record.data;
+            }
+        }
+    }
 });

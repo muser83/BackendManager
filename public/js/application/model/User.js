@@ -9,7 +9,7 @@
 Ext.define('App.model.User', {
     extend: 'Ext.data.Model',
     uses: [
-//        'associated_model_name'
+        'App.model.Person'
     ],
 //    idProperty: 'id',
 //    persistenceProperty: 'data',
@@ -23,14 +23,14 @@ Ext.define('App.model.User', {
 //            filterProperty: undefined,
 //            storeConfig: undefined
 //        }],
-//    hasOne: [{
-//            model: 'associated_model_name',
-//            getterName: 'getAssociatedModel',
-//            setterName: 'setAssociatedModel',
-//            associationKey: 'associated_data_name',
-//            foreignKey: 'id', // lowercased name of the owner model plus "_id".
-//            primaryKey: 'id' // Associated model primary key.
-//        }],
+    hasOne: [{
+            model: 'App.model.Person',
+            getterName: 'getPerson',
+            setterName: 'setPerson',
+            associationKey: 'person',
+            foreignKey: 'personsId',
+            primaryKey: 'id'
+        }],
 //    belongsTo: [{
 //            model: 'owner_model_name',
 //            getterName: 'getOwnerModel',
@@ -41,6 +41,23 @@ Ext.define('App.model.User', {
 //        }],
 //    validations: [],
     fields: [{
+            name: 'id',
+            type: 'int'
+        }, {
+            name: 'localesId',
+            type: 'int'
+        }, {
+            name: 'personsId',
+            type: 'int'
+        }, {
+            name: 'isVerified',
+            type: 'boolean',
+            defaultValue: false
+        }, {
+            name: 'isActive',
+            type: 'boolean',
+            defaultValue: false
+        }, {
             name: 'identity',
             type: 'string'
         }, {
@@ -52,31 +69,8 @@ Ext.define('App.model.User', {
         }, {
             name: 'verifyToken',
             type: 'string'
-        }, {
-            name: 'isVerified',
-            type: 'boolean',
-            defaultValue: false
-        }, {
-            name: 'isActive',
-            type: 'boolean',
-            defaultValue: false
         }],
-//    listners: {},
-    /*
-     * Proxy types:
-     * Server
-     * _Ajax
-     * __Rest
-     * _Direct
-     * _JsonP
-     * Client
-     * _WebStorage
-     * __LocalStorage
-     * __SessionStorage
-     * _Memory
-     * __Rest
-     */
-    proxy: {// Server proxy.
+    proxy: {
         type: 'ajax',
         url: '~system/get-user',
         reader: {// Json reader defaults.
@@ -89,7 +83,7 @@ Ext.define('App.model.User', {
             nameProperty: 'name',
             writeAllFields: true,
             allowSingle: true,
-            encode: false,
+            encode: true,
             root: 'user',
             getRecordData: function(record) {
                 Ext.apply(record.data, record.getAssociatedData());
