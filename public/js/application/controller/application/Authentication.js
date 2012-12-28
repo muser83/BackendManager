@@ -9,14 +9,15 @@
 Ext.define('App.controller.application.Authentication', {
     extend: 'App.controller.Abstract',
     models: [
-        'Users'
+        'User'
     ],
     stores: [],
     views: [
         'application.authentication.Window',
         'application.authentication.from.Login'
     ],
-    listners: {},
+    listners: {
+    },
     invalidLoginText: 'The given username or password is invalid.',
     /**
      * COMMENTME
@@ -62,12 +63,12 @@ Ext.define('App.controller.application.Authentication', {
     {
         var window = this.getApplicationAuthenticationWindowView().create();
         var loginForm = this.getApplicationAuthenticationFromLoginView()
-            .create();
+                .create();
         var usersModel = this.getUsersModel().create();
 
         if (args.msg) {
             var logoutMessage = 'you are logged off because of the following reason:\n'
-                + args.msg;
+                    + args.msg;
 
             loginForm.add({
                 xtype: 'panel',
@@ -108,8 +109,8 @@ Ext.define('App.controller.application.Authentication', {
 
                         credentialField.reset();
                         credentialField.markInvalid(
-                            operation.getError()
-                            );
+                                operation.getError()
+                                );
 
                         // End.
                         return false;

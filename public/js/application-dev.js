@@ -74,7 +74,7 @@ Ext.application({
     /**
      * Whatever the user is logged on and the system config is initialized.
      */
-    isLoggedon: false,
+    loggedon: false,
     /**
      * Define the application folder, here the application will search for all
      * needed classes.
@@ -102,7 +102,7 @@ Ext.application({
      */
     controllers: [
         'application.Authentication',
-//        'application.Dashboard',
+        'application.Dashboard',
 //        'application.Issue',
         'admin.Countries',
         'admin.Locales',
@@ -114,8 +114,6 @@ Ext.application({
      * Array of models to require from AppName.model namespace.
      */
     models: [
-//        'application.authentication.User',
-//        'application.additional.System',
         'application.System'
     ],
     /**
@@ -151,13 +149,15 @@ Ext.application({
         personModel: undefined,
         settingsModel: undefined,
         navigationHtml: '',
-        toolbarConfig: {},
+        toolbarConfig: {
+        },
         debug: []
     },
     /**
      * Contains all system delayed task instances.
      */
-    tasks: {},
+    tasks: {
+    },
     /**
      * Initialize the application.
      *
@@ -166,15 +166,17 @@ Ext.application({
      */
     launch: function()
     {
-        this.systemModel = this.getApplicationSystemModel().create();
-
         this.viewport = Ext.create('App.view.Viewport');
 
         this.navigation = Ext.create('App.navigation.Navigation');
 
-        this.debug('Application launch.');
+        this.systemModel = this.getApplicationSystemModel().create();
 
-        this.systemModel.set('bootTime', Ext.Date.now());
+        this.getSystemModel().set('bootTime', Ext.Date.now());
+
+        console.log('s', this.getSystemModel());
+
+        this.debug('Application launch.');
 
         this.initErrorHandler();
 
@@ -190,6 +192,535 @@ Ext.application({
         return false;
     },
     /**
+     * Helper methods.
+     * These methods can be called from all classes. Controllers, Views, ect.
+     */
+
+    /**
+     * COMMENTME
+     */
+    isInDevelopment: function()
+    {
+        // End.
+        return this.inDevelopment;
+    },
+    /**
+     * COMMENTME
+     */
+    isLoggedon: function()
+    {
+        // End.
+        return this.loggedon;
+    },
+    /**
+     * Returns a boolean true if the user is authenticated by the server,
+     * false otherwise.
+     *
+     * isActive is an status that only tells if the current user is
+     * authenticated by the server.
+     * This means, the given login credentials are authorized for this instance
+     * and there is an login session, identified by the login cookie on the
+     * client.
+     *
+     * @return {Boolean} True if the user is authenticated by the server.
+     */
+    isAuthenticated: function()
+    {
+        // End.
+        return this.getUserModel().get('isActive');
+    },
+    /**
+     * COMMENTME
+     */
+    getViewport: function()
+    {
+        // End.
+        return this.viewport;
+    },
+    /**
+     * COMMENTME
+     */
+    getNavigation: function()
+    {
+        // End.
+        return this.navigation
+    },
+    /**
+     * COMMENTME
+     */
+    getSystemModel: function()
+    {
+        // End.
+        return this.systemModel;
+    },
+    /**
+     * COMMENTME
+     */
+    getUserModel: function()
+    {
+        // End.
+        return this.getSystemModel().getUser();
+    },
+    /**
+     * COMMENTME
+     */
+    getPersonModel: function()
+    {
+        // End.
+        return this.getUserModel(); // .getPerson() Get the person model from the userModel
+    },
+    /**
+     * Return a Ext.CompositeElement instance of the application
+     * header logo dom.
+     *
+     * @return Ext.CompositeElement
+     */
+    getLoaderDOM: function()
+    {
+        // End.
+        return Ext.select('#application-header-loader');
+    },
+    /**
+     * Return a Ext.CompositeElement instance of the application
+     * header navigation dom.
+     *
+     * @return Ext.CompositeElement
+     */
+    getNavigationDOM: function()
+    {
+        // End.
+        return Ext.select('#application-header-navigation');
+    },
+    /**
+     * Return a Ext.CompositeElement instance of the application
+     * header user info dom.
+     *
+     * @return Ext.CompositeElement
+     */
+    getUserInfoDOM: function()
+    {
+        // End.
+        return Ext.select('#application-header-userinfo');
+    },
+    /**
+     * Create and action object based on the given URI and dispatch the action
+     * if the user is logged on and the given uri is not ! or empty.
+     *
+     * @param {String} uri The request URI.
+     * @return {Boolean} Void.
+     */
+    doRequest: function(uri)
+    {
+        var action;
+
+        if (!uri || ('!' === uri)) {
+            // End.
+            return false;
+        }
+
+        if (true !== this.isLoggedon()) {
+            this.logoff();
+
+            // End.
+            return false;
+        }
+
+        Ext.History.add(uri, true);
+
+        action = this.getAction(uri);
+
+        this.navigation.highlightTab(uri);
+
+        this.dispatch(action);
+
+        // End.
+        return true;
+    },
+    /**
+     * Log an messages that will form the application debug trace.
+     *
+     * @param {String} msg Debug messages.
+     * @param {Object} dump Debug dump object.
+     * @return {Booleand} Void
+     */
+    debug: function(msg, dump)
+    {
+        dump = dump || {
+        };
+        // TODO SystemInfo Use.
+        Ext.Array.insert(this.systemInfo.debug, Ext.Date.now(), [{
+                time: Ext.Date.now(),
+                msg: msg,
+                dump: dump
+            }]);
+
+        console.info(msg/*, dump*/);
+
+        // End.
+        return true;
+    },
+    /**
+     * Application methos.
+     * Do not call these methods from somewhere else than this application class
+     * unless absolutely necessary.
+     */
+
+    /**
+     * Load the system information model, once loaded the given callback method
+     * will be called with the systemModel as argument.
+     *
+     * @param {Function} callback
+     * @return {Booleand} Void
+     */
+    loadSystemInfo: function(callback)
+    {
+        this.debug('Load system info.');
+
+        var operation = new Ext.data.Operation({
+            action: 'read'
+        });
+
+        this.getSystemModel().getProxy().read(operation, function(operation)
+        {
+            if (operation.wasSuccessful()) {
+                var systemModel = operation.getRecords()[0];
+                // Copy all event times and debug logs to the new system model.
+                systemModel.set('bootTime', this.getSystemModel().get('bootTime'));
+                systemModel.set('logonTime', this.getSystemModel().get('logonTime'));
+                systemModel.set('logoffTime', this.getSystemModel().get('logoffTime'));
+                systemModel.set('bebug', this.getSystemModel().get('bebug'));
+
+                // Replace the systemModel.
+                this.systemModel = systemModel;
+            }
+
+            Ext.callback(callback, this, [this.getSystemModel()]);
+
+        }, this);
+
+        // End.
+        return true;
+    },
+    /**
+     * Calls the systemModel save method.
+     * This method will save the current data in the system model to the server.
+     *
+     * @returns {Booleand} Void
+     */
+    saveSystemInfo: function()
+    {
+        this.debug('Save system info.');
+
+        this.getSystemModel().save();
+
+        // End.
+        return true;
+    },
+    /**
+     * If the user is authenticated by the server
+     *
+     * @return {Boolean} Void
+     */
+    logon: function()
+    {
+        var logon = function()
+        {
+            this.debug('System logon.');
+
+            this.systemModel.set('logonTime', Ext.Date.now());
+
+            this.buildNavigation();
+
+            this.buildUserInfo();
+
+            this.loggedon = true;
+
+            // TODO get the logonAction from the systemInfo and dispatch it.
+            this.doRequest(
+                    Ext.History.getToken()
+                    );
+        };
+
+        this.resetLogoffTimer();
+
+        this.loadSystemInfo(function()
+        {
+            if (this.isAuthenticated()) {
+                logon.call(this);
+            } else {
+                this.logoff();
+            }
+
+        });
+
+        // End.
+        return true;
+    },
+    /**
+     * Abort all load calls, reset the system information, set the
+     * isAuthenticated and isLoggedOn flags to false, delete the navigationDOM
+     * and userInfoDOM and call the application.authentication.login action that
+     * will ask the server to destroy the login session and show an login window
+     *
+     * @param {String} msg Pre logoff message.
+     * @return {Boolean} Void
+     */
+    preLogoff: function(msg)
+    {
+        this.debug('System pre-logoff.');
+
+        var loginAction = {
+            module: 'application',
+            controller: 'authentication',
+            action: 'login',
+            args: {
+                msg: Ext.isString(msg)
+                        ? msg
+                        : undefined
+            }
+        };
+
+        this.tasks.preLogoff.cancel();
+
+        this.dispatch(loginAction);
+
+        // End.
+        return true;
+    },
+    /**
+     * Abort all load calls, reset the system information, set the
+     * isAuthenticated and isLoggedOn flags to false, delete the navigationDOM
+     * and userInfoDOM and call the application.authentication.login action that
+     * will ask the server to destroy the login session and show an login window
+     *
+     * @param {String} msg Logoff message.
+     * @return {Boolean} Void
+     */
+    logoff: function(msg)
+    {
+        this.debug('System logoff.');
+
+        var openWindows = Ext.ComponentQuery.query('window');
+        var loginAction = {
+            module: 'application',
+            controller: 'authentication',
+            action: 'login',
+            args: {
+                logoutFirst: true,
+                msg: Ext.isString(msg)
+                        ? msg
+                        : undefined
+            }
+        };
+
+        Ext.Ajax.abortAll();
+
+        this.getNavigationDOM()
+                .hide()
+                .setHTML('<li></li>');
+
+        this.getUserInfoDOM()
+                .hide()
+                .setHTML('');
+
+        this.getViewport().down('[region=center]').removeAll();
+
+        Ext.each(openWindows, function(window) {
+            if (window.rendered) {
+                window.close();
+            }
+        }, this);
+
+        this.getSystemModel().set('logoffTime', Ext.Date.now());
+        this.getSystemModel().save();
+
+        this.tasks.preLogoff.cancel();
+        this.tasks.logoff.cancel();
+
+        this.dispatch(loginAction);
+
+        // End.
+        return true;
+    },
+    /**
+     * Dispatch the given action object.
+     * If either the Module, Controller or Action does not exists an exception
+     * will be thrown.
+     *
+     * @param {Object} action This action object contains the module, controller
+     * and action name.
+     * @return {Boolean} Void
+     */
+    dispatch: function(action)
+    {
+        this.debug('New action dispatched:', action);
+
+        var moduleName = Ext.String.uncapitalize(action.module);
+        var controllerName = Ext.String.capitalize(action.controller);
+        var moduleControllerName = moduleName + '.' + controllerName;
+        var actionName = Ext.String.uncapitalize(action.action) + 'Action';
+        var controller = this.controllers.get(moduleControllerName);
+
+        if (undefined === controller || undefined === controller[actionName]) {
+            Ext.Error.raise({
+                title: 'Application dispatch error.',
+                msg: 'Could not dispatch action ' + controllerName + '.' +
+                        actionName + '.'
+            });
+        }
+
+        // Call the module controller action.
+        controller[actionName](action.args);
+
+        // End.
+        return true;
+    },
+    /**
+     * Inject the navigation HTML in the navigation container and initialize the
+     * navigation call.
+     *
+     * @return {Booleand} Void
+     */
+    buildNavigation: function()
+    {
+        var nagigationHTML = this.getSystemModel().get('navigation');
+
+        this.getNavigationDOM().setHTML(nagigationHTML);
+
+        this.navigation.init();
+
+        this.getNavigationDOM().show(true);
+
+        // End.
+        return true;
+    },
+    /**
+     * COMMENTME
+     *
+     * @return {Booleand} Void
+     */
+    buildUserInfo: function()
+    {
+        var imageId = Ext.id();
+        var fullnameId = Ext.id();
+        var logoffId = Ext.id();
+        var settingsId = Ext.id();
+//        var personModel = this.systemInfo.personModel;
+        var userInfo = new Ext.Template(
+                '<img src="{src}" alt="{fullname}" id={imageId} height="41" width="41" />' +
+                '<p id="{fullnameId}">{fullname}</p>' +
+                '<span id="{logoffId}"><span class="application-icon icon-lock"></span>Logoff</span> ' +
+                '<span id="{settingsId}"><span class="application-icon icon-settings"></span>Settings</span>'
+                );
+
+//        userInfo = userInfo.apply({
+//            src: personModel.get('image'),
+//            fullname: personModel.get('fullname'),
+//            imageId: imageId,
+//            fullnameId: fullnameId,
+//            logoffId: logoffId,
+//            settingsId: settingsId
+//        });
+
+        this.getUserInfoDOM().setHTML(userInfo).show(true);
+
+        // Define click handlers.
+//        Ext.fly(logoffId).on('click', this.logoff, this);
+
+//        Ext.fly(settingsId).on('click', function()
+//        {
+//            var settingsAction = {
+//                module: 'account',
+//                controller: 'settings',
+//                action: 'startup'
+//            };
+//
+//            this.dispatch(settingsAction);
+//
+//            // End.
+//            return;
+//        }, this);
+
+    },
+    /**
+     * Cancel and reset the logoff and preLogoff delayed tasks.
+     *
+     * @returns {Booleand} Void
+     */
+    resetLogoffTimer: function()
+    {
+        var preLogoffTime = ((60 * 1000) * 30); // 30 min.
+        var logoffTime = ((60 * 1000) * 45); // 45 min.
+
+        this.tasks.preLogoff.cancel();
+        this.tasks.preLogoff.delay(preLogoffTime);
+
+        this.tasks.logoff.cancel();
+        this.tasks.logoff.delay(logoffTime);
+
+        // End.
+        return true;
+
+    },
+    /**
+     * Create an dispatchable action object based on the given URI.
+     * If the URI does not cover all expected action segments, segments from the
+     * default action will be used.
+     *
+     * @param {String} uri description
+     * @returns {Boolean} Void
+     */
+    getAction: function(uri)
+    {
+        var segments;
+        var segment;
+        var segmentsMatchingRegex = new RegExp(/\/([0-9A-Za-z\_]*)/g);
+        var action = {
+            module: 'application',
+            controller: 'dashboard',
+            action: 'startup',
+            args: {
+            }
+        };
+
+        uri = '/' + uri;
+        uri = uri.replace(/^\/\//, '/');
+
+        segments = uri.match(segmentsMatchingRegex) || [];
+
+        Ext.Array.each(segments, function(value, key)
+        {
+            segments[key] = value.replace(/^\//, '');
+        });
+
+        Ext.Object.each(action, function(key)
+        {
+            if ('args' === key) {
+                // End.
+                return false;
+            }
+
+            segment = segments.splice(0, 1).toString();
+
+            if (segment) {
+                action[key] = segment;
+            }
+        });
+
+        if (segments) {
+            action['args'] = segments;
+        }
+
+        // End.
+        return action;
+
+    },
+    /**
+     * Init methods.
+     * Treat this methods as private.
+     */
+
+    /**
      * Configure a default error message and initialize an error listener that
      * will display all thrown errors in a messages box.
      *
@@ -197,6 +728,8 @@ Ext.application({
      */
     initErrorHandler: function()
     {
+        this.debug('Initialize error handler.');
+
         var self = this;
         var errorDefault = {
             scope: this,
@@ -217,8 +750,7 @@ Ext.application({
             fn: function(buttonId)
             {
                 if ('yes' === buttonId) {
-                    // Reload the application.
-                    window.location.replace('/#!');
+                    window.location.href = '/';
                 }
 
                 if ('no' === buttonId) {
@@ -261,12 +793,15 @@ Ext.application({
      */
     initLoadListner: function()
     {
+        this.debug('Initialize load listner.');
+
         this.getLoaderDOM().hide();
 
         Ext.Ajax.disableCaching = true;
         Ext.Ajax.disableCachingParam = '_';
         Ext.Ajax.method = 'GET';
-        Ext.Ajax.extraParams = {};
+        Ext.Ajax.extraParams = {
+        };
 
         /**
          * Reset the logoff timer.
@@ -323,13 +858,13 @@ Ext.application({
                 case 401:
                     // System logout.
                     this.logoff(
-                        'You are not authenticated by the server anymore.'
-                        );
+                            'You are not authenticated by the server anymore.'
+                            );
                     break;
                 default:
                     this.debug('Request exception:', {
                         contentLength: response.getResponseHeader(
-                            'content-length'),
+                                'content-length'),
                         status: response.status,
                         url: options.url
                     });
@@ -353,6 +888,8 @@ The server didn\'t answered with the expected data.'
      */
     initUriListner: function()
     {
+        this.debug('Initialize URI listner.');
+
         Ext.History.init();
 
         Ext.History.on('change', this.doRequest, this);
@@ -371,6 +908,8 @@ The server didn\'t answered with the expected data.'
      */
     initTasks: function()
     {
+        this.debug('Initialize tasks.');
+
         this.tasks.preLogoff = new Ext.util.DelayedTask(function() {
             this.preLogoff('Pre logoff test.');
         }, this);
@@ -381,465 +920,5 @@ The server didn\'t answered with the expected data.'
 
         // End.
         return true;
-    },
-    /**
-     * Create and action object based on the given or current URI and dispatch
-     * the action object if an user is logged on.
-     *
-     * @param {String} uri The request URI.
-     * @return {Boolean} Void.
-     */
-    doRequest: function(uri)
-    {
-        var action;
-
-        if (true !== this.isLoggedon) {
-            this.logoff();
-
-            // End.
-            return false;
-        }
-
-        // TODO Ask the system settings what to do if ! == uri on doRequest.
-        if ('!' === uri) {
-            // End.
-            return false;
-        }
-
-        // TODO Get the default action from the systemModel.
-//        action = this.systemInfo.settingsModel.get('action');
-
-//        console.log(action);
-
-        if (uri) {
-            Ext.History.add(uri, true);
-
-            action = this.getAction(uri);
-
-            this.navigation.highlightTab(uri);
-        }
-
-        this.dispatch(action);
-
-        // End.
-        return true;
-    },
-    /**
-     * Create an dispatchable action object based on the given URI.
-     * If the URI does not cover all expected action segments, segments from the
-     * default action will be used.
-     *
-     * @param {String} uri description
-     * @returns {Boolean} Void
-     */
-    getAction: function(uri)
-    {
-        var segments, segment,
-            segmentsMatchingRegex = new RegExp(/\/([0-9A-Za-z\_]*)/g);
-        var action = {
-            module: 'application',
-            controller: 'startup',
-            action: 'startup',
-            args: {}
-        };
-
-        uri = '/' + uri;
-        uri = uri.replace(/^\/\//, '/');
-
-        segments = uri.match(segmentsMatchingRegex) || [];
-
-        Ext.Array.each(segments, function(value, key)
-        {
-            segments[key] = value.replace(/^\//, '');
-        });
-
-        Ext.Object.each(action, function(key)
-        {
-            if ('args' === key) {
-                // End.
-                return false;
-            }
-
-            segment = segments.splice(0, 1).toString();
-
-            if (segment) {
-                action[key] = segment;
-            }
-        });
-
-        if (segments) {
-            action['args'] = segments;
-        }
-
-        // End.
-        return action;
-
-    },
-    /**
-     * Dispatch the given action object.
-     * If either the Module, Controller or Action does not exists an exception
-     * will be thrown.
-     *
-     * @param {Object} action This action object contains the module, controller
-     * and action name.
-     * @return {Boolean} Void
-     */
-    dispatch: function(action)
-    {
-        this.debug('New action dispatched:', action);
-
-        var moduleName = Ext.String.uncapitalize(action.module),
-            controllerName = Ext.String.capitalize(action.controller),
-            moduleControllerName = moduleName + '.' + controllerName,
-            actionName = Ext.String.uncapitalize(action.action) + 'Action',
-            controller = this.controllers.get(moduleControllerName);
-
-        if (undefined === controller || undefined === controller[actionName]) {
-            Ext.Error.raise({
-                title: 'Application dispatch error.',
-                msg: 'Could not dispatch action ' + controllerName + '.' +
-                    actionName + '.'
-            });
-        }
-
-        // Call the module controller action.
-        controller[actionName](action.args);
-
-        // End.
-        return true;
-    },
-    /**
-     * Abort all load calls, reset the system information, set the
-     * isAuthenticated and isLoggedOn flags to false, delete the navigationDOM
-     * and userInfoDOM and call the application.authentication.login action that
-     * will ask the server to destroy the login session and show an login window
-     *
-     * @param {String} msg Logoff message.
-     * @return {Boolean} Void
-     */
-    logoff: function(msg)
-    {
-        this.debug('Application logoff.');
-
-        var openWindows = Ext.ComponentQuery.query('window');
-        var loginAction = {
-            module: 'application',
-            controller: 'authentication',
-            action: 'login',
-            args: {
-                logoutFirst: true,
-                msg: Ext.isString(msg)
-                    ? msg
-                    : undefined
-            }
-        };
-
-        Ext.Ajax.abortAll();
-
-        this.getNavigationDOM()
-            .hide()
-            .setHTML('<li></li>');
-
-        this.getUserInfoDOM()
-            .hide()
-            .setHTML('');
-
-        this.viewport.down('[region=center]').removeAll();
-
-        Ext.each(openWindows, function(window) {
-            if (window.rendered) {
-                window.close();
-            }
-        }, this);
-
-        this.systemModel.set('logoffTime', Ext.Date.now());
-        this.systemModel.save();
-
-        this.tasks.preLogoff.cancel();
-        this.tasks.logoff.cancel();
-
-        this.dispatch(loginAction);
-
-        // End.
-        return true;
-    },
-    /**
-     * Abort all load calls, reset the system information, set the
-     * isAuthenticated and isLoggedOn flags to false, delete the navigationDOM
-     * and userInfoDOM and call the application.authentication.login action that
-     * will ask the server to destroy the login session and show an login window
-     *
-     * @param {String} msg Pre logoff message.
-     * @return {Boolean} Void
-     */
-    preLogoff: function(msg)
-    {
-        this.debug('Application preLogoff.');
-
-        this.tasks.preLogoff.cancel();
-
-        var loginAction = {
-            module: 'application',
-            controller: 'authentication',
-            action: 'login',
-            args: {
-                msg: Ext.isString(msg)
-                    ? msg
-                    : undefined
-            }
-        };
-
-        this.dispatch(loginAction);
-
-        // End.
-        return true;
-    },
-    /**
-     * If the user is authenticated by the server
-     *
-     * @return {Boolean} Void
-     */
-    logon: function()
-    {
-        var logon = function()
-        {
-            this.debug('Application logon.');
-
-            this.systemModel.set('logonTime', Ext.Date.now());
-
-            this.buildNavigation();
-
-            this.buildUserInfo();
-
-            this.isLoggedon = true;
-
-            // TODO get the logonAction from the systemInfo and dispatch it.
-            this.doRequest(
-                Ext.History.getToken()
-                );
-        };
-
-        this.loadSystemInfo(function()
-        {
-            if (this.isAuthenticated()) {
-                logon.call(this);
-            } else {
-                this.logoff();
-            }
-
-        });
-
-        this.resetLogoffTimer();
-
-        // End.
-        return true;
-    },
-    /**
-     * Inject the navigation HTML in the navigation container and initialize the
-     * navigation call.
-     *
-     * @return {Booleand} Void
-     */
-    buildNavigation: function()
-    {
-        var nagigationHTML = this.systemModel.get('navigation');
-
-        this.getNavigationDOM().setHTML(nagigationHTML);
-
-        this.navigation.init();
-
-        this.getNavigationDOM().show(true);
-
-        // End.
-        return true;
-    },
-    /**
-     * COMMENTME
-     *
-     * @return {Booleand} Void
-     */
-    buildUserInfo: function()
-    {
-        var imageId = Ext.id(),
-            fullnameId = Ext.id(),
-            logoffId = Ext.id(),
-            settingsId = Ext.id();
-        // TODO SystemInfo Use.
-//        var personModel = this.systemInfo.personModel;
-        var userInfo = new Ext.Template(
-            '<img src="{src}" alt="{fullname}" id={imageId} height="41" width="41" />' +
-            '<p id="{fullnameId}">{fullname}</p>' +
-            '<span id="{logoffId}"><span class="application-icon icon-lock"></span>Logoff</span> ' +
-            '<span id="{settingsId}"><span class="application-icon icon-settings"></span>Settings</span>'
-            );
-
-//        userInfo = userInfo.apply({
-//            src: personModel.get('image'),
-//            fullname: personModel.get('fullname'),
-//            imageId: imageId,
-//            fullnameId: fullnameId,
-//            logoffId: logoffId,
-//            settingsId: settingsId
-//        });
-
-        this.getUserInfoDOM().setHTML(userInfo).show(true);
-
-        // Define click handlers.
-//        Ext.fly(logoffId).on('click', this.logoff, this);
-
-//        Ext.fly(settingsId).on('click', function()
-//        {
-//            var settingsAction = {
-//                module: 'account',
-//                controller: 'settings',
-//                action: 'startup'
-//            };
-//
-//            this.dispatch(settingsAction);
-//
-//            // End.
-//            return;
-//        }, this);
-
-    },
-    /**
-     * Log an messages that will form the application debug trace.
-     *
-     * @param {String} msg Debug messages.
-     * @param {Object} dump Debug dump object.
-     * @return {Booleand} Void
-     */
-    debug: function(msg, dump)
-    {
-        dump = dump || {};
-        // TODO SystemInfo Use.
-        Ext.Array.insert(this.systemInfo.debug, Ext.Date.now(), [{
-                time: Ext.Date.now(),
-                msg: msg,
-                dump: dump
-            }]);
-
-        console.info(msg/*, dump*/);
-
-        // End.
-        return true;
-    },
-    /**
-     * Load the system information model, once loaded the given callback method
-     * will be called with the systemModel as argument.
-     *
-     * @param {Function} callback
-     * @return {Booleand} Void
-     */
-    loadSystemInfo: function(callback)
-    {
-        var operation = new Ext.data.Operation({
-            action: 'read'
-        });
-
-        this.systemModel.getProxy().read(operation, function(operation)
-        {
-            var systemModel = operation.getRecords()[0];
-            // Copy all event times and debug logs to the new system model.
-            systemModel.set('bootTime', this.systemModel.get('bootTime'));
-            systemModel.set('logonTime', this.systemModel.get('logonTime'));
-            systemModel.set('logoffTime', this.systemModel.get('logoffTime'));
-            systemModel.set('bebug', this.systemModel.get('bebug'));
-
-            this.systemModel = systemModel;
-
-            Ext.callback(callback, this, [this.systemModel]);
-
-        }, this);
-
-        // End.
-        return true;
-    },
-    /**
-     * COMMENTME
-     *
-     * @returns {Booleand} Void
-     */
-    saveSystemInfo: function()
-    {
-        this.systemModel.save();
-
-        // End.
-        return true;
-    },
-    /**
-     * Helper methods.
-     */
-
-    /**
-     * Cancel and reset the logoff and preLogoff delayed tasks.
-     *
-     * @returns {Booleand} Void
-     */
-    resetLogoffTimer: function()
-    {
-        var preLogoffTime = ((60 * 1000) * 30), // 30 min.
-            logoffTime = ((60 * 1000) * 45); // 45 min.
-
-        this.tasks.preLogoff.cancel();
-        this.tasks.preLogoff.delay(preLogoffTime);
-
-        this.tasks.logoff.cancel();
-        this.tasks.logoff.delay(logoffTime);
-
-        // End.
-        return true;
-
-    },
-    /**
-     * Returns a boolean true if the user is authenticated by the server,
-     * false otherwise.
-     *
-     * Is authenticated is an status that only tells the current user is
-     * authenticated by the server.
-     * This means, the given login credentials are authorized for this instance
-     * and there is an login session, identified by the login cookie on the
-     * client.
-     *
-     * @return {Boolean} True if the user is authenticated by the server.
-     */
-    isAuthenticated: function()
-    {
-        // End.
-        // TODO get the isAuthenticated data from the systemModel.
-        return true;
-    },
-    /**
-     * Return a Ext.CompositeElement instance of the application
-     * header logo dom.
-     *
-     * @return Ext.CompositeElement
-     */
-    getLoaderDOM: function()
-    {
-        // End.
-        return Ext.select('#application-header-loader');
-    },
-    /**
-     * Return a Ext.CompositeElement instance of the application
-     * header navigation dom.
-     *
-     * @return Ext.CompositeElement
-     */
-    getNavigationDOM: function()
-    {
-        // End.
-        return Ext.select('#application-header-navigation');
-    },
-    /**
-     * Return a Ext.CompositeElement instance of the application
-     * header user info dom.
-     *
-     * @return Ext.CompositeElement
-     */
-    getUserInfoDOM: function()
-    {
-        // End.
-        return Ext.select('#application-header-userinfo');
     }
 });

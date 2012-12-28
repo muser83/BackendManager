@@ -1,12 +1,12 @@
 /**
- * Users.js
+ * User.js
  * Created on Dec 27, 2012 12:17:48 AM
  *
  * @author    Boy van Moorsel <development@wittestier.nl>
  * @license   -
  * @copyright 2012 witteStier.nl
  */
-Ext.define('App.model.Users', {
+Ext.define('App.model.User', {
     extend: 'Ext.data.Model',
     uses: [
 //        'associated_model_name'
@@ -78,7 +78,7 @@ Ext.define('App.model.Users', {
      */
     proxy: {// Server proxy.
         type: 'ajax',
-        url: '',
+        url: '~system/get-user',
         reader: {// Json reader defaults.
             type: 'json',
             root: 'user',

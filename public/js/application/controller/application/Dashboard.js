@@ -17,7 +17,8 @@ Ext.define('App.controller.application.Dashboard', {
     views: [
 //        'application.dashboard.panel.Dashboard'
     ],
-    listners: {},
+    listners: {
+    },
     /**
      * COMMENTME
      *
@@ -37,6 +38,9 @@ Ext.define('App.controller.application.Dashboard', {
      */
     startupAction: function()
     {
+        var centerRegion = this.getCenterRegion();
+        centerRegion.removeAll();
+
         // End.
         return true;
     }
