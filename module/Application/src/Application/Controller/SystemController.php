@@ -32,8 +32,10 @@ class SystemController
      */
     private $entityManager;
     private $isAuthenticated = true;
-    private $navigation = '<li><a href="#!">Dashboard</a></li>
-<li><a href="tab/1" type="text/html">Tab one</a><ul><li><a href="tab/2" type="text/html">Tab one A</a></li><li><a href="tab/3" type="text/html">Tab one B</a></li></ul></li><li><a href="tab/4" type="text/html" >Tab two</a><ul><li><a href="tab/5" type="text/html">Tab two a</a></li><li><a href="tab/6" type="text/html">Tab two b</a></li></ul></li><li ><a href="tab/7" type="text/html" >Tab three</a><ul><li><a href="tab/8" type="text/html">Tab three a</a></li><li><a href="tab/9" type="text/html">Tab three b</a></li></ul></li>
+    private $navigation = '
+<li>
+<a href="#!">Dashboard</a>
+</li>
 <li>
 <a href="admin">Admin</a>
 <ul>
@@ -49,6 +51,24 @@ class SystemController
             'items' => array(
                 '<b><div>Dashboard</div></b>',
                 '-'
+            )
+        ),
+        'adminUsers' => array(
+            'items' => array(
+                '<b><div>Users</div></b>',
+                '-',
+                array('text' => 'Add', 'action' => 'add'),
+                array('text' => 'Edit', 'action' => 'edit'),
+                array('text' => 'Delete', 'action' => 'delete')
+            )
+        ),
+        'adminRoles' => array(
+            'items' => array(
+                '<b><div>Roles</div></b>',
+                '-',
+                array('text' => 'Add', 'action' => 'add'),
+                array('text' => 'Edit', 'action' => 'edit'),
+                array('text' => 'Delete', 'action' => 'delete')
             )
         ),
         'adminCountries' => array(
@@ -71,7 +91,16 @@ class SystemController
                 array('text' => 'Delete', 'action' => 'delete'),
                 array('text' => 'Languages', 'action' => 'languages')
             )
-        )
+        ),
+        'adminTranslate' => array(
+            'items' => array(
+                '<b><div>Translate</div></b>',
+                '-',
+                array('text' => 'Add', 'action' => 'add'),
+                array('text' => 'Edit', 'action' => 'edit'),
+                array('text' => 'Delete', 'action' => 'delete')
+            )
+        ),
     );
     private $settings = array(
         'defaultAction' => array(

@@ -6,6 +6,8 @@
  * @license   -
  * @copyright 2012 witteStier.nl
  */
+
+
 Ext.define('App.controller.admin.Roles', {
     extend: 'App.controller.Abstract',
     models: [
@@ -15,9 +17,10 @@ Ext.define('App.controller.admin.Roles', {
 //        'admin.Roles'
     ],
     views: [
-//        'admin.roles.grid.Roles'
+        'admin.roles.grid.Roles'
     ],
-    listners: {},
+    listners: {
+    },
     /**
      * COMMENTME
      *
@@ -37,6 +40,10 @@ Ext.define('App.controller.admin.Roles', {
      */
     startupAction: function()
     {
+        var rolesGrid = this.getAdminRolesGridRolesView().create();
+
+        this.addToCenter(rolesGrid);
+
         // End.
         return true;
     }

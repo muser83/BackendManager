@@ -108,7 +108,7 @@ Ext.application({
         'admin.Locales',
         'admin.Roles',
         'admin.Translate',
-//        'admin.Users'
+        'admin.Users'
     ],
     /**
      * Array of models to require from AppName.model namespace.
@@ -437,8 +437,8 @@ Ext.application({
 
             // TODO get the logonAction from the systemInfo and dispatch it.
             this.doRequest(
-                    Ext.History.getToken()
-                    );
+                Ext.History.getToken()
+                );
         };
 
         this.resetLogoffTimer();
@@ -475,8 +475,8 @@ Ext.application({
             action: 'login',
             args: {
                 msg: Ext.isString(msg)
-                        ? msg
-                        : undefined
+                    ? msg
+                    : undefined
             }
         };
 
@@ -508,20 +508,20 @@ Ext.application({
             args: {
                 logoutFirst: true,
                 msg: Ext.isString(msg)
-                        ? msg
-                        : undefined
+                    ? msg
+                    : undefined
             }
         };
 
         Ext.Ajax.abortAll();
 
         this.getNavigationDOM()
-                .hide()
-                .setHTML('<li></li>');
+            .hide()
+            .setHTML('<li></li>');
 
         this.getUserInfoDOM()
-                .hide()
-                .setHTML('');
+            .hide()
+            .setHTML('');
 
         this.getViewport().down('[region=center]').removeAll();
 
@@ -565,7 +565,7 @@ Ext.application({
             Ext.Error.raise({
                 title: 'Application dispatch error.',
                 msg: 'Could not dispatch action ' + controllerName + '.' +
-                        actionName + '.'
+                    actionName + '.'
             });
         }
 
@@ -607,11 +607,11 @@ Ext.application({
         var settingsId = Ext.id();
 //        var personModel = this.systemInfo.personModel;
         var userInfo = new Ext.Template(
-                '<img src="{src}" alt="{fullname}" id={imageId} height="41" width="41" />' +
-                '<p id="{fullnameId}">{fullname}</p>' +
-                '<span id="{logoffId}"><span class="application-icon icon-lock"></span>Logoff</span> ' +
-                '<span id="{settingsId}"><span class="application-icon icon-settings"></span>Settings</span>'
-                );
+            '<img src="{src}" alt="{fullname}" id={imageId} height="41" width="41" />' +
+            '<p id="{fullnameId}">{fullname}</p>' +
+            '<span id="{logoffId}"><span class="application-icon icon-lock"></span>Logoff</span> ' +
+            '<span id="{settingsId}"><span class="application-icon icon-settings"></span>Settings</span>'
+            );
 
 //        userInfo = userInfo.apply({
 //            src: personModel.get('image'),
@@ -858,13 +858,13 @@ Ext.application({
                 case 401:
                     // System logout.
                     this.logoff(
-                            'You are not authenticated by the server anymore.'
-                            );
+                        'You are not authenticated by the server anymore.'
+                        );
                     break;
                 default:
                     this.debug('Request exception:', {
                         contentLength: response.getResponseHeader(
-                                'content-length'),
+                            'content-length'),
                         status: response.status,
                         url: options.url
                     });

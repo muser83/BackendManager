@@ -15,9 +15,10 @@ Ext.define('App.controller.admin.Translate', {
 //        'admin.Translate'
     ],
     views: [
-//        'admin.translate.grid.Translate'
+        'admin.translate.grid.Translate'
     ],
-    listners: {},
+    listners: {
+    },
     /**
      * COMMENTME
      *
@@ -37,6 +38,10 @@ Ext.define('App.controller.admin.Translate', {
      */
     startupAction: function()
     {
+        var translateGrid = this.getAdminTranslateGridTranslateView().create();
+
+        this.addToCenter(translateGrid);
+
         // End.
         return true;
     }

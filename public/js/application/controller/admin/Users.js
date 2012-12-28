@@ -1,23 +1,24 @@
 /**
- * Settings.js
- * Created on Nov 5, 2012 11:17:56 PM
+ * Users.js
+ * Created on Dec 28, 2012 5:29:22 PM
  *
  * @author    Boy van Moorsel <development@wittestier.nl>
  * @license   -
  * @copyright 2012 witteStier.nl
  */
-Ext.define('App.controller.account.Settings', {
+Ext.define('App.controller.admin.Users', {
     extend: 'App.controller.Abstract',
     models: [
-//        'account.Settings'
+//        'admin.Users'
     ],
     stores: [
-//        'account.Settings'
+//        'admin.Users'
     ],
     views: [
-//        'account.settings.form.Settings'
+        'admin.users.grid.Users'
     ],
-    listners: {},
+    listners: {
+    },
     /**
      * COMMENTME
      *
@@ -37,6 +38,10 @@ Ext.define('App.controller.account.Settings', {
      */
     startupAction: function()
     {
+        var translateGrid = this.getAdminUsersGridUsersView().create();
+
+        this.addToCenter(translateGrid);
+
         // End.
         return true;
     }
