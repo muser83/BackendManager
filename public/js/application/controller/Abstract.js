@@ -46,8 +46,11 @@ Ext.define('App.controller.Abstract', {
         var toolbarConfig = allToolbarConfig[toolbarName] || {
         };
 
+        Ext.apply(toolbarConfig, {
+        });
+
         view.addDocked(
-            Ext.create('Ext.toolbar.Toolbar', allToolbarConfig[toolbarName])
+            Ext.create('Ext.toolbar.Toolbar', toolbarConfig)
             );
 
         // End.

@@ -605,7 +605,7 @@ Ext.application({
         var fullnameId = Ext.id();
         var logoffId = Ext.id();
         var settingsId = Ext.id();
-//        var personModel = this.systemInfo.personModel;
+        var personModel = this.getPersonModel();
         var userInfo = new Ext.Template(
             '<img src="{src}" alt="{fullname}" id={imageId} height="41" width="41" />' +
             '<p id="{fullnameId}">{fullname}</p>' +
@@ -613,14 +613,14 @@ Ext.application({
             '<span id="{settingsId}"><span class="application-icon icon-settings"></span>Settings</span>'
             );
 
-//        userInfo = userInfo.apply({
-//            src: personModel.get('image'),
-//            fullname: personModel.get('fullname'),
-//            imageId: imageId,
-//            fullnameId: fullnameId,
-//            logoffId: logoffId,
-//            settingsId: settingsId
-//        });
+        userInfo = userInfo.apply({
+            src: personModel.get('image'),
+            fullname: personModel.get('fullname'),
+            imageId: imageId,
+            fullnameId: fullnameId,
+            logoffId: logoffId,
+            settingsId: settingsId
+        });
 
         this.getUserInfoDOM().setHTML(userInfo).show(true);
 

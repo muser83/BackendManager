@@ -40,7 +40,8 @@ body
 
 #application-header
 {
-    background: #7000FF url('../images/layout/header-bg.png') repeat-x top left;
+    background: #1E5E92;
+    border-bottom: 1px solid #99BCE8;
     height:46px;
 }
 
@@ -70,12 +71,12 @@ body
 
 .application-navigation-anchor
 {
-    background:#067ac1 url('../images/layout/nav-bg.png') repeat-x;
+    background:#067AC1 url('../images/layout/nav-bg.png') repeat-x;
     border:1px solid;
-    border-top-color:#067ac1;
+    border-top-color:#067AC1;
     border-right-color:#0067BC;
     border-bottom:none;
-    border-left-color:#067ac1;
+    border-left-color:#067AC1;
     padding:11px 20px 12px 18px;
     display:block;
     color:#FFFFFF;
@@ -110,8 +111,9 @@ body
 .application-navigation-anchor
 {
     background-image: none;
-    border-color: #99BCE8;
     background: -webkit-linear-gradient(top, #ffffff 0%,#dde7f3 57%,#DFE9F5 100%);
+    border-color: #99BCE8;
+    border-bottom: 1px solid #DFE9F5;
     color: #4C4C4C;
     z-index:inherit;
 }
