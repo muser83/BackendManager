@@ -17,7 +17,8 @@ Ext.define('App.controller.admin.Countries', {
     views: [
         'admin.countries.grid.Countries'
     ],
-    listners: {},
+    listners: {
+    },
     /**
      * COMMENTME
      *

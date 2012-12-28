@@ -1,6 +1,6 @@
 /**
  * Dashboard.js
- * Created on Dec 27, 2012 12:17:48 AM
+ * Created on Dec 28, 2012 4:55:35 PM
  *
  * @author    Boy van Moorsel <development@wittestier.nl>
  * @license   -
@@ -11,11 +11,11 @@ Ext.define('App.controller.application.Dashboard', {
     models: [
 //        'application.Dashboard'
     ],
-    store: [
+    stores: [
 //        'application.Dashboard'
     ],
     views: [
-//        'application.dashboard.panel.Dashboard'
+        'application.dashboard.panel.Dashboard'
     ],
     listners: {
     },
@@ -38,10 +38,10 @@ Ext.define('App.controller.application.Dashboard', {
      */
     startupAction: function()
     {
-        var centerRegion = this.getCenterRegion();
-        centerRegion.removeAll();
+        var dashboardPanel = this.getApplicationDashboardPanelDashboardView()
+            .create();
 
-        // End.
+        this.addToCenter(dashboardPanel);
         return true;
     }
 

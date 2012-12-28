@@ -15,7 +15,8 @@ Ext.define('App.controller.Abstract', {
             ref: 'SouthRegion',
             selector: '[region=south]'
         }],
-    listners: {},
+    listners: {
+    },
     /**
      * COMMENTME
      *
@@ -42,7 +43,8 @@ Ext.define('App.controller.Abstract', {
     {
         var allToolbarConfig = this.application.systemModel.get('toolbar');
         var toolbarName = this.self.getName().replace(/\.|App.controller/g, '');
-        var toolbarConfig = allToolbarConfig[toolbarName] || {};
+        var toolbarConfig = allToolbarConfig[toolbarName] || {
+        };
 
         view.addDocked(
             Ext.create('Ext.toolbar.Toolbar', allToolbarConfig[toolbarName])

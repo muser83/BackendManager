@@ -45,6 +45,12 @@ class SystemController
 </ul>
 </li>';
     private $toolbar = array(
+        'applicationDashboard' => array(
+            'items' => array(
+                '<b><div>Dashboard</div></b>',
+                '-'
+            )
+        ),
         'adminCountries' => array(
             'items' => array(
                 '<b><div>Countries</div></b>',
