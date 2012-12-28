@@ -9,28 +9,28 @@
 Ext.define('App.model.application.System', {
     extend: 'Ext.data.Model',
     uses: [
-        'App.model.Users'
+        'App.model.User'
     ],
     hasOne: [{
-            model: 'App.model.Users',
-            getterName: 'getUsers',
-            setterName: 'setUsers',
-            associationKey: 'users',
-            foreignKey: 'users_id',
+            model: 'App.model.User',
+            getterName: 'getUser',
+            setterName: 'setUser',
+            associationKey: 'user',
+            foreignKey: 'user_id',
             primaryKey: 'id'
         }],
 //    validations: [],
     fields: [{
             name: 'bootTime',
-            type: 'date',
+            type: 'int',
             defaultValue: 0
         }, {
             name: 'logonTime',
-            type: 'date',
+            type: 'int',
             defaultValue: 0
         }, {
             name: 'logoffTime',
-            type: 'date',
+            type: 'int',
             defaultValue: 0
         }, {
             name: 'navigation',
@@ -41,11 +41,13 @@ Ext.define('App.model.application.System', {
             name: 'toolbar',
             type: 'object',
             persist: false,
-            defaultValue: {}
+            defaultValue: {
+            }
         }, {
             name: 'bebug',
             type: 'object',
-            defaultValue: {}
+            defaultValue: {
+            }
         }],
     proxy: {
         type: 'ajax',
