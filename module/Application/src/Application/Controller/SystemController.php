@@ -12,6 +12,7 @@
 namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController,
+    Zend\Json\Json,
     Zend\View\Model\JsonModel,
     Doctrine\ORM\EntityManager;
 
@@ -172,6 +173,24 @@ class SystemController
      */
     public function indexAction()
     {
+        $request = $this->getRequest();
+
+        if ($request->isPost()) {
+            $systemData = Json::decode(
+                    $request->getPost('system', '{}'), Json::TYPE_ARRAY
+            );
+
+            // End.
+            return new JsonModel(
+                array(
+                'success' => $this->isAuthenticated,
+                'system' => $systemData
+                )
+            );
+        }
+
+
+
         $user = $this->user;
         $user['person'] = $this->person;
 

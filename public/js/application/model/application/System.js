@@ -45,9 +45,8 @@ Ext.define('App.model.application.System', {
             }
         }, {
             name: 'bebug',
-            type: 'object',
-            defaultValue: {
-            }
+            type: 'array',
+            defaultValue: []
         }],
     proxy: {
         type: 'ajax',
@@ -62,7 +61,7 @@ Ext.define('App.model.application.System', {
             nameProperty: 'name',
             writeAllFields: true,
             allowSingle: true,
-            encode: false,
+            encode: true,
             root: 'system',
             getRecordData: function(record) {
                 Ext.apply(record.data, record.getAssociatedData());

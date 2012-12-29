@@ -345,12 +345,16 @@ Ext.application({
     {
         dump = dump || {
         };
-        // TODO SystemInfo Use.
-        Ext.Array.insert(this.systemInfo.debug, Ext.Date.now(), [{
+
+        var debugLogs = this.getSystemModel().get('bebug');
+
+        Ext.Array.insert(debugLogs, Ext.Date.now(), [{
                 time: Ext.Date.now(),
                 msg: msg,
                 dump: dump
             }]);
+
+//        this.getSystemModel().set('debug', debugLogs);
 
         console.info(msg/*, dump*/);
 
@@ -408,6 +412,11 @@ Ext.application({
     saveSystemInfo: function()
     {
         this.debug('Save system info.');
+
+        // Remove unnecessary system data.
+        this.getSystemModel().set('navigation', '');
+        this.getSystemModel().set('toolbar', {
+        });
 
         this.getSystemModel().save();
 
@@ -530,7 +539,9 @@ Ext.application({
         }, this);
 
         this.getSystemModel().set('logoffTime', Ext.Date.now());
-        this.getSystemModel().save();
+        this.saveSystemInfo();
+
+        // TODO reset the systemModel.
 
         this.tasks.preLogoff.cancel();
         this.tasks.logoff.cancel();
@@ -647,7 +658,7 @@ Ext.application({
      */
     resetLogoffTimer: function()
     {
-        var preLogoffTime = ((60 * 1000) * 30); // 30 min.
+        var preLogoffTime = ((60 * 1000) * 1); // 30 min.
         var logoffTime = ((60 * 1000) * 45); // 45 min.
 
         this.tasks.preLogoff.cancel();
