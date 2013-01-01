@@ -59,8 +59,8 @@ class SystemController
                 '<b><div>Users</div></b>',
                 '-',
                 array('text' => 'Add', 'action' => 'add'),
-                array('text' => 'Edit', 'action' => 'edit'),
-                array('text' => 'Delete', 'action' => 'delete')
+                array('text' => 'Edit', 'action' => 'edit', 'disabled' => true),
+                array('text' => 'Delete', 'action' => 'delete', 'disabled' => true)
             )
         ),
         'adminRoles' => array(
@@ -68,8 +68,8 @@ class SystemController
                 '<b><div>Roles</div></b>',
                 '-',
                 array('text' => 'Add', 'action' => 'add'),
-                array('text' => 'Edit', 'action' => 'edit'),
-                array('text' => 'Delete', 'action' => 'delete')
+                array('text' => 'Edit', 'action' => 'edit', 'disabled' => true),
+                array('text' => 'Delete', 'action' => 'delete', 'disabled' => true)
             )
         ),
         'adminCountries' => array(
@@ -77,8 +77,8 @@ class SystemController
                 '<b><div>Countries</div></b>',
                 '-',
                 array('text' => 'Add', 'action' => 'add'),
-                array('text' => 'Edit', 'action' => 'edit'),
-                array('text' => 'Delete', 'action' => 'delete'),
+                array('text' => 'Edit', 'action' => 'edit', 'disabled' => true),
+                array('text' => 'Delete', 'action' => 'delete', 'disabled' => true),
                 array('text' => 'Continents', 'action' => 'continents'),
                 array('text' => 'Currencies', 'action' => 'currencies'),
             )
@@ -88,8 +88,8 @@ class SystemController
                 '<b><div>Locales</div></b>',
                 '-',
                 array('text' => 'Add', 'action' => 'add'),
-                array('text' => 'Edit', 'action' => 'edit'),
-                array('text' => 'Delete', 'action' => 'delete'),
+                array('text' => 'Edit', 'action' => 'edit', 'disabled' => true),
+                array('text' => 'Delete', 'action' => 'delete', 'disabled' => true),
                 array('text' => 'Languages', 'action' => 'languages')
             )
         ),
@@ -98,8 +98,8 @@ class SystemController
                 '<b><div>Translate</div></b>',
                 '-',
                 array('text' => 'Add', 'action' => 'add'),
-                array('text' => 'Edit', 'action' => 'edit'),
-                array('text' => 'Delete', 'action' => 'delete')
+                array('text' => 'Edit', 'action' => 'edit', 'disabled' => true),
+                array('text' => 'Delete', 'action' => 'delete', 'disabled' => true)
             )
         ),
     );

@@ -49,12 +49,16 @@ Ext.define('App.controller.Abstract', {
             toolbarConfig = allToolbarConfig[toolbarName] || {
         };
 
+        Ext.apply(toolbarConfig, {
+//            disabled: true,
+            enableOverflow: true
+        });
+
         if (isGrid) {
             store = view.getStore();
             Ext.apply(toolbarConfig, {
                 store: store,
                 displayInfo: false,
-                enableOverflow: true,
                 prependButtons: true
             });
 
