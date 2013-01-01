@@ -16,8 +16,12 @@ var rowEditingPlugin = Ext.create('Ext.grid.plugin.RowEditing', {
 Ext.define('App.view.admin.countries.grid.Countries', {
     extend: 'Ext.grid.Panel',
     viewConfig: {
-        style: {overflow: 'auto', overflowX: 'hidden'}
+        style: {
+            overflow: 'auto',
+            overflowX: 'hidden'
+        }
     },
+    loadMask: true,
     border: false,
     emptyText: 'No Countries found.',
     columns: [{

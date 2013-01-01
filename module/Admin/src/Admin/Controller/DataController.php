@@ -89,13 +89,19 @@ class DataController
             "Make sure the first argument is an valid Entity name."
             );
         }
+        $criteria = array('isVisible' => true);
+        $orderBy = array('id' => 'ASC');
+        $limit = $this->params()->fromQuery('limit', 25);
+        $offset = $this->params()->fromQuery('start', 0);
 
-        $entities = $this->getEntityManager()->getRepository($entityClass)->findAll();
+        $entities = $this->getEntityManager()->getRepository($entityClass)
+            ->findBy($criteria, $orderBy, $limit, $offset);
 
         return new JsonModel(
             array(
             'success' => true,
             'entity' => $entityName,
+            'total' => 49,
             'data' => EntityHelper::toArrayRecursive($entities),
             )
         );

@@ -40,7 +40,8 @@ Ext.define('App.controller.admin.Countries', {
     {
         var store = this.getAdminCountriesStore().load();
         var countriesGrid = this.getAdminCountriesGridCountriesView().create({
-            store: store
+            store: store,
+//            bbar: this.getPagingToolbar(store)
         });
         var rowEditor = countriesGrid.getPlugin('adminCountriesEditor');
 
@@ -48,7 +49,7 @@ Ext.define('App.controller.admin.Countries', {
             console.log(e.record);
         }, this);
 
-        this.addToCenter(countriesGrid);
+        this.addToCenter(countriesGrid, store);
         // End.
         return true;
     }

@@ -25,8 +25,8 @@ Ext.define('App.controller.Abstract', {
      */
     addToCenter: function(centerView)
     {
-        centerView = this.injectToolbar(centerView);
         var centerRegion = this.getCenterRegion();
+        centerView = this.injectToolbar(centerView);
         centerRegion.removeAll();
         centerRegion.add(centerView);
 
@@ -41,20 +41,46 @@ Ext.define('App.controller.Abstract', {
      */
     injectToolbar: function(view)
     {
-        var allToolbarConfig = this.application.systemModel.get('toolbar');
-        var toolbarName = this.self.getName().replace(/\.|App.controller/g, '');
-        var toolbarConfig = allToolbarConfig[toolbarName] || {
+        var toolbar,
+            store,
+            isGrid = (view.self.getName().indexOf('.grid.') >= 0),
+            allToolbarConfig = this.application.systemModel.get('toolbar'),
+            toolbarName = this.self.getName().replace(/\.|App.controller/g, ''),
+            toolbarConfig = allToolbarConfig[toolbarName] || {
         };
 
-        Ext.apply(toolbarConfig, {
-        });
+        if (isGrid) {
+            store = view.getStore();
+            Ext.apply(toolbarConfig, {
+                store: store,
+                prependButtons: true,
+                displayInfo: false
+            });
 
-        view.addDocked(
-            Ext.create('Ext.toolbar.Toolbar', toolbarConfig)
-            );
+            toolbarConfig.items.push('->');
+
+            toolbar = Ext.create('Ext.PagingToolbar', toolbarConfig);
+        } else {
+            toolbar = Ext.create('Ext.toolbar.Toolbar', toolbarConfig);
+        }
+
+        view.addDocked(toolbar);
 
         // End.
         return view;
+    },
+    /**
+     * COMMENTME
+     * @param {Ext.data.Store} store To the grid binded store.
+     * @return {Ext.PagingToolbar} Configured paging toolbar.
+     */
+    getPagingToolbar: function(store)
+    {
+        // End.
+        return Ext.create('Ext.PagingToolbar', {
+            store: store,
+            displayInfo: true
+        });
     }
 
 });

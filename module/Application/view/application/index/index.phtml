@@ -14,14 +14,3 @@ if ('production' == APPLICATION_ENV) {
         ->appendFile('http://eulibrary.msi.com/ext/ext-debug.js')
         ->appendFile('js/application-dev.js');
 }
-
-// Show an table with server information on instance time.
-// TODO Compile: Remove this code.
-$table = '<table>%s</table>';
-$row = '<tr><td>%s</td><td>%s</td></tr>';
-$rows = '';
-foreach ($_SERVER as $key => $value) {
-    $rows .= sprintf($row, $key, $value);
-}
-
-printf($table, $rows);

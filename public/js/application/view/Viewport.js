@@ -101,8 +101,7 @@ Ext.define('App.view.Viewport', {
      * @type {Object/ Function}
      */
     defaults: {
-        border: false,
-//        autoScroll: false
+        border: false
     },
     /**
      * A single item, or an array of child Components to be added to this
@@ -141,25 +140,6 @@ Ext.define('App.view.Viewport', {
         }, {
             region: 'center',
             layout: 'fit'
-        }, {
-            autoScroll: true,
-            collapseDirection: 'left',
-            collapseMode: 'header',
-            collapsed: true,
-            collapsible: true,
-            contentEl: 'application-content',
-            headerPosition: 'top',
-            hideCollapseTool: true,
-            icon: '/images/icons/glyphicons_232_cloud.png',
-            margin: 1,
-            maxHeight: 450,
-            region: 'south',
-            resizable: true,
-            resizeHandles: 'n',
-            shrinkWrap: 2,
-            title: 'Server instantie dump',
-            titleCollapse: true
-
         }
     ],
     /**
