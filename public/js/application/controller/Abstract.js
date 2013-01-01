@@ -53,8 +53,9 @@ Ext.define('App.controller.Abstract', {
             store = view.getStore();
             Ext.apply(toolbarConfig, {
                 store: store,
-                prependButtons: true,
-                displayInfo: false
+                displayInfo: false,
+                enableOverflow: true,
+                prependButtons: true
             });
 
             toolbarConfig.items.push('->');
