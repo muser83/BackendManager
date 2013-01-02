@@ -26,6 +26,7 @@ Ext.define('App.model.admin.Countries', {
 //        }],
     hasOne: [{
             model: 'App.model.admin.Continents',
+            name: 'continents',
             getterName: 'getContinents',
             setterName: 'setContinents',
             associationKey: 'continents',
@@ -33,6 +34,7 @@ Ext.define('App.model.admin.Countries', {
             primaryKey: 'id'
         }, {
             model: 'App.model.admin.Currencies',
+            name: 'currencies',
             getterName: 'getCurrencies',
             setterName: 'setCurrencies',
             associationKey: 'currencies',
@@ -123,11 +125,16 @@ Ext.define('App.model.admin.Countries', {
         },
         writer: {
             type: 'json',
-//            nameProperty: 'name',
-//            writeAllFields: true,
+            writeAllFields: true,
 //            allowSingle: true,
-//            encode: false,
-            root: 'data'
+            encode: true,
+            root: 'data',
+            getRecordData: function(record) {
+//                Ext.apply(record.data, record.getAssociatedData());
+
+                // End.
+                return record.getData(true);
+            }
         }
     }
 });

@@ -44,7 +44,7 @@ Ext.define('App.model.application.System', {
             defaultValue: {
             }
         }, {
-            name: 'bebug',
+            name: 'debug',
             type: 'array',
             defaultValue: []
         }],

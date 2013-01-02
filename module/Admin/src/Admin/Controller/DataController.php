@@ -16,6 +16,7 @@ namespace Admin\Controller;
 //    Zend\View\Model\ViewModel,
 use Zend\Mvc\Controller\AbstractRestfulController,
     Zend\View\Model\JsonModel,
+    Zend\Json\Decoder AS JsonDecode,
     Doctrine\ORM\EntityManager,
     Admin\Doctrine\Helper AS EntityHelper;
 
@@ -183,6 +184,9 @@ class DataController
             );
         }
 
+
+        $dataJson = (string) isset($data['data']) ? $data['data'] : $data;
+
         // Find entity
         // Populate entity with new data.
         // Save entity.
@@ -190,9 +194,8 @@ class DataController
         return new JsonModel(
             array(
             'success' => true,
-            'action' => 'update',
-            'id' => $id,
-            'data' => $data
+            'messages' => 'updated.',
+            'data' => JsonDecode::decode($dataJson)
             )
         );
     }

@@ -22,123 +22,109 @@ Ext.define('App.view.admin.countries.grid.Countries', {
             overflowX: 'hidden'
         }
     },
+    columns: [{
+            text: 'ID',
+            dataIndex: 'id',
+            hidden: true
+        }, {
+            text: 'Continents ID',
+            dataIndex: 'continentsId',
+            hideable: false,
+            editor: {
+                xtype: 'combobox',
+                store: 'admin.Continents',
+                displayField: 'id',
+                valueField: 'id',
+                editable: false,
+                allowBlank: false,
+                tpl: Ext.create('Ext.XTemplate',
+                    '<tpl for=".">',
+                    '<div class="x-boundlist-item">{id} - {name}</div>',
+                    '</tpl>'
+                    )
+            }
+        }, {
+            text: 'Currencies ID',
+            dataIndex: 'currenciesId',
+            hideable: false,
+            editor: {
+                xtype: 'combobox',
+                store: 'admin.Currencies',
+                displayField: 'id',
+                valueField: 'id',
+                editable: false,
+                allowBlank: false,
+                tpl: Ext.create('Ext.XTemplate',
+                    '<tpl for=".">',
+                    '<div class="x-boundlist-item">{id} - {name}</div>',
+                    '</tpl>'
+                    )
+            }
+        }, {
+            text: 'Visible',
+            type: 'boolean',
+            dataIndex: 'isVisible',
+            hideable: false,
+            editor: {
+                xtype: 'checkbox',
+                allowBlank: false
+            }
+        }, {
+            text: 'Name',
+            dataIndex: 'name',
+            hideable: false,
+            flex: 1,
+            editor: {
+                xtype: 'textfield',
+                allowBlank: false
+            }
+        }, {
+            text: 'Local name',
+            dataIndex: 'localName',
+            hideable: false,
+            flex: 1,
+            editor: {
+                xtype: 'textfield',
+                allowBlank: false
+            }
+        }, {
+            text: 'ISO 3166-2',
+            dataIndex: 'iso31662',
+            hideable: false,
+            editor: {
+                xtype: 'textfield',
+                allowBlank: false
+            }
+        }, {
+            text: 'ISO 3166-3',
+            dataIndex: 'iso31663',
+            hideable: false,
+            editor: {
+                xtype: 'textfield',
+                allowBlank: false
+            }
+        }, {
+            text: 'Tld',
+            dataIndex: 'tld',
+            hideable: false,
+            editor: {
+                xtype: 'textfield',
+                allowBlank: false
+            }
+        }, {
+            text: 'Calling code',
+            dataIndex: 'callingCode',
+            hideable: false,
+            editor: {
+                xtype: 'textfield',
+                allowBlank: false
+            }
+        }],
     border: false,
     emptyText: 'No Countries found.',
     plugins: [rowEditingPlugin],
     initComponent: function()
     {
-        // TODO Query to the continents and currencies columns and add an store.
-        this.columns = [{
-                text: 'ID',
-                dataIndex: 'id',
-                hidden: true
-            }, {
-                text: 'Continents ID',
-                dataIndex: 'continentsId',
-                hideable: false,
-                editor: {
-                    xtype: 'combobox',
-                    store: Ext.create('App.store.admin.Continents'),
-                    displayField: 'name',
-                    valueField: 'id',
-                    editable: false,
-                    allowBlank: false
-                },
-                renderer: function(value, metaData, record) {
-                    var continentsStore = this.continentsStore,
-                        continentModel = record.getContinents();
-
-                    if (continentsStore.getCount() > 0) {
-                        continentModel = continentsStore.findRecord('id', value);
-                    }
-
-                    // End.
-                    return continentModel.get('name');
-                }
-            }, {
-                text: 'Currencies ID',
-                dataIndex: 'currenciesId',
-                hideable: false,
-                editor: {
-                    xtype: 'combobox',
-                    store: Ext.create('App.store.admin.Currencies'),
-                    displayField: 'name',
-                    valueField: 'id',
-                    editable: false,
-                    allowBlank: false
-                },
-                renderer: function(value, metaData, record) {
-                    var currenciesStore = this.currenciesStore,
-                        currencyModel = record.getCurrencies();
-
-                    if (currenciesStore.getCount() > 0) {
-                        currencyModel = currenciesStore.findRecord('id', value);
-                    }
-
-                    // End.
-                    return currencyModel.get('name');
-                }
-            }, {
-                text: 'Visible',
-                type: 'boolean',
-                dataIndex: 'isVisible',
-                hideable: false,
-                editor: {
-                    xtype: 'checkbox',
-                    allowBlank: false
-                }
-            }, {
-                text: 'Name',
-                dataIndex: 'name',
-                hideable: false,
-                flex: 1,
-                editor: {
-                    xtype: 'textfield',
-                    allowBlank: false
-                }
-            }, {
-                text: 'Local name',
-                dataIndex: 'localName',
-                hideable: false,
-                flex: 1,
-                editor: {
-                    xtype: 'textfield',
-                    allowBlank: false
-                }
-            }, {
-                text: 'ISO 3166-2',
-                dataIndex: 'iso31662',
-                hideable: false,
-                editor: {
-                    xtype: 'textfield',
-                    allowBlank: false
-                }
-            }, {
-                text: 'ISO 3166-3',
-                dataIndex: 'iso31663',
-                hideable: false,
-                editor: {
-                    xtype: 'textfield',
-                    allowBlank: false
-                }
-            }, {
-                text: 'Tld',
-                dataIndex: 'tld',
-                hideable: false,
-                editor: {
-                    xtype: 'textfield',
-                    allowBlank: false
-                }
-            }, {
-                text: 'Calling code',
-                dataIndex: 'callingCode',
-                hideable: false,
-                editor: {
-                    xtype: 'textfield',
-                    allowBlank: false
-                }
-            }];
-
         this.callParent();
     }
 });

@@ -137,25 +137,6 @@ Ext.application({
      */
     systemModel: undefined,
     /**
-     * Contains all system information like event time, data models or debug
-     * messages. This info object will be submited to the server when the logoff
-     * method is called.
-     */
-    systemInfo: {
-        bootTime: 0,
-        logonTime: 0,
-        logoffTime: 0,
-        isLoggedOn: false,
-        isAuthenticated: false,
-        userModel: undefined,
-        personModel: undefined,
-        settingsModel: undefined,
-        navigationHtml: '',
-        toolbarConfig: {
-        },
-        debug: []
-    },
-    /**
      * Contains all system delayed task instances.
      */
     tasks: {
@@ -196,7 +177,7 @@ Ext.application({
     },
     /**
      * Helper methods.
-     * These methods can be called from all classes. Controllers, Views, ect.
+     * Public methods.
      */
 
     /**
@@ -391,17 +372,22 @@ Ext.application({
                     : undefined
             }
         };
+        this.loggedon = false;
 
+        this.debug('Abort load requests.', 'System');
         Ext.Ajax.abortAll();
 
+        this.debug('Remove navigation.', 'System');
         this.getNavigationDOM()
             .hide()
             .setHTML('<li></li>');
 
+        this.debug('Remove user infomation.', 'System');
         this.getUserInfoDOM()
             .hide()
             .setHTML('');
 
+        this.debug('Remove all views and open windows.', 'System');
         this.getViewport().down('[region=center]').removeAll();
 
         Ext.each(openWindows, function(window) {
@@ -410,12 +396,12 @@ Ext.application({
             }
         }, this);
 
+        this.debug('Goodbye.', 'System');
+
         this.getSystemModel().set('logoffTime', Ext.Date.now());
         this.saveSystemInfo();
         // Reset system data.
         this.initSystemInfo();
-
-        this.loggedon = false;
 
         this.tasks.preLogoff.cancel();
         this.tasks.logoff.cancel();
@@ -446,7 +432,7 @@ Ext.application({
 
         // TODO use levels.
 
-        var debugLogs = this.getSystemModel().get('bebug');
+        var debugLogs = this.getSystemModel().get('debug');
 
         Ext.Array.insert(debugLogs, Ext.Date.now(), [{
                 time: Ext.Date.now(),
@@ -463,8 +449,7 @@ Ext.application({
     },
     /**
      * System methods.
-     * Do not call these methods from somewhere else than this system class
-     * unless absolutely necessary.
+     * Public methods.
      */
 
     /**
@@ -490,7 +475,7 @@ Ext.application({
                 systemModel.set('bootTime', this.getSystemModel().get('bootTime'));
                 systemModel.set('logonTime', this.getSystemModel().get('logonTime'));
                 systemModel.set('logoffTime', this.getSystemModel().get('logoffTime'));
-                systemModel.set('bebug', this.getSystemModel().get('bebug'));
+                systemModel.set('debug', this.getSystemModel().get('debug'));
 
                 // Replace the systemModel.
                 this.systemModel = systemModel;
@@ -541,11 +526,11 @@ Ext.application({
 
             this.systemModel.set('logonTime', Ext.Date.now());
 
+            this.loggedon = true;
+
             this.buildNavigation();
 
             this.buildUserInfo();
-
-            this.loggedon = true;
 
             if ('!' === Ext.History.getToken()) {
                 Ext.History.add('/');
@@ -612,6 +597,8 @@ Ext.application({
      */
     buildNavigation: function()
     {
+        this.debug('Build navigation.', 'System');
+
         var nagigationHTML = this.getSystemModel().get('navigation');
 
         this.getNavigationDOM().setHTML(nagigationHTML);
@@ -631,6 +618,8 @@ Ext.application({
      */
     buildUserInfo: function()
     {
+        this.debug('Build user infomation.', 'System');
+
         var imageId = Ext.id();
         var fullnameId = Ext.id();
         var logoffId = Ext.id();
@@ -747,8 +736,8 @@ Ext.application({
 
     },
     /**
-     * Init methods.
-     * Treat this methods as private methods.
+     * System methods.
+     * Private methods.
      */
 
     /**
@@ -856,18 +845,7 @@ Ext.application({
          * @param {Ext.data.Connection} conn This Connection object.
          * @param {Object} options A config object passed to the request method.
          */
-        Ext.Ajax.on('beforerequest', function(conn, options)
-        {
-            this.resetLogoffTimer();
-
-            this.debug('Start loading data:', 'System', {
-                action: options.action,
-                method: options.method,
-                url: options.url
-            });
-
-            this.getLoaderDOM().show();
-        }, this);
+        Ext.Ajax.on('beforerequest', this.beforeRequest, this);
 
         /**
          * Hide the loader animation.
@@ -876,16 +854,7 @@ Ext.application({
          * @param {Object} response The XHR object.
          * @param {Object} options A config object passed to the request method.
          */
-        Ext.Ajax.on('requestcomplete', function(conn, response, options)
-        {
-            this.debug('Data loaded:', 'System', {
-                contentLength: response.getResponseHeader('content-length'),
-                status: response.status,
-                url: options.url
-            });
-
-            this.getLoaderDOM().hide();
-        }, this);
+        Ext.Ajax.on('requestcomplete', this.requestComplete, this);
 
         /**
          * If the response status = 401 Unauthorized?
@@ -896,34 +865,7 @@ Ext.application({
          * @param {Object} response The XHR object.
          * @param {Object} options A config object passed to the request method.
          */
-        Ext.Ajax.on('requestexception', function(conn, response, options)
-        {
-            this.getLoaderDOM().hide();
-
-            switch (response.status) {
-                case 401:
-                    this.debug('401 header received.', 'Error');
-
-                    // System logout.
-                    this.logoff(
-                        'You are not authenticated by the server anymore.'
-                        );
-                    break;
-                default:
-                    this.debug('Data load exception:', 'Error', {
-                        contentLength: response
-                            .getResponseHeader('content-length'),
-                        status: response.status,
-                        url: options.url
-                    });
-
-                    Ext.Error.raise({
-                        title: 'System load error.',
-                        msg: 'Error while loading data from the server.\n\
-The server didn\'t answered with the expected data.'
-                    });
-            }
-        }, this);
+        Ext.Ajax.on('requestexception', this.requestException, this);
 
         // End.
         return true;
@@ -990,5 +932,96 @@ The server didn\'t answered with the expected data.'
 
             }
         });
+    },
+    /**
+     * COMMENTME
+     * TODO get the diff between get|post|update|delete
+     *
+     *
+     * @private
+     * @param {Ext.data.Connection} conn description1
+     * @param {Object} options description2
+     * @return {Boolean} Void.
+     */
+    beforeRequest: function(conn, options)
+    {
+        this.resetLogoffTimer();
+
+        this.debug('Start loading data:', 'System', {
+            action: options.action,
+            method: options.method,
+            url: options.url
+        });
+
+        this.getLoaderDOM().show();
+
+        // End.
+        return true;
+    },
+    /**
+     * COMMENTME
+     * TODO get the diff between get|post|update|delete
+     *
+     *
+     * @private
+     * @param {Ext.data.Connection} conn description1
+     * @param {Object} response description2
+     * @param {Object} options description3
+     * @return {Boolean} Void.
+     */
+    requestComplete: function(conn, response, options)
+    {
+        this.debug('Data loaded:', 'System', {
+            contentLength: response.getResponseHeader('content-length'),
+            status: response.status,
+            url: options.url
+        });
+
+        this.getLoaderDOM().hide();
+
+        // End.
+        return true;
+    },
+    /**
+     * COMMENTME
+     *
+     *
+     * @private
+     * @param {Ext.data.Connection} conn description1
+     * @param {Object} response description2
+     * @param {Object} options description3
+     * @return {Boolean} Void.
+     */
+    requestException: function(conn, response, options)
+    {
+
+        this.getLoaderDOM().hide();
+
+        switch (response.status) {
+            case 401:
+                this.debug('401 header received.', 'Error');
+
+                // System logout.
+                this.logoff(
+                    'You are not authenticated by the server anymore.'
+                    );
+                break;
+            default:
+                this.debug('Data load exception:', 'Error', {
+                    contentLength: response
+                        .getResponseHeader('content-length'),
+                    status: response.status,
+                    url: options.url
+                });
+
+                Ext.Error.raise({
+                    title: 'System load error.',
+                    msg: 'Error while loading data from the server.\n\
+The server didn\'t answered with the expected data.'
+                });
+        }
+
+        // End.
+        return true;
     }
 });
