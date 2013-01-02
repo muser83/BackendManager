@@ -38,7 +38,9 @@ Ext.define('App.controller.admin.Users', {
      */
     startupAction: function()
     {
-        var translateGrid = this.getAdminUsersGridUsersView().create();
+        var translateGrid = this.getAdminUsersGridUsersView().create({
+            tbar: this.getToolbar()
+        });
 
         this.addToCenter(translateGrid);
 

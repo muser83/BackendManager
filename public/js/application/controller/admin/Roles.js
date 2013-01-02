@@ -40,7 +40,9 @@ Ext.define('App.controller.admin.Roles', {
      */
     startupAction: function()
     {
-        var rolesGrid = this.getAdminRolesGridRolesView().create();
+        var rolesGrid = this.getAdminRolesGridRolesView().create({
+            tbar: this.getToolbar()
+        });
 
         this.addToCenter(rolesGrid);
 

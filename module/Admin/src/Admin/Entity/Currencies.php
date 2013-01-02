@@ -11,13 +11,16 @@
 
 namespace Admin\Entity;
 
-use Doctrine\ORM\Mapping AS ORM;
+use Zend\Json\Json,
+    Doctrine\ORM\Mapping AS ORM,
+    Admin\Doctrine\Helper AS EntityHelper;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="currencies")
  */
 class Currencies
+    extends EntityHelper
 {
 
     /**

@@ -38,7 +38,9 @@ Ext.define('App.controller.admin.Translate', {
      */
     startupAction: function()
     {
-        var translateGrid = this.getAdminTranslateGridTranslateView().create();
+        var translateGrid = this.getAdminTranslateGridTranslateView().create({
+            tbar: this.getToolbar()
+        });
 
         this.addToCenter(translateGrid);
 

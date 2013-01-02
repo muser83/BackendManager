@@ -17,7 +17,8 @@ Ext.define('App.controller.admin.Locales', {
     views: [
         'admin.locales.grid.Locales'
     ],
-    listners: {},
+    listners: {
+    },
     /**
      * COMMENTME
      *
@@ -37,7 +38,9 @@ Ext.define('App.controller.admin.Locales', {
      */
     startupAction: function()
     {
-        var localesGrid = this.getAdminLocalesGridLocalesView().create();
+        var localesGrid = this.getAdminLocalesGridLocalesView().create({
+            tbar: this.getToolbar()
+        });
 
         this.addToCenter(localesGrid);
 

@@ -10,10 +10,7 @@ Ext.define('App.controller.Abstract', {
     extend: 'Ext.app.Controller',
     refs: [{
             ref: 'CenterRegion',
-            selector: '[region=center]'
-        }, {
-            ref: 'SouthRegion',
-            selector: '[region=south]'
+            selector: 'viewport [region=center]'
         }],
     listners: {
     },
@@ -26,8 +23,7 @@ Ext.define('App.controller.Abstract', {
     addToCenter: function(centerView)
     {
         var centerRegion = this.getCenterRegion();
-        centerView = this.injectToolbar(centerView);
-        centerRegion.removeAll();
+        centerRegion.removeAll(true);
         centerRegion.add(centerView);
 
         // End.
@@ -36,43 +32,18 @@ Ext.define('App.controller.Abstract', {
     /**
      * COMMENTME
      *
-     * @param {App.view.*} view View to add to the toolbar to.
      * @returns {App.view.*} View with toolbar.
      */
-    injectToolbar: function(view)
+    getToolbar: function()
     {
-        var toolbar,
-            store,
-            isGrid = (view.self.getName().indexOf('.grid.') >= 0),
-            allToolbarConfig = this.application.systemModel.get('toolbar'),
-            toolbarName = this.self.getName().replace(/\.|App.controller/g, ''),
-            toolbarConfig = allToolbarConfig[toolbarName] || {
-        };
+        var toolbarConfig = this.getToolbarConfig();
 
         Ext.apply(toolbarConfig, {
-//            disabled: true,
-            enableOverflow: true
+//            enableOverflow: true // This option causes errors on centerview.removeAll
         });
 
-        if (isGrid) {
-            store = view.getStore();
-            Ext.apply(toolbarConfig, {
-                store: store,
-                displayInfo: false,
-                prependButtons: true
-            });
-
-            toolbarConfig.items.push('->');
-
-            toolbar = Ext.create('Ext.PagingToolbar', toolbarConfig);
-        } else {
-            toolbar = Ext.create('Ext.toolbar.Toolbar', toolbarConfig);
-        }
-
-        view.addDocked(toolbar);
-
         // End.
-        return view;
+        return Ext.create('Ext.toolbar.Toolbar', toolbarConfig);
     },
     /**
      * COMMENTME
@@ -81,11 +52,35 @@ Ext.define('App.controller.Abstract', {
      */
     getPagingToolbar: function(store)
     {
-        // End.
-        return Ext.create('Ext.PagingToolbar', {
+        var toolbarConfig = this.getToolbarConfig();
+        Ext.apply(toolbarConfig, {
             store: store,
-            displayInfo: true
+//            enableOverflow: true, // This option causes errors on centerview.removeAll
+            displayInfo: false,
+            prependButtons: true
         });
+
+        toolbarConfig.items.push('->');
+
+        Ext.apply(toolbarConfig, {
+        });
+
+        // End.
+        return Ext.create('Ext.toolbar.Paging', toolbarConfig);
+    },
+    /**
+     * COMMENTME
+     *
+     * @return {Object} toolbar configuration.
+     */
+    getToolbarConfig: function()
+    {
+        var allToolbarConfig = this.application.systemModel.get('toolbar'),
+            toolbarName = this.self.getName().replace(/\.|App.controller/g, '');
+
+        // End.
+        return allToolbarConfig[toolbarName] || {
+        };
     }
 
 });

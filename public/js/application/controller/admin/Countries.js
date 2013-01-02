@@ -12,7 +12,9 @@ Ext.define('App.controller.admin.Countries', {
         'admin.Countries'
     ],
     stores: [
-        'admin.Countries'
+        'admin.Countries',
+        'admin.Continents',
+        'admin.Currencies'
     ],
     views: [
         'admin.countries.grid.Countries'
@@ -38,18 +40,22 @@ Ext.define('App.controller.admin.Countries', {
      */
     startupAction: function()
     {
-        var store = this.getAdminCountriesStore().load();
+        var rowEditor,
+            continentsStore = this.getAdminContinentsStore().load(),
+            currenciesStore = this.getAdminCurrenciesStore().load(),
+            countriesStore = this.getAdminCountriesStore().load();
         var countriesGrid = this.getAdminCountriesGridCountriesView().create({
-            store: store,
-//            bbar: this.getPagingToolbar(store)
+            store: countriesStore,
+            continentsStore: continentsStore,
+            currenciesStore: currenciesStore,
+            tbar: this.getPagingToolbar(countriesStore)
         });
-        var rowEditor = countriesGrid.getPlugin('adminCountriesEditor');
-
+        rowEditor = countriesGrid.getPlugin('adminCountriesEditor');
         rowEditor.on('edit', function(editor, e) {
-            console.log(e.record);
+            e.record.save();
         }, this);
 
-        this.addToCenter(countriesGrid, store);
+        this.addToCenter(countriesGrid, countriesStore);
         // End.
         return true;
     }

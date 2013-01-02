@@ -12,7 +12,6 @@
 namespace Admin\Entity;
 
 use Zend\Json\Json,
-    Doctrine\Common\Collections\ArrayCollection,
     Doctrine\ORM\Mapping AS ORM,
     Admin\Doctrine\Helper AS EntityHelper;
 
@@ -89,9 +88,17 @@ class Countries
      * @ORM\ManyToOne(targetEntity="Continents", cascade={"all"}, fetch="EAGER")
      * @ORM\JoinColumn(name="continents_id", referencedColumnName="id")
      *
-     * @var Countries
+     * @var Admin\Entity\Continents
      */
     protected $continents;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Currencies", cascade={"all"}, fetch="EAGER")
+     * @ORM\JoinColumn(name="currencies_id", referencedColumnName="id")
+     *
+     * @var Admin\Entity\Currencies
+     */
+    protected $currencies;
 
     public function __construct()
     {

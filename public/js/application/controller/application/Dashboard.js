@@ -38,8 +38,9 @@ Ext.define('App.controller.application.Dashboard', {
      */
     startupAction: function()
     {
-        var dashboardPanel = this.getApplicationDashboardPanelDashboardView()
-            .create();
+        var dashboardPanel = this.getApplicationDashboardPanelDashboardView().create({
+            tbar: this.getToolbar()
+        });
 
         this.addToCenter(dashboardPanel);
         return true;

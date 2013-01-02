@@ -9,7 +9,8 @@
 Ext.define('App.model.admin.Countries', {
     extend: 'Ext.data.Model',
     uses: [
-//        'App.model.admin.Continents',
+        'App.model.admin.Continents',
+        'App.model.admin.Currencies',
 //        'App.model.admin.Timezones'
     ],
 //    hasMany: [{
@@ -25,31 +26,19 @@ Ext.define('App.model.admin.Countries', {
 //        }],
     hasOne: [{
             model: 'App.model.admin.Continents',
-            getterName: 'getContinentsModel',
+            getterName: 'getContinents',
             setterName: 'setContinents',
             associationKey: 'continents',
             foreignKey: 'continents_id',
-            // lowercased name of the owner model plus "_id".
-            primaryKey: 'id' // Associated model primary key.
-//        },
-//        {
-//            model: 'App.model.admin.Currencies',
-//            getterName: 'getCurrenciesModel',
-//            setterName: 'setCurrenciesModel',
-//            associationKey: 'currencies',
-//            foreignKey: 'currencies_id',
-//            // lowercased name of the owner model plus "_id".
-//            primaryKey: 'id' // Associated model primary key.
-        }
-    ],
-//    belongsTo: [{
-//        model: 'owner_model_name',
-//        getterName: 'getOwnerModel',
-//        setterName: 'setOwnerModel',
-//        associationKey: 'owner_data_name',
-//        foreignKey: 'id', // lowercased name of the owner model plus "_id".
-//        primaryKey: 'id' // Owner model primary key.
-//    }],
+            primaryKey: 'id'
+        }, {
+            model: 'App.model.admin.Currencies',
+            getterName: 'getCurrencies',
+            setterName: 'setCurrencies',
+            associationKey: 'currencies',
+            foreignKey: 'currencies_id',
+            primaryKey: 'id'
+        }],
 //    validations: [],
     fields: [{
             name: 'id',
@@ -85,12 +74,10 @@ Ext.define('App.model.admin.Countries', {
         }, {
             name: 'callingCode',
             type: 'string'
-        }, {
-            name: 'continent',
-            mapping: 'continents.name'
         }],
-    listners: {},
-    proxy: {// Server proxy.
+    listners: {
+    },
+    proxy: {
         type: 'rest',
         url: '/admin/data/countries',
 //        startParam: 'start',
@@ -125,7 +112,7 @@ Ext.define('App.model.admin.Countries', {
         reader: {
             type: 'json',
             root: 'data',
-            idProperty: 'id',
+//            idProperty: 'id',
 //            implicitIncludes: true,
 //            readRecordsOnFailure: true,
 //            useSimpleAccessors: false,

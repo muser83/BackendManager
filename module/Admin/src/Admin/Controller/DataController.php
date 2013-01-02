@@ -77,8 +77,8 @@ class DataController
         $entityName = $this->params('entity', false);
         if (!$entityName) {
             throw new \Zend\Mvc\Exception\DomainException(
-            "Missing data identifier." .
-            "Make sure the first argument is an valid Entity name."
+            'Missing data identifier.' .
+            'Make sure the first argument is an valid Entity name.'
             );
         }
 
@@ -86,7 +86,7 @@ class DataController
         if (!class_exists($entityClass)) {
             throw new \Zend\Mvc\Exception\DomainException(
             "Entity '{$entityClass}' does not exists." .
-            "Make sure the first argument is an valid Entity name."
+            'Make sure the first argument is an valid Entity name.'
             );
         }
         $criteria = array('isVisible' => true);
@@ -115,11 +115,11 @@ class DataController
      */
     public function get($id)
     {
-        $model = $this->params('model', false);
-        if (!$model) {
+        $entityName = $this->params('entity', false);
+        if (!$entityName) {
             throw new \Zend\Mvc\Exception\DomainException(
-            'Missing data identifier, make sure the first argument is an ' .
-            'valid Model/ Entity name.'
+            'Missing data identifier.' .
+            'Make sure the first argument is an valid Entity name.'
             );
         }
 
@@ -140,11 +140,11 @@ class DataController
      */
     public function create($data)
     {
-        $model = $this->params('model', false);
-        if (!$model) {
+        $entityName = $this->params('entity', false);
+        if (!$entityName) {
             throw new \Zend\Mvc\Exception\DomainException(
-            'Missing data identifier, make sure the first argument is an ' .
-            'valid Model/ Entity name.'
+            'Missing data identifier.' .
+            'Make sure the first argument is an valid Entity name.'
             );
         }
 
@@ -166,13 +166,26 @@ class DataController
      */
     public function update($id, $data)
     {
-        $model = $this->params('model', false);
-        if (!$model) {
+        $entityNamespace = 'Admin\Entity\\';
+        $entityName = $this->params('entity', false);
+        if (!$entityName) {
             throw new \Zend\Mvc\Exception\DomainException(
-            'Missing data identifier, make sure the first argument is an ' .
-            'valid Model/ Entity name.'
+            'Missing data identifier.' .
+            'Make sure the first argument is an valid Entity name.'
             );
         }
+
+        $entityClass = ($entityNamespace . $entityName);
+        if (!class_exists($entityClass)) {
+            throw new \Zend\Mvc\Exception\DomainException(
+            "Entity '{$entityClass}' does not exists." .
+            'Make sure the first argument is an valid Entity name.'
+            );
+        }
+
+        // Find entity
+        // Populate entity with new data.
+        // Save entity.
 
         return new JsonModel(
             array(
@@ -192,11 +205,11 @@ class DataController
      */
     public function delete($id)
     {
-        $model = $this->params('model', false);
-        if (!$model) {
+        $entityName = $this->params('entity', false);
+        if (!$entityName) {
             throw new \Zend\Mvc\Exception\DomainException(
-            'Missing data identifier, make sure the first argument is an ' .
-            'valid Model/ Entity name.'
+            'Missing data identifier.' .
+            'Make sure the first argument is an valid Entity name.'
             );
         }
 
