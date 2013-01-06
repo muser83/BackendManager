@@ -119,6 +119,9 @@ class DataController
             $repository = $this->getEntityManager()->getRepository($entityClass);
             $entities = $repository->findBy($criteria, $orderBy, $limit, $offset);
             $data = EntityHelper::toArrayRecursive($entities);
+            $total = $this->getEntityManager()
+                ->createQuery('SELECT COUNT(t) FROM ' . $entityClass . ' AS t')
+                ->getSingleScalarResult();
         } catch (\Exception $e) {
             // End.
             return new JsonModel(
@@ -135,7 +138,7 @@ class DataController
             array(
             'success' => true,
             'source' => $entityName,
-            'total' => 100, // TODO get total counts for the executed query.
+            'total' => $total,
             'data' => $data,
             )
         );
