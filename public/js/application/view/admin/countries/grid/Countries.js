@@ -7,13 +7,6 @@
  * @copyright 2012 witteStier.nl
  */
 
-var rowEditingPlugin = Ext.create('Ext.grid.plugin.RowEditing', {
-    pluginId: 'adminCountriesEditor',
-    clicksToMoveEditor: 1,
-    errorSummary: false,
-    autoCancel: false
-});
-
 Ext.define('App.view.admin.countries.grid.Countries', {
     extend: 'Ext.grid.Panel',
     viewConfig: {
@@ -121,8 +114,7 @@ Ext.define('App.view.admin.countries.grid.Countries', {
             }
         }],
     border: false,
-    emptyText: 'No Countries found.',
-    plugins: [rowEditingPlugin],
+    emptyText: 'No countries found.',
     initComponent: function()
     {
         this.callParent();

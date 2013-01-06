@@ -11,13 +11,15 @@
 
 namespace Admin\Entity;
 
-use Doctrine\ORM\Mapping AS ORM;
+use Doctrine\ORM\Mapping AS ORM,
+    Admin\Doctrine\Helper AS EntityHelper;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="locales")
  */
 class Locales
+    extends EntityHelper
 {
 
     /**
@@ -34,7 +36,7 @@ class Locales
     protected $languagesId;
 
     /**
-     * @Column(name="countries_id", type="integer", unique=true, nullable=false)
+     * @ORM\Column(name="countries_id", type="integer", unique=true, nullable=false)
      * @var type
      */
     protected $countriesId;

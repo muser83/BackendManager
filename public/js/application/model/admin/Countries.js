@@ -44,16 +44,13 @@ Ext.define('App.model.admin.Countries', {
 //    validations: [],
     fields: [{
             name: 'id',
-            type: 'int',
-            useNull: true
+            type: 'int'
         }, {
             name: 'continentsId',
-            type: 'int',
-            useNull: true
+            type: 'int'
         }, {
             name: 'currenciesId',
-            type: 'int',
-            useNull: true
+            type: 'int'
         }, {
             name: 'isVisible',
             type: 'boolean',
@@ -130,8 +127,6 @@ Ext.define('App.model.admin.Countries', {
             encode: true,
             root: 'data',
             getRecordData: function(record) {
-//                Ext.apply(record.data, record.getAssociatedData());
-
                 // End.
                 return record.getData(true);
             }

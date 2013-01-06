@@ -81,6 +81,21 @@ Ext.define('App.controller.Abstract', {
         // End.
         return allToolbarConfig[toolbarName] || {
         };
-    }
-
+    },
+    /**
+     * COMMENTME
+     *
+     *
+     * @public
+     * @return {Ext.grid.plugin.RowEditing} RowEditor plugin.
+     */
+    getRowEditor: function()
+    {
+        // End.
+        return Ext.create('Ext.grid.plugin.RowEditing', {
+            clicksToMoveEditor: 1,
+            errorSummary: false,
+            autoCancel: false
+        });
+    },
 });

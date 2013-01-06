@@ -9,10 +9,10 @@
 Ext.define('App.controller.admin.Locales', {
     extend: 'App.controller.Abstract',
     models: [
-//        'admin.Locales'
+        'admin.Locales'
     ],
     stores: [
-//        'admin.Locales'
+        'admin.Locales'
     ],
     views: [
         'admin.locales.grid.Locales'
@@ -38,9 +38,17 @@ Ext.define('App.controller.admin.Locales', {
      */
     startupAction: function()
     {
+        var rowEditor = this.getRowEditor(),
+            localesStore = this.getAdminLocalesStore().load();
         var localesGrid = this.getAdminLocalesGridLocalesView().create({
-            tbar: this.getToolbar()
+            store: localesStore,
+            tbar: this.getPagingToolbar(localesStore),
+            plugins: [rowEditor]
         });
+
+        rowEditor.on('edit', function(editor, e) {
+            e.record.save();
+        }, this);
 
         this.addToCenter(localesGrid);
 

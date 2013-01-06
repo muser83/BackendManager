@@ -40,19 +40,19 @@ Ext.define('App.controller.admin.Countries', {
      */
     startupAction: function()
     {
-        var rowEditor,
+        var rowEditor = this.getRowEditor(),
             countriesStore = this.getAdminCountriesStore().load();
         var countriesGrid = this.getAdminCountriesGridCountriesView().create({
             store: countriesStore,
-            tbar: this.getPagingToolbar(countriesStore)
+            tbar: this.getPagingToolbar(countriesStore),
+            plugins: [rowEditor]
         });
 
-        rowEditor = countriesGrid.getPlugin('adminCountriesEditor');
         rowEditor.on('edit', function(editor, e) {
             e.record.save();
         }, this);
 
-        this.addToCenter(countriesGrid, countriesStore);
+        this.addToCenter(countriesGrid);
 
         // End.
         return true;

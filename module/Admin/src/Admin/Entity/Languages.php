@@ -11,13 +11,15 @@
 
 namespace Admin\Entity;
 
-use Doctrine\ORM\Mapping AS ORM;
+use Doctrine\ORM\Mapping AS ORM,
+    Admin\Doctrine\Helper AS EntityHelper;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="languages")
  */
 class Languages
+    extends EntityHelper
 {
 
     /**

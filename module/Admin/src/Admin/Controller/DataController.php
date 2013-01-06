@@ -77,6 +77,16 @@ class DataController
         $entityNamespace = 'Admin\Entity\\';
         $entityName = $this->params('entity', false);
         if (!$entityName) {
+            // End.
+            return new JsonModel(
+                array(
+                'success' => false,
+                'messages' => 'Missing source identifier.\n' .
+                'Make sure the first argument is an valid data source name.'
+                )
+            );
+
+            // TODO Remove
             throw new \Zend\Mvc\Exception\DomainException(
             'Missing data identifier.' .
             'Make sure the first argument is an valid Entity name.'
@@ -85,6 +95,16 @@ class DataController
 
         $entityClass = ($entityNamespace . $entityName);
         if (!class_exists($entityClass)) {
+            // End.
+            return new JsonModel(
+                array(
+                'success' => false,
+                'messages' => 'Unknown source identifier.\n' .
+                'Make sure the first argument is an valid data source name.'
+                )
+            );
+
+            // TODO Remove
             throw new \Zend\Mvc\Exception\DomainException(
             "Entity '{$entityClass}' does not exists." .
             'Make sure the first argument is an valid Entity name.'
@@ -95,15 +115,28 @@ class DataController
         $limit = $this->params()->fromQuery('limit', 25);
         $offset = $this->params()->fromQuery('start', 0);
 
-        $entities = $this->getEntityManager()->getRepository($entityClass)
-            ->findBy($criteria, $orderBy, $limit, $offset);
+        try {
+            $repository = $this->getEntityManager()->getRepository($entityClass);
+            $entities = $repository->findBy($criteria, $orderBy, $limit, $offset);
+            $data = EntityHelper::toArrayRecursive($entities);
+        } catch (\Exception $e) {
+            // End.
+            return new JsonModel(
+                array(
+                'success' => false,
+                'messages' => 'Unexpected exception in file: ' . $e->getFile() .
+                '.\nWith messages:\n' . $e->getMessage()
+                )
+            );
+        }
 
+        // End.
         return new JsonModel(
             array(
             'success' => true,
-            'entity' => $entityName,
-            'total' => 49,
-            'data' => EntityHelper::toArrayRecursive($entities),
+            'source' => $entityName,
+            'total' => 100, // TODO get total counts for the executed query.
+            'data' => $data,
             )
         );
     }
