@@ -24,24 +24,71 @@ Ext.define('App.view.admin.locales.grid.Locales', {
         }, {
             text: 'Language ID',
             dataIndex: 'languagesId',
-            hideable: false
+            hideable: false,
+            editor: {
+                xtype: 'combobox',
+                store: 'admin.Languages',
+                displayField: 'id',
+                valueField: 'id',
+                editable: false,
+                allowBlank: false,
+                tpl: Ext.create('Ext.XTemplate',
+                    '<tpl for=".">',
+                    '<div class="x-boundlist-item">{id} - {name}</div>',
+                    '</tpl>'
+                    )
+            }
         }, {
             text: 'Country ID',
             dataIndex: 'countriesId',
-            hideable: false
+            hideable: false,
+            editor: {
+                xtype: 'combobox',
+                store: 'admin.Countries',
+                displayField: 'id',
+                valueField: 'id',
+                editable: false,
+                allowBlank: false,
+                tpl: Ext.create('Ext.XTemplate',
+                    '<tpl for=".">',
+                    '<div class="x-boundlist-item">{id} - {name}</div>',
+                    '</tpl>'
+                    )
+            }
         }, {
             text: 'Charset ID',
             dataIndex: 'charsetsId',
-            hideable: false
+            hideable: false,
+            editor: {
+                xtype: 'combobox',
+                store: 'admin.Charsets',
+                displayField: 'id',
+                valueField: 'id',
+                editable: false,
+                allowBlank: false,
+                tpl: Ext.create('Ext.XTemplate',
+                    '<tpl for=".">',
+                    '<div class="x-boundlist-item">{id} - {name}</div>',
+                    '</tpl>'
+                    )
+            }
         }, {
             text: 'Is visible',
-            dataIndex: 'is_visible',
-            hideable: false
+            dataIndex: 'isVisible',
+            hideable: false,
+            editor: {
+                xtype: 'checkbox',
+                allowBlank: false
+            }
         }, {
             text: 'Name',
             dataIndex: 'name',
             hideable: false,
-            flex: 1
+            flex: 1,
+            editor: {
+                xtype: 'textfield',
+                allowBlank: false
+            }
         }],
     initComponent: function()
     {

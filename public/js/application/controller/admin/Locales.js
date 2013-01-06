@@ -12,7 +12,9 @@ Ext.define('App.controller.admin.Locales', {
         'admin.Locales'
     ],
     stores: [
-        'admin.Locales'
+        'admin.Locales',
+        'admin.Languages',
+        'admin.Charsets'
     ],
     views: [
         'admin.locales.grid.Locales'
