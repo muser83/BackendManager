@@ -30,6 +30,12 @@ Ext.define('App.controller.admin.Locales', {
     init: function(application)
     {
         this.control({
+            '#adminLocalesToolbar button[action=add]': {
+                'click': function()
+                {
+                    alert('Yepa');
+                }
+            }
         });
         return true;
     },

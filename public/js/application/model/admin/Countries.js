@@ -44,13 +44,16 @@ Ext.define('App.model.admin.Countries', {
 //    validations: [],
     fields: [{
             name: 'id',
-            type: 'int'
+            type: 'int',
+            useNull: true
         }, {
             name: 'continentsId',
-            type: 'int'
+            type: 'int',
+            useNull: true
         }, {
             name: 'currenciesId',
-            type: 'int'
+            type: 'int',
+            useNull: true
         }, {
             name: 'isVisible',
             type: 'boolean',

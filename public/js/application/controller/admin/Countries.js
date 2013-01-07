@@ -30,6 +30,15 @@ Ext.define('App.controller.admin.Countries', {
     init: function(application)
     {
         this.control({
+            '#adminCountriesToolbar button[action=add]': {
+                'click': this.addCountryAction
+            },
+            '#adminCountriesToolbar button[action=edit]': {
+                'click': this.editCountryAction
+            },
+            '#adminCountriesToolbar button[action=delete]': {
+                'click': this.deleteCountryAction
+            }
         });
         return true;
     },
@@ -56,6 +65,78 @@ Ext.define('App.controller.admin.Countries', {
 
         // End.
         return true;
-    }
+    },
+    /**
+     * COMMENTME
+     *
+     *
+     * @public
+     * @param {Ext.button.Button} button
+     * @param {Event} event
+     * @return {Boolean} Void.
+     */
+    addCountryAction: function(button, event)
+    {
+        var countriesGrid = button.up('grid'),
+            rowEditor = countriesGrid.getPlugin('adminCountriesEditor'),
+            countriesStore = countriesGrid.getStore(),
+            countryModel = this.getAdminCountriesModel().create();
 
+        rowEditor.cancelEdit();
+
+        countriesStore.insert(0, countryModel);
+        rowEditor.startEdit(0, 0);
+
+        // End.
+        return true;
+    },
+    /**
+     * COMMENTME
+     *
+     *
+     * @public
+     * @param {Ext.button.Button} button
+     * @param {Event} event
+     * @return {Boolean} Void.
+     */
+    editCountryAction: function(button, event)
+    {
+        var countriesGrid = button.up('grid'),
+            rowEditor = countriesGrid.getPlugin('adminCountriesEditor'),
+            countriesStore = countriesGrid.getStore(),
+            countryModel = countriesGrid.getSelectionModel();
+
+        rowEditor.startEdit(countryModel.getLastSelected(), 0);
+
+        // End.
+        return true;
+    },
+    /**
+     * COMMENTME
+     *
+     *
+     * @public
+     * @param {Ext.button.Button} button description1
+     * @param {Event} event description2
+     * @return {Boolean} Void.
+     */
+    deleteCountryAction: function(button, event)
+    {
+        var countriesGrid = button.up('grid'),
+            rowEditor = countriesGrid.getPlugin('adminCountriesEditor'),
+            countriesStore = countriesGrid.getStore(),
+            countryModel = countriesGrid.getSelectionModel();
+
+        rowEditor.cancelEdit(countryModel.getLastSelected());
+
+        countriesStore.remove(countryModel.getLastSelected());
+
+        if (countriesStore.getCount() > 0) {
+            countryModel.select(0);
+        }
+
+        countriesStore.sync();
+        // End.
+        return true;
+    }
 });

@@ -53,6 +53,7 @@ Ext.define('App.controller.Abstract', {
     getPagingToolbar: function(store)
     {
         var toolbarConfig = this.getToolbarConfig();
+
         Ext.apply(toolbarConfig, {
             store: store,
 //            enableOverflow: true, // This option causes errors on centerview.removeAll
@@ -75,12 +76,19 @@ Ext.define('App.controller.Abstract', {
      */
     getToolbarConfig: function()
     {
-        var allToolbarConfig = this.application.systemModel.get('toolbar'),
-            toolbarName = this.self.getName().replace(/\.|App.controller/g, '');
+        var toolbarConfig,
+            allToolbarConfig = this.application.systemModel.get('toolbar'),
+            toolbarName = this.getIdPrefix();
+
+        toolbarConfig = allToolbarConfig[toolbarName] || {
+        };
+
+        Ext.apply(toolbarConfig, {
+            id: toolbarName + 'Toolbar'
+        });
 
         // End.
-        return allToolbarConfig[toolbarName] || {
-        };
+        return toolbarConfig;
     },
     /**
      * COMMENTME
@@ -93,9 +101,22 @@ Ext.define('App.controller.Abstract', {
     {
         // End.
         return Ext.create('Ext.grid.plugin.RowEditing', {
+            pluginId: this.getIdPrefix() + 'Editor',
             clicksToMoveEditor: 1,
             errorSummary: false,
             autoCancel: false
         });
+    },
+    /**
+     * COMMENTME
+     *
+     *
+     * @private
+     * @return {String} Element id prefix.
+     */
+    getIdPrefix: function()
+    {
+        // End.
+        return this.self.getName().replace(/\.|App.controller/g, '');
     },
 });

@@ -74,42 +74,18 @@ class DataController
      */
     public function getList()
     {
-        $entityNamespace = 'Admin\Entity\\';
-        $entityName = $this->params('entity', false);
-        if (!$entityName) {
+        try {
+            $entityClass = $this->getDataEntity();
+        } catch (\Exception $e) {
             // End.
             return new JsonModel(
                 array(
                 'success' => false,
-                'messages' => 'Missing source identifier.\n' .
-                'Make sure the first argument is an valid data source name.'
+                'messages' => $e->getMssage()
                 )
-            );
-
-            // TODO Remove
-            throw new \Zend\Mvc\Exception\DomainException(
-            'Missing data identifier.' .
-            'Make sure the first argument is an valid Entity name.'
             );
         }
 
-        $entityClass = ($entityNamespace . $entityName);
-        if (!class_exists($entityClass)) {
-            // End.
-            return new JsonModel(
-                array(
-                'success' => false,
-                'messages' => 'Unknown source identifier.\n' .
-                'Make sure the first argument is an valid data source name.'
-                )
-            );
-
-            // TODO Remove
-            throw new \Zend\Mvc\Exception\DomainException(
-            "Entity '{$entityClass}' does not exists." .
-            'Make sure the first argument is an valid Entity name.'
-            );
-        }
         $criteria = array('isVisible' => true);
         $orderBy = array('id' => 'ASC');
         $limit = $this->params()->fromQuery('limit', 25);
@@ -137,7 +113,6 @@ class DataController
         return new JsonModel(
             array(
             'success' => true,
-            'source' => $entityName,
             'total' => $total,
             'data' => $data,
             )
@@ -152,11 +127,15 @@ class DataController
      */
     public function get($id)
     {
-        $entityName = $this->params('entity', false);
-        if (!$entityName) {
-            throw new \Zend\Mvc\Exception\DomainException(
-            'Missing data identifier.' .
-            'Make sure the first argument is an valid Entity name.'
+        try {
+            $entityClass = $this->getDataEntity();
+        } catch (\Exception $e) {
+            // End.
+            return new JsonModel(
+                array(
+                'success' => false,
+                'messages' => $e->getMssage()
+                )
             );
         }
 
@@ -203,23 +182,17 @@ class DataController
      */
     public function update($id, $data)
     {
-        $entityNamespace = 'Admin\Entity\\';
-        $entityName = $this->params('entity', false);
-        if (!$entityName) {
-            throw new \Zend\Mvc\Exception\DomainException(
-            'Missing data identifier.' .
-            'Make sure the first argument is an valid Entity name.'
+        try {
+            $entityClass = $this->getDataEntity();
+        } catch (\Exception $e) {
+            // End.
+            return new JsonModel(
+                array(
+                'success' => false,
+                'messages' => $e->getMssage()
+                )
             );
         }
-
-        $entityClass = ($entityNamespace . $entityName);
-        if (!class_exists($entityClass)) {
-            throw new \Zend\Mvc\Exception\DomainException(
-            "Entity '{$entityClass}' does not exists." .
-            'Make sure the first argument is an valid Entity name.'
-            );
-        }
-
 
         $dataJson = (string) isset($data['data']) ? $data['data'] : $data;
 
@@ -230,7 +203,6 @@ class DataController
         return new JsonModel(
             array(
             'success' => true,
-            'messages' => 'updated.',
             'data' => JsonDecode::decode($dataJson)
             )
         );
@@ -244,22 +216,53 @@ class DataController
      */
     public function delete($id)
     {
-        $entityName = $this->params('entity', false);
-        if (!$entityName) {
-            throw new \Zend\Mvc\Exception\DomainException(
-            'Missing data identifier.' .
-            'Make sure the first argument is an valid Entity name.'
+        try {
+            $entityClass = $this->getDataEntity();
+            $repository = $this->getEntityManager()->getRepository($entityClass);
+            $entity = $repository->find($id);
+            // Delete entity
+        } catch (\Exception $e) {
+            // End.
+            return new JsonModel(
+                array(
+                'success' => false,
+                'messages' => 'Unexpected exception in file: ' . $e->getFile() .
+                '.\nWith messages:\n' . $e->getMessage()
+                )
             );
         }
 
         return new JsonModel(
             array(
             'success' => true,
-            'action' => 'delete',
-            'id' => $id,
-            'data' => $this->request->getContent()
+            'data' => $id
             )
         );
+    }
+
+    private function getDataEntity()
+    {
+        $entityNamespace = 'Admin\Entity\\';
+        $entityName = $this->params('entity', false);
+        if (!$entityName) {
+            // End.
+            throw new \Zend\Mvc\Exception\DomainException(
+            'Missing source identifier.\n' .
+            'Make sure the first argument is an valid data source name.'
+            );
+        }
+
+        $entityClass = ($entityNamespace . $entityName);
+        if (!class_exists($entityClass)) {
+            // End.
+            throw new \Zend\Mvc\Exception\DomainException(
+            'Unknown source identifier.\n' .
+            'Make sure the first argument is an valid data source name.'
+            );
+        }
+
+        // End.
+        return $entityClass;
     }
 
 }
