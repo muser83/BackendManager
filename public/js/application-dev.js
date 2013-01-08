@@ -289,10 +289,9 @@ Ext.application({
      * if the user is logged on and the given uri is not ! or empty.
      *
      * @param {String} uri The request URI.
-     * @param {Boolean} force force to dispaths the given URI.
      * @return {Boolean} Void.
      */
-    doRequest: function(uri, force)
+    doRequest: function(uri)
     {
         var action;
 
@@ -306,6 +305,10 @@ Ext.application({
 
             // End.
             return false;
+        }
+
+        if (uri !== Ext.History.getToken()) {
+            Ext.History.add(uri);
         }
 
         action = this.getAction(uri);
@@ -575,13 +578,25 @@ Ext.application({
         var actionName = Ext.String.uncapitalize(action.action) + 'Action';
         var controller = this.controllers.get(moduleControllerName);
 
-        if (undefined === controller || (('Action' !== actionName)
-            && (undefined === controller[actionName]))) {
+        actionName = ('Action' === actionName)
+            ? false
+            : actionName;
+
+        if (!controller) {
             Ext.Error.raise({
                 title: 'System dispatch error.',
-                msg: 'Could not dispatch action ' + controllerName + '.' +
-                    actionName + '.'
+                msg: 'Could not load controller ' + controllerName + '.',
+                closable: false,
+                addSuffix: false,
+                buttons: Ext.Msg.YESNO,
+                buttonText: {
+                    yes: 'Relaunch System',
+                    no: 'Report issue'
+                }
             });
+
+            // End.
+            return false;
         }
 
         // Call the module controller action.
@@ -769,6 +784,7 @@ Ext.application({
         var self = this;
         var errorDefault = {
             scope: this,
+            addSuffix: true,
             closable: true,
             modal: true,
             multiline: false,
@@ -803,14 +819,15 @@ Ext.application({
         // Initialize the error listner.
         Ext.Error.handle = function(error)
         {
-            error.msg += '\n\'Report issue\' to help debugging this system.\n\
-\'Continue\' otherwise.';
-
             Ext.apply(errorDefault, error);
+            if (error.addSuffix) {
+                error.msg += '\n\'Report issue\' to help debugging this system.\n\
+\'Continue\' otherwise.';
+            }
 
             if (!error.showError || false !== error.showError) {
 
-                self.debug('New error throwed:', {
+                self.debug('New error throwed:', 'Error', {
                     errorMsg: error.msg
                 });
 

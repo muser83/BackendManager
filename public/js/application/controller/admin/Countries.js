@@ -69,10 +69,6 @@ Ext.define('App.controller.admin.Countries', {
 
         this.setCenter(countriesGrid);
 
-        console.log(action);
-
-        this[action]();
-
         // End.
         return true;
     },
