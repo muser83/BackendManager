@@ -42,7 +42,7 @@ Ext.define('App.controller.application.Dashboard', {
             tbar: this.getToolbar()
         });
 
-        this.addToCenter(dashboardPanel);
+        this.setCenter(dashboardPanel);
         return true;
     }
 

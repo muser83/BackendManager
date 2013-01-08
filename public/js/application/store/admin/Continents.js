@@ -7,7 +7,6 @@
  * @copyright 2012 witteStier.nl
  */
 Ext.define('App.store.admin.Continents', {
-    extend: 'Ext.data.Store',
-    // Config
+    extend: 'App.store.Continents',
     model: 'App.model.admin.Continents'
 });

@@ -20,7 +20,7 @@ Ext.define('App.controller.Abstract', {
      * @param {App.view.*} centerView View to add to the viewport center region.
      * @returns {Boolean} Void
      */
-    addToCenter: function(centerView)
+    setCenter: function(centerView)
     {
         var centerRegion = this.getCenterRegion();
         centerRegion.removeAll(true);
@@ -28,6 +28,19 @@ Ext.define('App.controller.Abstract', {
 
         // End.
         return true;
+    },
+    /**
+     * COMMENTME
+     *
+     * @protected
+     * @return {App.view.*} To the viewport center region added view.
+     */
+    getCenter: function()
+    {
+        var centerRegion = this.getCenterRegion();
+
+        // End.
+        return centerRegion.down('panel');
     },
     /**
      * COMMENTME

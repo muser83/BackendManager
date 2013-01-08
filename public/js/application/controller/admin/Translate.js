@@ -42,7 +42,7 @@ Ext.define('App.controller.admin.Translate', {
             tbar: this.getToolbar()
         });
 
-        this.addToCenter(translateGrid);
+        this.setCenter(translateGrid);
 
         // End.
         return true;

@@ -8,6 +8,6 @@
  */
 
 Ext.define('App.store.admin.Currencies', {
-    extend: 'Ext.data.Store',
+    extend: 'App.store.Currencies',
     model: 'App.model.admin.Currencies'
 });

@@ -8,26 +8,7 @@
  */
 
 Ext.define('App.model.admin.Currencies', {
-    extend: 'Ext.data.Model',
-    validations: [],
-    fields: [{
-            name: 'id',
-            type: 'int',
-            useNull: true
-        }, {
-            name: 'isVisible',
-            type: 'boolean',
-            defaultValue: false
-        }, {
-            name: 'name',
-            type: 'string'
-        }, {
-            name: 'iso4217',
-            type: 'string'
-        }, {
-            name: 'symbol',
-            type: 'string'
-        }, ],
+    extend: 'App.model.Currencies',
     listners: {
     },
     proxy: {

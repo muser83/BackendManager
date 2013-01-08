@@ -79,6 +79,7 @@ class SystemController
                 array('text' => 'Add', 'action' => 'add'),
                 array('text' => 'Edit', 'action' => 'edit', 'disabled' => true),
                 array('text' => 'Delete', 'action' => 'delete', 'disabled' => true),
+                '-',
                 array('text' => 'Continents', 'action' => 'continents'),
                 array('text' => 'Currencies', 'action' => 'currencies'),
             )
@@ -90,6 +91,7 @@ class SystemController
                 array('text' => 'Add', 'action' => 'add'),
                 array('text' => 'Edit', 'action' => 'edit', 'disabled' => true),
                 array('text' => 'Delete', 'action' => 'delete', 'disabled' => true),
+                '-',
                 array('text' => 'Languages', 'action' => 'languages')
             )
         ),

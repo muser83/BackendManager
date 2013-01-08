@@ -31,13 +31,19 @@ Ext.define('App.controller.admin.Countries', {
     {
         this.control({
             '#adminCountriesToolbar button[action=add]': {
-                'click': this.addCountryAction
+                'click': this.addAction
             },
             '#adminCountriesToolbar button[action=edit]': {
-                'click': this.editCountryAction
+                'click': this.editAction
             },
             '#adminCountriesToolbar button[action=delete]': {
-                'click': this.deleteCountryAction
+                'click': this.deleteAction
+            },
+            '#adminCountriesToolbar button[action=continents]': {
+                'click': this.continentsAction
+            },
+            '#adminCountriesToolbar button[action=currencies]': {
+                'click': this.currenciesAction
             }
         });
         return true;
@@ -47,7 +53,7 @@ Ext.define('App.controller.admin.Countries', {
      *
      * @return Boolean Void
      */
-    startupAction: function()
+    startupAction: function(action)
     {
         var rowEditor = this.getRowEditor(),
             countriesStore = this.getAdminCountriesStore().load();
@@ -61,7 +67,11 @@ Ext.define('App.controller.admin.Countries', {
             e.record.save();
         }, this);
 
-        this.addToCenter(countriesGrid);
+        this.setCenter(countriesGrid);
+
+        console.log(action);
+
+        this[action]();
 
         // End.
         return true;
@@ -69,15 +79,12 @@ Ext.define('App.controller.admin.Countries', {
     /**
      * COMMENTME
      *
-     *
      * @public
-     * @param {Ext.button.Button} button
-     * @param {Event} event
      * @return {Boolean} Void.
      */
-    addCountryAction: function(button, event)
+    addAction: function()
     {
-        var countriesGrid = button.up('grid'),
+        var countriesGrid = this.getCenter(),
             rowEditor = countriesGrid.getPlugin('adminCountriesEditor'),
             countriesStore = countriesGrid.getStore(),
             countryModel = this.getAdminCountriesModel().create();
@@ -93,15 +100,12 @@ Ext.define('App.controller.admin.Countries', {
     /**
      * COMMENTME
      *
-     *
      * @public
-     * @param {Ext.button.Button} button
-     * @param {Event} event
      * @return {Boolean} Void.
      */
-    editCountryAction: function(button, event)
+    editAction: function()
     {
-        var countriesGrid = button.up('grid'),
+        var countriesGrid = this.getCenter(),
             rowEditor = countriesGrid.getPlugin('adminCountriesEditor'),
             countriesStore = countriesGrid.getStore(),
             countryModel = countriesGrid.getSelectionModel();
@@ -114,15 +118,12 @@ Ext.define('App.controller.admin.Countries', {
     /**
      * COMMENTME
      *
-     *
      * @public
-     * @param {Ext.button.Button} button description1
-     * @param {Event} event description2
      * @return {Boolean} Void.
      */
-    deleteCountryAction: function(button, event)
+    deleteAction: function()
     {
-        var countriesGrid = button.up('grid'),
+        var countriesGrid = this.getCenter(),
             rowEditor = countriesGrid.getPlugin('adminCountriesEditor'),
             countriesStore = countriesGrid.getStore(),
             countryModel = countriesGrid.getSelectionModel();
@@ -131,11 +132,45 @@ Ext.define('App.controller.admin.Countries', {
 
         countriesStore.remove(countryModel.getLastSelected());
 
-        if (countriesStore.getCount() > 0) {
-            countryModel.select(0);
-        }
+        // SETTING
+//        if (countriesStore.getCount() > 0) {
+//            countryModel.select(0);
+//        }
 
         countriesStore.sync();
+        // End.
+        return true;
+    },
+    /**
+     * COMMENTME
+     *
+     * @public
+     * @return {Boolean} Void.
+     */
+    continentsAction: function()
+    {
+        /**
+         * Open a window with this.openWindow(view)
+         * Get a open window with this.getWindow([viewQuery])
+         *  current open window.down(viewQuery)
+         */
+
+        console.log('view continents action.')
+
+        // End.
+        return true;
+    },
+    /**
+     * COMMENTME
+     *
+     * @public
+     * @return {Boolean} Void.
+     */
+    currenciesAction: function()
+    {
+        console.log('view Currencies action.')
+
+
         // End.
         return true;
     }

@@ -7,9 +7,7 @@
  * @copyright 2012 witteStier.nl
  */
 Ext.define('App.store.admin.Countries', {
-    extend: 'Ext.data.Store',
-    model: 'App.model.admin.Countries',
-    storeId: 'adminCountries'
+    extend: 'App.store.Countries',
+    model: 'App.model.admin.Countries'
 });
-
 

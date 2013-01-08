@@ -45,26 +45,5 @@ Ext.define('App.model.Person', {
 
                 return fullname;
             }
-        }],
-    proxy: {
-        type: 'ajax',
-        url: '~system/get-person',
-        reader: {
-            type: 'json',
-            root: 'person',
-            messageProperty: 'message'
-        },
-        writer: {
-            type: 'json',
-            nameProperty: 'name',
-            writeAllFields: true,
-            allowSingle: true,
-            encode: false,
-            root: 'person',
-            getRecordData: function(record) {
-                Ext.apply(record.data, record.getAssociatedData());
-                return record.data;
-            }
-        }
-    }
+        }]
 });

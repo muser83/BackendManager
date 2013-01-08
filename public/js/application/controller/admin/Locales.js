@@ -58,7 +58,7 @@ Ext.define('App.controller.admin.Locales', {
             e.record.save();
         }, this);
 
-        this.addToCenter(localesGrid);
+        this.setCenter(localesGrid);
 
         // End.
         return true;

@@ -44,7 +44,7 @@ Ext.define('App.controller.admin.Roles', {
             tbar: this.getToolbar()
         });
 
-        this.addToCenter(rolesGrid);
+        this.setCenter(rolesGrid);
 
         // End.
         return true;

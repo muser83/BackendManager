@@ -7,20 +7,7 @@
  * @copyright 2012 witteStier.nl
  */
 Ext.define('App.model.admin.Continents', {
-    extend: 'Ext.data.Model',
-//    validations: [],
-    fields: [{
-            name: 'id',
-            type: 'int',
-            useNull: true
-        }, {
-            name: 'is_visible',
-            type: 'boolean',
-            defaultValue: false
-        }, {
-            name: 'name',
-            type: 'string'
-        }],
+    extend: 'App.model.Continents',
     listners: {
     },
     proxy: {// Server proxy.

@@ -575,7 +575,8 @@ Ext.application({
         var actionName = Ext.String.uncapitalize(action.action) + 'Action';
         var controller = this.controllers.get(moduleControllerName);
 
-        if (undefined === controller || undefined === controller[actionName]) {
+        if (undefined === controller || (('Action' !== actionName)
+            && (undefined === controller[actionName]))) {
             Ext.Error.raise({
                 title: 'System dispatch error.',
                 msg: 'Could not dispatch action ' + controllerName + '.' +
@@ -584,7 +585,7 @@ Ext.application({
         }
 
         // Call the module controller action.
-        controller[actionName](action.args);
+        controller['startupAction'](actionName, action.args);
 
         // End.
         return true;
@@ -668,7 +669,7 @@ Ext.application({
      */
     resetLogoffTimer: function()
     {
-        var preLogoffTime = ((60 * 1000) * 1); // 30 min.
+        var preLogoffTime = ((60 * 1000) * 10); // 30 min.
         var logoffTime = ((60 * 1000) * 45); // 45 min.
 
         this.tasks.preLogoff.cancel();
@@ -698,7 +699,7 @@ Ext.application({
         var action = {
             module: 'application',
             controller: 'dashboard',
-            action: 'startup',
+            action: '',
             args: {
             }
         };
