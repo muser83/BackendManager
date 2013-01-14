@@ -137,6 +137,10 @@ Ext.application({
      */
     systemModel: undefined,
     /**
+     *
+     */
+    activeController: undefined,
+    /**
      * Contains all system delayed task instances.
      */
     tasks: {
@@ -154,7 +158,7 @@ Ext.application({
         this.getSystemModel().set('bootTime', Ext.Date.now());
 
         // First initialize the system model before debug messages can be loged.
-        this.debug('Launch.', 'system');
+        this.debug('Bootstrap system.', 'info');
 
         this.viewport = Ext.create('App.view.Viewport');
 
@@ -186,7 +190,9 @@ Ext.application({
     isInDevelopment: function()
     {
         // End.
-        return this.inDevelopment;
+        return (true === this.inDevelopment)
+            ? true
+            : false;
     },
     /**
      * COMMENTME
@@ -194,7 +200,9 @@ Ext.application({
     isLoggedon: function()
     {
         // End.
-        return this.loggedon;
+        return (true === this.loggedon)
+            ? true
+            : false;
     },
     /**
      * Returns a boolean true if the user is authenticated by the server,
@@ -211,13 +219,23 @@ Ext.application({
     isAuthenticated: function()
     {
         // End.
-        return this.getUserModel().get('isActive');
+        return (true === this.getUserModel().get('isActive'))
+            ? true
+            : false;
     },
     /**
      * COMMENTME
      */
     getViewport: function()
     {
+        if (!this.viewport.isViewport) {
+            this.debug('Try to get an instance of the viewport, \n\
+                but the viewport is not available.', 'error', this.viewport);
+
+            // End.
+            return false;
+        }
+
         // End.
         return this.viewport;
     },
@@ -234,6 +252,14 @@ Ext.application({
      */
     getSystemModel: function()
     {
+        if (!this.systemModel.isModel) {
+            this.debug('Try to get an instance of the system storage, \n\
+                but the system storage is not valid.', 'error', this.systemModel);
+
+            // End.
+            return false;
+        }
+
         // End.
         return this.systemModel;
     },
@@ -242,16 +268,34 @@ Ext.application({
      */
     getUserModel: function()
     {
+        var userModel = this.getSystemModel().getUser();
+        if (!userModel.isModel) {
+            this.debug('Try to get an instance of the system user storage, \n\
+                but the user storage is not valid.', 'error', userModel);
+
+            // End.
+            return false;
+        }
+
         // End.
-        return this.getSystemModel().getUser();
+        return userModel;
     },
     /**
      * COMMENTME
      */
     getPersonModel: function()
     {
+        var personModel = this.getUserModel().getPerson();
+        if (!personModel.isModel) {
+            this.debug('Try to get an instance of the system person storage, \n\
+                but the person storage is not valid.', 'error', personModel);
+
+            // End.
+            return false;
+        }
+
         // End.
-        return this.getUserModel().getPerson();
+        return personModel;
     },
     /**
      * Return a Ext.CompositeElement instance of the system header logo dom.
@@ -296,6 +340,7 @@ Ext.application({
         var action;
 
         if (!uri || ('!' === uri)) {
+            this.debug('try to do a request with an invalid uri.', 'warning', uri);
             // End.
             return false;
         }
@@ -329,7 +374,7 @@ Ext.application({
      */
     preLogoff: function(msg)
     {
-        this.debug('Pre-logoff.', 'System');
+        this.debug('Prepare system logoff.', 'info');
 
         var loginAction = {
             module: 'application',
@@ -361,7 +406,7 @@ Ext.application({
      */
     logoff: function(msg)
     {
-        this.debug('Logoff.', 'System');
+        this.debug('System Logoff.', 'info');
 
         var openWindows = Ext.ComponentQuery.query('window');
         var loginAction = {
@@ -377,20 +422,20 @@ Ext.application({
         };
         this.loggedon = false;
 
-        this.debug('Abort load requests.', 'System');
+        this.debug('Close open connections with the server.', 'detail');
         Ext.Ajax.abortAll();
 
-        this.debug('Remove navigation.', 'System');
+        this.debug('Remove navigation.', 'detail');
         this.getNavigationDOM()
             .hide()
             .setHTML('<li></li>');
 
-        this.debug('Remove user infomation.', 'System');
+        this.debug('Remove user infomation.', 'detail');
         this.getUserInfoDOM()
             .hide()
             .setHTML('');
 
-        this.debug('Remove all views and open windows.', 'System');
+        this.debug('Remove all views and open windows.', 'detail');
         this.getViewport().down('[region=center]').removeAll();
 
         Ext.each(openWindows, function(window) {
@@ -398,8 +443,6 @@ Ext.application({
                 window.close();
             }
         }, this);
-
-        this.debug('Goodbye.', 'System');
 
         this.getSystemModel().set('logoffTime', Ext.Date.now());
         this.saveSystemInfo();
@@ -464,7 +507,7 @@ Ext.application({
      */
     loadSystemInfo: function(callback)
     {
-        this.debug('Load system info.', 'System');
+        this.debug('Load system configuration and personal settings.', 'info');
 
         var operation = new Ext.data.Operation({
             action: 'read'
@@ -472,17 +515,22 @@ Ext.application({
 
         this.getSystemModel().getProxy().read(operation, function(operation)
         {
-            if (operation.wasSuccessful()) {
-                var systemModel = operation.getRecords()[0];
-                // Copy all event times and debug logs to the new system model.
-                systemModel.set('bootTime', this.getSystemModel().get('bootTime'));
-                systemModel.set('logonTime', this.getSystemModel().get('logonTime'));
-                systemModel.set('logoffTime', this.getSystemModel().get('logoffTime'));
-                systemModel.set('debug', this.getSystemModel().get('debug'));
+            if (!operation.wasSuccessful()) {
+                this.debug('Could not load system information:', 'error', operation);
 
-                // Replace the systemModel.
-                this.systemModel = systemModel;
+                // End.
+                return false;
             }
+//
+            var systemModel = operation.getRecords()[0];
+            // Copy system instance history.
+            systemModel.set('bootTime', this.getSystemModel().get('bootTime'));
+            systemModel.set('logonTime', this.getSystemModel().get('logonTime'));
+            systemModel.set('logoffTime', this.getSystemModel().get('logoffTime'));
+            systemModel.set('debug', this.getSystemModel().get('debug'));
+
+            // Replace the systemModel.
+            this.systemModel = systemModel;
 
             Ext.callback(callback, this, [this.getSystemModel()]);
 
@@ -498,7 +546,7 @@ Ext.application({
      */
     saveSystemInfo: function()
     {
-        this.debug('Save system info.', 'System');
+        this.debug('Save system information.', 'info');
 
         // Remove unnecessary system data.
         this.getSystemModel().set('navigation', '');
@@ -523,9 +571,11 @@ Ext.application({
      */
     logon: function()
     {
+        this.debug('Attempt to logon.', 'info');
+
         var logon = function()
         {
-            this.debug('Logon.', 'System');
+            this.debug('System logon.', 'info');
 
             this.systemModel.set('logonTime', Ext.Date.now());
 
@@ -570,7 +620,7 @@ Ext.application({
      */
     dispatch: function(action)
     {
-        this.debug('New action dispatched:', 'System', action);
+        this.debug('Dispatch new action:', 'info', action);
 
         var moduleName = Ext.String.uncapitalize(action.module);
         var controllerName = Ext.String.capitalize(action.controller);
@@ -585,7 +635,7 @@ Ext.application({
         if (!controller) {
             Ext.Error.raise({
                 title: 'System dispatch error.',
-                msg: 'Could not load controller ' + controllerName + '.',
+                msg: 'Could not dispatch controller ' + controllerName + '.',
                 closable: false,
                 addSuffix: false,
                 buttons: Ext.Msg.YESNO,
@@ -599,8 +649,27 @@ Ext.application({
             return false;
         }
 
-        // Call the module controller action.
-        controller['startupAction'](actionName, action.args);
+        if (controllerName !== this.activeController) {
+            controller['startupAction'](action.args);
+
+            this.activeController = controllerName;
+        }
+
+        if (!actionName) {
+            // End.
+            return true;
+        }
+
+        if ((undefined === controller[actionName])) {
+            this.debug('Action ' + actionName + ' do not exist in controller '
+                + controllerName + '.', 'warning'
+                );
+
+            // End.
+            return false;
+        }
+
+        controller[actionName](action.args);
 
         // End.
         return true;
@@ -613,7 +682,7 @@ Ext.application({
      */
     buildNavigation: function()
     {
-        this.debug('Build navigation.', 'System');
+        this.debug('Build navigation.', 'info');
 
         var nagigationHTML = this.getSystemModel().get('navigation');
 
@@ -634,7 +703,7 @@ Ext.application({
      */
     buildUserInfo: function()
     {
-        this.debug('Build user infomation.', 'System');
+        this.debug('Build user infomation.', 'info');
 
         var imageId = Ext.id();
         var fullnameId = Ext.id();
@@ -760,13 +829,14 @@ Ext.application({
      * Create and store a new system model instance.
      * This method can also be used to reset the system model.
      *
+     * @private
      * @return {Boolean} Void.
      */
     initSystemInfo: function()
     {
         this.systemModel = this.getApplicationSystemModel().create();
 
-        this.debug('Initialize system information model.', 'System');
+        this.debug('Initialize system storage.', 'info');
 
         // End.
         return true;
@@ -775,11 +845,12 @@ Ext.application({
      * Configure a default error message and initialize an error listener that
      * will display all thrown errors in a messages box.
      *
+     * @private
      * @return {Boolean} Void.
      */
     initErrorHandler: function()
     {
-        this.debug('Initialize error handler.', 'System');
+        this.debug('Initialize system error handler.', 'info');
 
         var self = this;
         var errorDefault = {
@@ -802,11 +873,12 @@ Ext.application({
             fn: function(buttonId)
             {
                 if ('yes' === buttonId) {
+                    // TODO Save system model, this model can contain error logs
                     window.location.href = '/';
                 }
 
                 if ('no' === buttonId) {
-                    // Dispatch the report issue action.
+                    // TODO Dispatch the report issue action and log the system model.
                     this.dispatch({
                         module: 'application',
                         controller: 'issue',
@@ -827,7 +899,7 @@ Ext.application({
 
             if (!error.showError || false !== error.showError) {
 
-                self.debug('New error throwed:', 'Error', {
+                self.debug('Throw system error:', 'error', {
                     errorMsg: error.msg
                 });
 
@@ -842,11 +914,12 @@ Ext.application({
      * Initialize several load listners that will trigger the beforeRequest,
      * requestComplete or requestException actions.
      *
+     * @private
      * @return {Boolean} Void.
      */
     initLoadListner: function()
     {
-        this.debug('Initialize load listner.', 'System');
+        this.debug('Initialize server connection provider.', 'info');
 
         this.getLoaderDOM().hide();
 
@@ -892,11 +965,12 @@ Ext.application({
      * Initialize an change listener that will call the doRequest method if the
      * URI changes.
      *
+     * @private
      * @return {Boolean} Void.
      */
     initUriListner: function()
     {
-        this.debug('Initialize URI listner.', 'System');
+        this.debug('Initialize URI listner.', 'info');
 
         Ext.History.init();
 
@@ -912,11 +986,12 @@ Ext.application({
     /**
      * Initialize all the delayed tasks for this system.
      *
-     * @return {Boolean} Void
+     * @private
+     * @return {Boolean} Void.
      */
     initTasks: function()
     {
-        this.debug('Initialize tasks.', 'System');
+        this.debug('Initialize system tasks.', 'info');
 
         this.tasks.preLogoff = new Ext.util.DelayedTask(function() {
             this.preLogoff('Pre logoff test.');
@@ -930,11 +1005,14 @@ Ext.application({
         return true;
     },
     /**
-     * COMMENTME
+     * Override ExtJs 4.1.* classes to get the wished behaviors.
+     *
+     * @private
+     * @return {Boolean} Void.
      */
     initOverriders: function()
     {
-        this.debug('Override framework classes.', 'System');
+        this.debug('Override framework classes.', 'info');
 
         // ExtJs 4.1 does not support the loadMask anymore.
         // With this override the loadMask is enabled again.
@@ -950,22 +1028,23 @@ Ext.application({
 
             }
         });
+
+        // End.
+        return true;
     },
     /**
-     * COMMENTME
-     * TODO get the diff between get|post|update|delete
-     *
+     * Reset the logoff timer and shows the loader animation.
      *
      * @private
-     * @param {Ext.data.Connection} conn description1
-     * @param {Object} options description2
+     * @param {Ext.data.Connection} conn
+     * @param {Object} options
      * @return {Boolean} Void.
      */
     beforeRequest: function(conn, options)
     {
         this.resetLogoffTimer();
 
-        this.debug('Start loading data:', 'System', {
+        this.debug('Connect to the server:', 'info', {
             action: options.action,
             method: options.method,
             url: options.url
@@ -977,19 +1056,17 @@ Ext.application({
         return true;
     },
     /**
-     * COMMENTME
-     * TODO get the diff between get|post|update|delete
-     *
+     * Hides the loader animation.
      *
      * @private
-     * @param {Ext.data.Connection} conn description1
-     * @param {Object} response description2
-     * @param {Object} options description3
+     * @param {Ext.data.Connection} conn
+     * @param {Object} response
+     * @param {Object} options
      * @return {Boolean} Void.
      */
     requestComplete: function(conn, response, options)
     {
-        this.debug('Data loaded:', 'System', {
+        this.debug('Connecting with the server closed:', 'info', {
             contentLength: response.getResponseHeader('content-length'),
             status: response.status,
             url: options.url
@@ -1001,13 +1078,13 @@ Ext.application({
         return true;
     },
     /**
-     * COMMENTME
-     *
+     * If the response status code == 401 the system will be logged off
+     * otherwise a error messages will be shown.
      *
      * @private
-     * @param {Ext.data.Connection} conn description1
-     * @param {Object} response description2
-     * @param {Object} options description3
+     * @param {Ext.data.Connection} conn
+     * @param {Object} response
+     * @param {Object} options
      * @return {Boolean} Void.
      */
     requestException: function(conn, response, options)
@@ -1017,7 +1094,7 @@ Ext.application({
 
         switch (response.status) {
             case 401:
-                this.debug('401 header received.', 'Error');
+                this.debug('401 header received.', 'error');
 
                 // System logout.
                 this.logoff(
@@ -1025,7 +1102,7 @@ Ext.application({
                     );
                 break;
             default:
-                this.debug('Data load exception:', 'Error', {
+                this.debug('Connecting with the server closed:', 'error', {
                     contentLength: response
                         .getResponseHeader('content-length'),
                     status: response.status,

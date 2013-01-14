@@ -61,10 +61,10 @@ Ext.define('App.controller.application.Authentication', {
      */
     loginAction: function(args)
     {
-        var window = this.getApplicationAuthenticationWindowView().create();
-        var loginForm = this.getApplicationAuthenticationFromLoginView()
-            .create();
-        var userModel = this.getUserModel().create();
+        var window = this.getApplicationAuthenticationWindowView().create(),
+            loginForm = this.getApplicationAuthenticationFromLoginView()
+            .create(),
+            userModel = this.getUserModel().create();
 
         if (args.msg) {
             var logoutMessage = 'you are logged off because of the following reason:\n'
@@ -93,15 +93,14 @@ Ext.define('App.controller.application.Authentication', {
      */
     authenticateAction: function(target)
     {
-        var window = target.up('window');
-        var loginForm = window.down('form').getForm();
-        var userModel = loginForm.getRecord();
-        var credentialField = loginForm.findField('credential');
+        var window = target.up('window'),
+            loginForm = window.down('form').getForm(),
+            userModel = loginForm.getRecord(),
+            credentialField = loginForm.findField('credential');
 
         if (loginForm.isValid()) {
             loginForm.updateRecord(userModel);
 
-            userModel.getProxy().url = '~authentication/login';
             userModel.save({
                 scope: this,
                 callback: function(userModel, operation)
@@ -116,6 +115,8 @@ Ext.define('App.controller.application.Authentication', {
                         // End.
                         return false;
                     }
+
+                    console.log(userModel)
 
                     if (true !== userModel.get('isActive')) {
                         this.application.logoff();

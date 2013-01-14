@@ -58,9 +58,9 @@ Ext.define('App.model.application.System', {
         },
         writer: {
             type: 'json',
-            nameProperty: 'name',
-            writeAllFields: true,
-            allowSingle: true,
+//            nameProperty: 'name',
+//            writeAllFields: true,
+//            allowSingle: true,
             encode: true,
             root: 'system',
             getRecordData: function(record) {

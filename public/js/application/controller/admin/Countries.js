@@ -53,7 +53,7 @@ Ext.define('App.controller.admin.Countries', {
      *
      * @return Boolean Void
      */
-    startupAction: function(action)
+    startupAction: function()
     {
         var rowEditor = this.getRowEditor(),
             countriesStore = this.getAdminCountriesStore().load();

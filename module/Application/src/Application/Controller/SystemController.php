@@ -32,7 +32,7 @@ class SystemController
      * @var \Doctrine\ORM\EntityManager
      */
     private $entityManager;
-    private $isAuthenticated = true;
+    private $isAuthenticated = false;
     private $navigation = '
 <li>
 <a href="#!">Dashboard</a>
