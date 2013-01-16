@@ -45,8 +45,9 @@ Ext.define('App.model.application.System', {
             }
         }, {
             name: 'debug',
-            type: 'array',
-            defaultValue: []
+            type: 'object',
+            defaultValue: {
+            }
         }],
     proxy: {
         type: 'ajax',

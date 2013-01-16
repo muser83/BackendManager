@@ -340,7 +340,7 @@ Ext.application({
         var action;
 
         if (!uri || ('!' === uri)) {
-            this.debug('try to do a request with an invalid uri.', 'warning', uri);
+            this;
             // End.
             return false;
         }
@@ -467,26 +467,33 @@ Ext.application({
      */
     debug: function(msg, level, dump)
     {
-        if (!level) {
-            level = 'Unknown';
-        }
-
-        level = Ext.String.capitalize(level);
-
-        dump = dump || {
+        msg = msg || 'Unknown messages',
+            dump = dump || {
         };
-
-        // TODO use levels.
-
         var debugLogs = this.getSystemModel().get('debug');
 
-        Ext.Array.insert(debugLogs, Ext.Date.now(), [{
-                time: Ext.Date.now(),
-                msg: msg,
-                dump: dump
-            }]);
+        switch (level.toLowerCase()) {
+            case 'detail':
+            case 'info':
+            case 'warning':
+            case 'error':
+            default:
+                'unknown';
+        }
+
+        if (!debugLogs.hasOwnProperty(level)) {
+            debugLogs[level] = {
+            };
+        }
+
+        debugLogs[level][Ext.Date.now()] = {
+            msg: msg,
+            dump: dump
+        };
 
         this.getSystemModel().set('debug', debugLogs);
+
+        level = Ext.String.capitalize(level);
 
         console.info((level + ': ' + msg), [dump]);
 
