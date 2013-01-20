@@ -139,7 +139,8 @@ Ext.define('App.view.Viewport', {
             height: 46
         }, {
             region: 'center',
-            layout: 'fit'
+            layout: 'fit',
+            contentEl: 'application-content'
         }
     ],
     /**

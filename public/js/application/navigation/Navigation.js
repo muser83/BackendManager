@@ -6,10 +6,14 @@
  * @license   -
  * @copyright 2012 witteStier.nl
  */
+
+/**
+ *
+ */
 Ext.define('App.navigation.Navigation', {
     navigationDOM: undefined,
     /**
-     * Construct the
+     * Constructor
      *
      * @return {App.navigation.Navigation}
      */
@@ -21,7 +25,7 @@ Ext.define('App.navigation.Navigation', {
         return this;
     },
     /**
-     * Initialize the navigation DOM for navigation use
+     * Initialize the navigation DOM for navigation use,
      * add classes, create new elements and set Event Handlers.
      *
      * @return {Boolean} Void
@@ -104,10 +108,7 @@ Ext.define('App.navigation.Navigation', {
                 hideTask.delay(300, false, false, [list]);
             });
 
-            list.hover(function()
-            {
-                hideTask.cancel();
-            }, function()
+            list.hover(hideTask.cancel, function()
             {
                 hideTask.delay(300, false, false, [list]);
             });
@@ -117,25 +118,34 @@ Ext.define('App.navigation.Navigation', {
         return true;
     },
     /**
-     * Highlight the loaded module tab.
+     * Highlight the loaded module tab(s).
      *
-     * @return {Boolean} Void
+     * @param {String} url This url will be used to search the loaded module tab
+     * @return {Boolean} true if the tab is highlighted, false otherwhise.
      */
     highlightTab: function(url)
     {
-        var selectedAnchors = this.navigationDOM
-            .select('a[href=#' + url + ']');
+        var selectedAnchors;
+
+        do {
+            selectedAnchors = this.navigationDOM
+                .select('a[href=#' + url + ']');
+
+            url = url.slice(0, -1);
+
+            if (url.length < 0) {
+                // End.
+                return false;
+            }
+
+        } while (selectedAnchors.elements.length < 1);
 
         this.hideOpen();
-
-        if (selectedAnchors.elements.length < 1) {
-            // End.
-            return this;
-        }
 
         this.navigationDOM.select('li.application-active')
             .removeCls('application-active');
 
+        // It is possible to highlight multiple tabs.
         selectedAnchors.each(function(selectedAnchor)
         {
             selectedAnchor.parent('li.application-navigation-tab')
@@ -145,8 +155,7 @@ Ext.define('App.navigation.Navigation', {
         // End.
         return true;
 
-    }
-    ,
+    },
     /**
      * Show the navigation list DOM.
      *
@@ -161,8 +170,7 @@ Ext.define('App.navigation.Navigation', {
 
         // End.
         return true;
-    }
-    ,
+    },
     /**
      * Hide the navigation list DOM.
      *
@@ -182,8 +190,7 @@ Ext.define('App.navigation.Navigation', {
 
         // End.
         return true;
-    }
-    ,
+    },
     /**
      * Hide all list DOM siblings and parent elements.
      *
@@ -192,7 +199,8 @@ Ext.define('App.navigation.Navigation', {
      */
     hideSiblings: function(list)
     {
-        list.parent().select('li:has(>ul)').each(function(sibling) {
+        list.parent().select('li:has(>ul)').each(function(sibling)
+        {
             if (list.dom.id !== sibling.dom.id) {
                 sibling.first('ul').hide();
                 sibling.first('a')
@@ -202,8 +210,7 @@ Ext.define('App.navigation.Navigation', {
 
         // End.
         return true;
-    }
-    ,
+    },
     /**
      * Hide all open navigation lists
      *
