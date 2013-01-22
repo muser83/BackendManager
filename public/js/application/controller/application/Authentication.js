@@ -9,7 +9,7 @@
 Ext.define('App.controller.application.Authentication', {
     extend: 'App.controller.Abstract',
     models: [
-        'User'
+        'application.User'
     ],
     stores: [],
     views: [
@@ -64,7 +64,7 @@ Ext.define('App.controller.application.Authentication', {
         var window = this.getApplicationAuthenticationWindowView().create(),
             loginForm = this.getApplicationAuthenticationFromLoginView()
             .create(),
-            userModel = this.getUserModel().create();
+            userModel = this.getApplicationUserModel().create();
 
         if (args.msg) {
             var logoutMessage = 'you are logged off because of the following reason:\n'

@@ -14,6 +14,7 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController,
     Zend\Json\Json,
     Zend\View\Model\JsonModel,
+    Zend\Session\Container AS sessionContainer,
     Doctrine\ORM\EntityManager;
 
 /**
@@ -39,13 +40,13 @@ class AuthenticationController
      * @param \Doctrine\ORM\EntityManager $entityManager
      * @return \Album\Controller\AlbumController
      */
-    public function setEntityManager(EntityManager $entityManager)
-    {
-        $this->entityManager = $entityManager;
-
-        // End.
-        return $this;
-    }
+//    public function setEntityManager(EntityManager $entityManager)
+//    {
+//        $this->entityManager = $entityManager;
+//
+//        // End.
+//        return $this;
+//    }
 
     /**
      * Create and or get an instance of \Doctrine\ORM\EntityManager.
@@ -137,7 +138,11 @@ class AuthenticationController
             );
         }
 
-        return $this->forward()->dispatch('System', array('action' => 'get-user'));
+        $session = new sessionContainer('dev');
+        $session->setExpirationHops(5);
+        $session->offsetSet('isAuthenticated', true);
+
+        return $this->forward()->dispatch('system', array('action' => 'get-user'));
     }
 
     /**

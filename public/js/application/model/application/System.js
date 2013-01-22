@@ -9,10 +9,18 @@
 Ext.define('App.model.application.System', {
     extend: 'Ext.data.Model',
     uses: [
-        'App.model.User'
+        'App.model.Person',
+        'App.model.application.User'
     ],
     hasOne: [{
-            model: 'App.model.User',
+            model: 'App.model.Person',
+            getterName: 'getPerson',
+            setterName: 'setPerson',
+            associationKey: 'person',
+            foreignKey: 'personId',
+            primaryKey: 'id'
+        }, {
+            model: 'App.model.application.User',
             getterName: 'getUser',
             setterName: 'setUser',
             associationKey: 'user',

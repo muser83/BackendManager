@@ -14,6 +14,7 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController,
     Zend\Json\Json,
     Zend\View\Model\JsonModel,
+    Zend\Session\Container AS sessionContainer,
     Doctrine\ORM\EntityManager;
 
 /**
@@ -32,7 +33,7 @@ class SystemController
      * @var \Doctrine\ORM\EntityManager
      */
     private $entityManager;
-    private $isAuthenticated = true;
+    private $isAuthenticated = false;
     private $navigation = '
 <li>
 <a href="#!">Dashboard</a>
@@ -128,7 +129,6 @@ class SystemController
     private $user = array(
         'id' => 1,
         'localesId' => 1,
-        'personsId' => 1,
         'isVerified' => true,
         'isActive' => true,
         'identity' => 'WitteStier',
@@ -139,10 +139,27 @@ class SystemController
     );
 
     /**
+     * Controller constructor
+     *
+     * @return boolean
+     */
+    public function __construct()
+    {
+        $session = new sessionContainer('dev');
+
+        if ($session->offsetExists('isAuthenticated')) {
+            $this->isAuthenticated = (bool) $session->offsetGet('isAuthenticated');
+        }
+
+        // End.
+        return true;
+    }
+
+    /**
      * Set an instance of \Doctrine\ORM\EntityManager.
      *
      * @param \Doctrine\ORM\EntityManager $entityManager
-     * @return \Album\Controller\AlbumController
+     * @return \Application\Controller\SystemController
      */
     public function setEntityManager(EntityManager $entityManager)
     {
@@ -177,6 +194,16 @@ class SystemController
     {
         $request = $this->getRequest();
 
+        $systemData = array(
+            'userId' => 1,
+            'personId' => 1,
+            'navigation' => $this->navigation,
+            'toolbar' => $this->toolbar,
+            'settings' => $this->settings,
+            'user' => $this->user,
+            'person' => $this->person
+        );
+
         if ($request->isPost()) {
             $systemData = Json::decode(
                     $request->getPost('system', '{}'), Json::TYPE_ARRAY
@@ -185,41 +212,29 @@ class SystemController
             // End.
             return new JsonModel(
                 array(
-                'success' => $this->isAuthenticated,
+                'success' => true,
                 'system' => $systemData
                 )
             );
         }
 
-
-
-        $user = $this->user;
-        $user['person'] = $this->person;
-
-        $systemData = array(
-            'userId' => 1,
-            'navigation' => $this->navigation,
-            'toolbar' => $this->toolbar,
-            'settings' => $this->settings,
-            'user' => $user
-        );
-
         return new JsonModel(
             array(
             'success' => $this->isAuthenticated,
-            'messages' => 'test msg',
+            'messages' => 'Not authenticated.',
             'system' => $systemData
             )
         );
     }
 
     /**
+     * COMMENTME
      *
+     * @return \Zend\View\Model\JsonModel
      */
     public function getUserAction()
     {
         $user = $this->user;
-        $user['person'] = $this->person;
 
         return new JsonModel(
             array(

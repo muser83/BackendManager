@@ -116,7 +116,8 @@ Ext.application({
      * Array of models to require from AppName.model namespace.
      */
     models: [
-        'application.System'
+        'application.System',
+        'application.User'
     ],
     /**
      * App.view.Viewport Viewport class.
@@ -229,7 +230,7 @@ Ext.application({
         var isActive = this.getUserModel().get('isActive');
 
         if (true !== isActive) {
-            this.debug('The user is not authenticated by the server.', 'error');
+            this.debug('The user is not authenticated by the server.', 'warning');
 
             // End.
             return false;
@@ -280,9 +281,6 @@ Ext.application({
     getSystemModel: function()
     {
         if (!this.systemModel.isModel) {
-            this.debug('Try to get an instance of the system storage, \n\
-                but the system storage is not valid.', 'error', this.systemModel);
-
             // End.
             return false;
         }
@@ -320,7 +318,7 @@ Ext.application({
      */
     getPersonModel: function()
     {
-        var personModel = this.getUserModel().getPerson();
+        var personModel = this.getSystemModel().getPerson();
         if (!personModel.isModel) {
             this.debug('Try to get an instance of the system person storage, \n\
                 but the person storage is not valid.', 'error', personModel);
@@ -499,7 +497,7 @@ Ext.application({
         }, this);
 
         this.getSystemModel().set('logoffTime', Ext.Date.now());
-        this.saveSystemInfo();
+//        this.saveSystemInfo();
         // Reset system data.
         this.initSystemInfo();
 
@@ -588,13 +586,47 @@ Ext.application({
 
             if (!operation.wasSuccessful()) {
                 this.debug(
-                    'Could not load system information:', 'error', operation);
+                    'Could not load system information:', 'warning', operation);
+
+                Ext.callback(callback, this);
 
                 // End.
                 return false;
             }
-//
+
             systemModel = operation.getRecords()[0];
+
+            if (!systemModel || !systemModel.isModel) {
+                Ext.Error.raise({
+                    addSuffix: false,
+                    closable: false,
+                    modal: true,
+                    multiline: false,
+                    title: 'System error',
+                    msg: 'The required system storage could not be loaded',
+                    icon: Ext.Msg.ERROR,
+                    cls: 'x-fix-msg-msg',
+                    animateTarget: Ext.get('application-header-logo'),
+                    buttons: Ext.Msg.OK,
+                    buttonText: {
+                        ok: 'Relaunch System'
+                    },
+                    fn: function(buttonId)
+                    {
+                        if ('ok' === buttonId) {
+                            this.saveSystemInfo();
+                            window.location.href = '/';
+                        }
+
+                        // End.
+                        return true;
+                    }
+                });
+
+                // End.
+                return false;
+            }
+
             systemModel.set('bootTime', this.getSystemModel().get('bootTime'));
             systemModel.set('logonTime', this.getSystemModel().get('logonTime'));
             systemModel.set('logoffTime', this.getSystemModel().get('logoffTime'));
@@ -1172,20 +1204,23 @@ Ext.application({
         this.getLoaderDOM().hide();
 
         switch (response.status) {
+            case -1:
+                this.debug('Connection with the server is forced closed.', 'warning', {
+                    status: response.status || '',
+                    url: options.url || ''
+                });
+                break;
             case 401:
-                this.debug('401 header received.', 'error');
+                this.debug('The user is not authenticated by the server.', 'warning');
 
+                // TODO, if a user is logged in, add a message to the logoff.
                 // System logout.
-                this.logoff(
-                    'You are not authenticated by the server anymore.'
-                    );
+                this.logoff();
                 break;
             default:
-                this.debug('Connecting with the server closed:', 'error', {
-                    contentLength: response
-                        .getResponseHeader('content-length'),
-                    status: response.status,
-                    url: options.url
+                this.debug('Connecting with the server closed.', 'error', {
+                    status: response.status || '',
+                    url: options.url || ''
                 });
 
                 Ext.Error.raise({
