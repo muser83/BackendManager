@@ -116,8 +116,6 @@ Ext.define('App.controller.application.Authentication', {
                         return false;
                     }
 
-                    console.log(userModel)
-
                     if (true !== userModel.get('isActive')) {
                         this.application.logoff();
 

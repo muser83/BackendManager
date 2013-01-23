@@ -138,7 +138,7 @@ Ext.application({
      */
     systemModel: undefined,
     /**
-     *
+     * COMMENTME
      */
     activeController: undefined,
     /**
@@ -155,13 +155,12 @@ Ext.application({
      */
     launch: function()
     {
-        // Initialize the system information storage model.
-        this.initSystemInfo();
-
-        this.getSystemModel().set('bootTime', Ext.Date.now());
+        this.systemModel = this.getApplicationSystemModel().create();
 
         // First initialize the system model before debug messages can be loged.
         this.debug('Bootstrap system.', 'info');
+
+        this.getSystemModel().set('bootTime', Ext.Date.now());
 
         this.viewport = Ext.create('App.view.Viewport');
 
@@ -424,6 +423,7 @@ Ext.application({
             module: 'application',
             controller: 'authentication',
             action: 'login',
+            silent: true,
             args: {
                 msg: Ext.isString(msg)
                     ? msg
@@ -453,11 +453,11 @@ Ext.application({
     {
         this.debug('System Logoff.', 'info');
 
-        var openWindows = Ext.ComponentQuery.query('window');
         var loginAction = {
             module: 'application',
             controller: 'authentication',
             action: 'login',
+            silent: true,
             args: {
                 logoutFirst: true,
                 msg: Ext.isString(msg)
@@ -466,40 +466,9 @@ Ext.application({
             }
         };
 
-        this.tasks.preLogoff.cancel();
-        this.tasks.logoff.cancel();
-
-        this.loggedon = false;
-
-        this.debug('Close open connections with the server.', 'detail');
-        Ext.Ajax.abortAll();
-
-        this.debug('Remove navigation.', 'detail');
-        this.getNavigationDOM()
-            .hide()
-            .setHTML('<li></li>');
-
-        this.debug('Remove user infomation.', 'detail');
-        this.getUserInfoDOM()
-            .hide()
-            .setHTML('');
-
-        this.debug('Remove all views and open windows.', 'detail');
-        this.getViewport().down('[region=center]').removeAll();
-
-        Ext.each(openWindows, function(window) {
-            if (window.rendered) {
-                window.close();
-            }
-
-            // End.
-            return true;
-        }, this);
-
         this.getSystemModel().set('logoffTime', Ext.Date.now());
-//        this.saveSystemInfo();
-        // Reset system data.
-        this.initSystemInfo();
+
+        this.shutdown();
 
         this.dispatch(loginAction);
 
@@ -675,36 +644,18 @@ Ext.application({
     {
         this.debug('Attempt to logon.', 'info');
 
-        var logon = function()
-        {
-            this.debug('System logon.', 'info');
-
-            this.systemModel.set('logonTime', Ext.Date.now());
-
-            this.loggedon = true;
-
-            this.buildNavigation();
-
-            this.buildUserInfo();
-
-            if ('!' === Ext.History.getToken()) {
-                Ext.History.add('/');
-            }
-
-            this.doRequest(
-                Ext.History.getToken(), true
-                );
-
-            // End.
-            return true;
-        };
-
         this.resetLogoffTimer();
 
         this.loadSystemInfo(function()
         {
             if (this.isAuthenticated()) {
-                logon.call(this);
+                this.debug('System logon.', 'info');
+
+                this.systemModel.set('logonTime', Ext.Date.now());
+
+                this.loggedon = true;
+
+                this.startup();
             } else {
                 this.logoff();
             }
@@ -730,11 +681,12 @@ Ext.application({
     {
         this.debug('Dispatch new action:', 'info', action);
 
-        var moduleName = Ext.String.uncapitalize(action.module);
-        var controllerName = Ext.String.capitalize(action.controller);
-        var moduleControllerName = moduleName + '.' + controllerName;
-        var actionName = Ext.String.uncapitalize(action.action) + 'Action';
-        var controller = this.controllers.get(moduleControllerName);
+        var moduleName = Ext.String.uncapitalize(action.module),
+            controllerName = Ext.String.capitalize(action.controller),
+            moduleControllerName = moduleName + '.' + controllerName,
+            actionName = Ext.String.uncapitalize(action.action) + 'Action',
+            controller = this.controllers.get(moduleControllerName),
+            silent = action.silent;
 
         actionName = ('Action' === actionName)
             ? false
@@ -760,7 +712,9 @@ Ext.application({
         if (controllerName !== this.activeController) {
             controller['startupAction'](action.args);
 
-            this.activeController = controllerName;
+            if (!silent) {
+                this.activeController = controllerName;
+            }
         }
 
         if (!actionName) {
@@ -850,7 +804,8 @@ Ext.application({
             var settingsAction = {
                 module: 'account',
                 controller: 'settings',
-                action: 'startup'
+                action: '',
+                silent: true
             };
 
             this.dispatch(settingsAction);
@@ -871,8 +826,8 @@ Ext.application({
      */
     resetLogoffTimer: function()
     {
-        var preLogoffTime = ((60 * 1000) * 30), // 30 min.
-            logoffTime = ((60 * 1000) * 45); // 45 min.
+        var preLogoffTime = ((60 * 1000) * 1), // 30 min.
+            logoffTime = ((60 * 1000) * 2); // 45 min.
 
         this.tasks.preLogoff.cancel();
         this.tasks.preLogoff.delay(preLogoffTime);
@@ -945,22 +900,6 @@ Ext.application({
      */
 
     /**
-     * Create and store a new system model instance.
-     * This method can also be used to reset the system model.
-     *
-     * @private
-     * @return {Boolean} Void.
-     */
-    initSystemInfo: function()
-    {
-        this.systemModel = this.getApplicationSystemModel().create();
-
-        this.debug('Initialize system storage.', 'info');
-
-        // End.
-        return true;
-    },
-    /**
      * Configure a default error message and initialize an error listener that
      * will display all thrown errors in a messages box.
      *
@@ -1001,7 +940,8 @@ Ext.application({
                     this.dispatch({
                         module: 'application',
                         controller: 'issue',
-                        action: 'report'
+                        action: 'report',
+                        silent: true
                     });
                 }
 
@@ -1229,6 +1169,84 @@ Ext.application({
 The server didn\'t answered with the expected data.'
                 });
         }
+
+        // End.
+        return true;
+    },
+    /**
+     * COMMENTME
+     *
+     *
+     * @private
+     * @return {Boolean} Void.
+     */
+    shutdown: function()
+    {
+        this.debug('System shutdown.', 'info');
+
+        var openWindows = Ext.ComponentQuery.query('window');
+
+        // Reset system properties.
+        this.debug('Reset system configuration.', 'detail');
+        this.activeController = undefined;
+        this.loggedon = false;
+        this.systemModel = this.getApplicationSystemModel().create();
+        // Cancel system tasks.
+        this.debug('Cancel system tasks.', 'detail');
+        this.tasks.preLogoff.cancel();
+        this.tasks.logoff.cancel();
+        // Abort all ajax calls.
+        this.debug('Close open connections with the server.', 'detail');
+        Ext.Ajax.abortAll();
+        // Remove navigation DOM.
+        this.debug('Remove navigation.', 'detail');
+        this.getNavigationDOM()
+            .hide()
+            .setHTML('<li></li>');
+        // Remove user/ personal info DOM.
+        this.debug('Remove user infomation.', 'detail');
+        this.getUserInfoDOM()
+            .hide()
+            .setHTML('');
+        // Remove all viewport center views.
+        this.debug('Remove all views and open windows.', 'detail');
+        this.getViewport().down('[region=center]').removeAll();
+
+        Ext.each(openWindows, function(window) {
+            if (window.rendered) {
+                window.close();
+            }
+
+            // End.
+            return true;
+        }, this);
+        // TODO Save the systemModel.
+
+        // End.
+        return true;
+    },
+    /**
+     * COMMENTME
+     *
+     *
+     * @private
+     * @return {Boolean} Void.
+     */
+    startup: function()
+    {
+        this.debug('System startup.', 'info');
+
+        this.buildNavigation();
+
+        this.buildUserInfo();
+
+        if ('!' === Ext.History.getToken()) {
+            Ext.History.add('/');
+        }
+
+        this.doRequest(
+            Ext.History.getToken(), true
+            );
 
         // End.
         return true;
