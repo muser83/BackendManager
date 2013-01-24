@@ -78,6 +78,10 @@ Ext.application({
      */
     loggedon: false,
     /**
+     * Whatever the system is started up.
+     */
+    startedup: false,
+    /**
      * Define the system classes folder, here the system will search for all
      * needed classes.
      */
@@ -87,11 +91,6 @@ Ext.application({
      * for all views, controllers, models and stores.
      */
     name: 'App',
-    /**
-     * Auto create viewport flag, if true the system will automatically
-     * create a viewport before the system launch.
-     */
-    autoCreateViewport: false,
     /**
      * Enable quick tips flag, if true the system will automatically
      * Initialize the quick tip messager.
@@ -186,10 +185,10 @@ Ext.application({
      */
 
     /**
-     * Return true, if and only if, the inDevelopment param is set to true.
+     * Return true, if and only if, the inDevelopment flag is set to true.
      *
      * @public
-     * @return {Boolean} If this system is in development mode or not.
+     * @return {Boolean}
      */
     isInDevelopment: function()
     {
@@ -199,10 +198,10 @@ Ext.application({
             : false;
     },
     /**
-     * Return true, if and only if, the loggedon param is set to true.
+     * Return true, if and only if, the loggedon flag is set to true.
      *
      * @public
-     * @return {Boolean} If the user is logged on.
+     * @return {Boolean}
      */
     isLoggedon: function()
     {
@@ -212,8 +211,7 @@ Ext.application({
             : false;
     },
     /**
-     * Returns true, if and only if, the user is authenticated by the server,
-     * false otherwise.
+     * Returns true, if and only if, the user is authenticated by the server..
      *
      * isActive is an status that only tells if the current user is
      * authenticated by the server.
@@ -222,7 +220,7 @@ Ext.application({
      * client.
      *
      * @public
-     * @return {Boolean} True if the user is authenticated by the server.
+     * @return {Boolean}
      */
     isAuthenticated: function()
     {
@@ -239,56 +237,64 @@ Ext.application({
         return true;
     },
     /**
-     * Return a instance of the viewport
-     * or false if the viewport does not exist.
+     * Returns true, if and only if, the startedup flag is set to true.
      *
      * @public
-     * @return {App.view.Viewport|Boolean} Viewport instance.
+     * @return {Boolean}
+     */
+    isStartedup: function()
+    {
+        // End.
+        return (true === this.startedup)
+            ? true
+            : false;
+    },
+    /**
+     * Return a instance or App.view.Viewport
+     * or false if the viewport do not exist.
+     *
+     * @public
+     * @return {App.view.Viewport|Boolean}
      */
     getViewport: function()
     {
-        if (!this.viewport.isViewport) {
-            this.debug('Try to get an instance of the viewport, \n\
-                but the viewport is not available.', 'error', this.viewport);
-
-            // End.
-            return false;
-        }
-
         // End.
-        return this.viewport;
+        return (this.viewport.isViewport)
+            ? this.viewport
+            : false;
     },
     /**
-     * Return a instance of App.navigation.Navigation.
+     * Return a instance of App.navigation.Navigation
+     * or false if the navigation do not exist.
      *
      * @public
-     * @return {App.navigation.Navigation} Navigation instance.
+     * @return {App.navigation.Navigation|Boolean}
      */
     getNavigation: function()
     {
         // End.
-        return this.navigation;
+        return (this.navigation)
+            ? this.navigation
+            : false;
     },
     /**
-     * Return a instance of the system model.
-     * this system model can be used to store or access system infomation.
+     * Return a instance of App.model.application.System
+     * or false if the system model do not exist.
+     * This system model can be used to store or access system infomation.
      *
      * @public
-     * @return {SAM.model.System|Boolean} A instance of the system model or
-     *                                    false if the system doesn't not exist.
+     * @return {SAM.model.System|Boolean}
      */
     getSystemModel: function()
     {
-        if (!this.systemModel.isModel) {
-            // End.
-            return false;
-        }
-
         // End.
-        return this.systemModel;
+        return (this.systemModel.isModel)
+            ? this.systemModel
+            : false;
     },
     /**
-     * Return a instance of the user model.
+     * Return a instance of App.model.User
+     * or false if the user model do not exist.
      *
      * @public
      * @return {App.model.User|false} User model or false if the user model do
@@ -297,19 +303,15 @@ Ext.application({
     getUserModel: function()
     {
         var userModel = this.getSystemModel().getUser();
-        if (!userModel.isModel) {
-            this.debug('Try to get an instance of the system user storage, \n\
-                but the user storage is not valid.', 'error', userModel);
-
-            // End.
-            return false;
-        }
 
         // End.
-        return userModel;
+        return (userModel.isModel)
+            ? userModel
+            : false;
     },
     /**
-     * Return a instance of the person model.
+     * Return a instance of App.model.Person
+     * or false if the person model doe not exist.
      *
      * @public
      * @return {App.model.Person} Person model of false if the person model do
@@ -318,16 +320,11 @@ Ext.application({
     getPersonModel: function()
     {
         var personModel = this.getSystemModel().getPerson();
-        if (!personModel.isModel) {
-            this.debug('Try to get an instance of the system person storage, \n\
-                but the person storage is not valid.', 'error', personModel);
-
-            // End.
-            return false;
-        }
 
         // End.
-        return personModel;
+        return (personModel.isModel)
+            ? personModel
+            : false;
     },
     /**
      * Return a Ext.CompositeElement instance of the system header logo dom.
@@ -364,18 +361,23 @@ Ext.application({
         return Ext.select('#application-header-userinfo');
     },
     /**
+     * System methods.
+     */
+
+    /**
      * Create a action object based on the given URI and dispatch the action
-     * if the user is logged on and the given uri is not ! or empty.
+     * if the system is tarted up and user is logged on.
      *
      * @public
      * @param {String} uri The request URI.
-     * @return {Boolean} Void.
+     * @return {Boolean}
      */
     doRequest: function(uri)
     {
-        var action,
-            r;
+        var r,
+            action;
 
+        // Cancel this request call if the uri is empty or == !.
         if (!uri || ('!' === uri)) {
             r = ('!' === uri)
                 ? 'equal to !'
@@ -387,26 +389,97 @@ Ext.application({
             return false;
         }
 
-        if (true !== this.isLoggedon()) {
+        // Cancel this request if the system is not started
+        // or the user is not authenticated.
+        if (this.isStartedup() && this.isLoggedon()) {
             this.logoff();
 
             // End.
             return false;
         }
 
+        // Add the given uri to the history manager.
         if (uri !== Ext.History.getToken()) {
             Ext.History.add(uri);
         }
 
-        action = this.getAction(uri);
-
-        this.navigation.highlightTab(uri);
+        action = this.buildAction(uri);
 
         this.dispatch(action);
+
+        // Highlight the navigation hoes match the disoatched uir.
+        this.navigation.highlightTab(uri);
 
         // End.
         return true;
     },
+    /**
+     * Log a messages that will form the system debug trace.
+     * If this system instance is in debug mode, the messages will also be
+     * logged to the browser console. (console.log)
+     *
+     * @public
+     * @param {String} msg Debug messages.
+     * @param {String} level Possible values: System, Error, User
+     * @param {Object} dump Debug dump object.
+     * @return {Boolean}
+     */
+    debug: function(msg, level, dump)
+    {
+        var l,
+            debugLogs,
+            systemModel = this.getSystemModel(),
+            msg = msg || 'Unknown messages',
+            dump = dump || {
+        };
+
+        switch (level.toLowerCase()) {
+            case 'detail':
+            case 'info':
+            case 'warning':
+            case 'error':
+            default:
+                'unknown';
+        }
+
+        // Send the given message to the browser console if this system instance
+        // is in development mode.
+        if (this.isInDevelopment()) {
+            l = Ext.String.capitalize(level);
+
+            console.log((l + ': ' + msg), [dump]);
+        }
+
+        // Can't store a messages if the system storage does not exist.
+        if (!systemModel) {
+            // End.
+            return false;
+        }
+
+        debugLogs = systemModel.get('debug');
+
+        // Group the messages on level.
+        if (!debugLogs.hasOwnProperty(level)) {
+            debugLogs[level] = {
+            };
+        }
+
+        // Add the messages to the collection.
+        debugLogs[level][Ext.Date.now()] = {
+            msg: msg,
+            dump: dump
+        };
+
+        this.getSystemModel().set('debug', debugLogs);
+
+        // End.
+        return true;
+    },
+    /*
+     * Continue from here
+     * Inspect the comment and document in the methods,
+     * check for var defines and logica.
+     */
     /**
      * Call the application.authentication.login action but does not destroy the
      * session on the server.
@@ -439,9 +512,7 @@ Ext.application({
         return true;
     },
     /**
-     * Abort all load calls, destroy the navigationDOM, userInfoDOM, viewport
-     * center region, all rendered windows, submit and reset the system model,
-     * set the loggedOn flags to false and call the
+     * Set the loggedOn flags to false and call the
      * application.authentication.login action that will ask the server to
      * destroy the login session and show an login window
      *
@@ -456,7 +527,7 @@ Ext.application({
         var loginAction = {
             module: 'application',
             controller: 'authentication',
-            action: 'login',
+            action: 'login', // TODO Do not call the login action, but only the startup action.
             silent: true,
             args: {
                 logoutFirst: true,
@@ -465,6 +536,9 @@ Ext.application({
                     : undefined
             }
         };
+
+        this.loggedon = false;
+        this.systemModel = this.getApplicationSystemModel().create();
 
         this.getSystemModel().set('logoffTime', Ext.Date.now());
 
@@ -475,64 +549,6 @@ Ext.application({
         // End.
         return true;
     },
-    /**
-     * Log a messages that will form the system debug trace.
-     * If this system instance is in debug mode, the messages will also be
-     * logged to the browser console. (console.log)
-     *
-     * @public
-     * @param {String} msg Debug messages.
-     * @param {String} level Possible values: System, Error, User
-     * @param {Object} dump Debug dump object.
-     * @return {Booleand} False if the system doent exist, true otherwhise.
-     */
-    debug: function(msg, level, dump)
-    {
-        msg = msg || 'Unknown messages',
-            dump = dump || {
-        };
-        var systemModel = this.getSystemModel(),
-            debugLogs = systemModel.get('debug');
-
-        if (!systemModel) {
-            // End.
-            return false;
-        }
-
-        switch (level.toLowerCase()) {
-            case 'detail':
-            case 'info':
-            case 'warning':
-            case 'error':
-            default:
-                'unknown';
-        }
-
-        if (!debugLogs.hasOwnProperty(level)) {
-            debugLogs[level] = {
-            };
-        }
-
-        debugLogs[level][Ext.Date.now()] = {
-            msg: msg,
-            dump: dump
-        };
-
-        this.getSystemModel().set('debug', debugLogs);
-
-        if (this.isInDevelopment()) {
-            level = Ext.String.capitalize(level);
-
-            console.log((level + ': ' + msg), [dump]);
-        }
-
-        // End.
-        return true;
-    },
-    /**
-     * System methods.
-     */
-
     /**
      * Load the system model, once loaded the given callback method will be
      * called with the system model as argument.
@@ -637,7 +653,7 @@ Ext.application({
      * else,
      * this logoff method will be called.
      *
-     * @public
+     * @private
      * @return {Boolean} Void
      */
     logon: function()
@@ -737,13 +753,68 @@ Ext.application({
         return true;
     },
     /**
+     * Create an dispatchable action object based on the given URI.
+     * If the URI does not cover all expected action segments, segments from the
+     * default action will be used.
+     *
+     * @private
+     * @param {String} uri description
+     * @returns {Boolean} Void
+     */
+    buildAction: function(uri)
+    {
+        var segments;
+        var segment;
+        var segmentsMatchingRegex = new RegExp(/\/([0-9A-Za-z\_]*)/g);
+        // Default action.
+        var action = {
+            module: 'application',
+            controller: 'dashboard',
+            action: '',
+            args: {
+            }
+        };
+
+        uri = '/' + uri;
+        uri = uri.replace(/^\/\//, '/');
+
+        segments = uri.match(segmentsMatchingRegex) || [];
+
+        Ext.Array.each(segments, function(value, key)
+        {
+            segments[key] = value.replace(/^\//, '');
+        });
+
+        Ext.Object.each(action, function(key)
+        {
+            if ('args' === key) {
+                // End.
+                return false;
+            }
+
+            segment = segments.splice(0, 1).toString();
+
+            if (segment) {
+                action[key] = segment;
+            }
+        });
+
+        if (segments) {
+            action['args'] = segments;
+        }
+
+        // End.
+        return action;
+
+    },
+    /**
      * Inject the navigation HTML in the navigation container and initialize the
      * navigation class.
      * The navigation HTML will be received from the system information storage
      * and is different for each user.
      *
      * @private
-     * @return {Booleand} Void
+     * @return {Boolean} Void
      */
     buildNavigation: function()
     {
@@ -839,66 +910,6 @@ Ext.application({
         return true;
 
     },
-    /**
-     * Create an dispatchable action object based on the given URI.
-     * If the URI does not cover all expected action segments, segments from the
-     * default action will be used.
-     *
-     * @private
-     * @param {String} uri description
-     * @returns {Boolean} Void
-     */
-    getAction: function(uri)
-    {
-        var segments;
-        var segment;
-        var segmentsMatchingRegex = new RegExp(/\/([0-9A-Za-z\_]*)/g);
-        // Default action.
-        var action = {
-            module: 'application',
-            controller: 'dashboard',
-            action: '',
-            args: {
-            }
-        };
-
-        uri = '/' + uri;
-        uri = uri.replace(/^\/\//, '/');
-
-        segments = uri.match(segmentsMatchingRegex) || [];
-
-        Ext.Array.each(segments, function(value, key)
-        {
-            segments[key] = value.replace(/^\//, '');
-        });
-
-        Ext.Object.each(action, function(key)
-        {
-            if ('args' === key) {
-                // End.
-                return false;
-            }
-
-            segment = segments.splice(0, 1).toString();
-
-            if (segment) {
-                action[key] = segment;
-            }
-        });
-
-        if (segments) {
-            action['args'] = segments;
-        }
-
-        // End.
-        return action;
-
-    },
-    /**
-     * System methods.
-     * Private methods.
-     */
-
     /**
      * Configure a default error message and initialize an error listener that
      * will display all thrown errors in a messages box.
@@ -1180,17 +1191,39 @@ The server didn\'t answered with the expected data.'
      * @private
      * @return {Boolean} Void.
      */
+    startup: function()
+    {
+        this.debug('System startup.', 'info');
+
+        this.buildNavigation();
+
+        this.buildUserInfo();
+
+        if ('!' === Ext.History.getToken()) {
+            Ext.History.add('/');
+        }
+
+        this.doRequest(
+            Ext.History.getToken(), true
+            );
+
+        // End.
+        return true;
+    },
+    /**
+     * Shutdown all active processes and destroy all open windows and views
+     *
+     * @private
+     * @return {Boolean} Void.
+     */
     shutdown: function()
     {
         this.debug('System shutdown.', 'info');
 
         var openWindows = Ext.ComponentQuery.query('window');
-
         // Reset system properties.
         this.debug('Reset system configuration.', 'detail');
         this.activeController = undefined;
-        this.loggedon = false;
-        this.systemModel = this.getApplicationSystemModel().create();
         // Cancel system tasks.
         this.debug('Cancel system tasks.', 'detail');
         this.tasks.preLogoff.cancel();
@@ -1224,31 +1257,6 @@ The server didn\'t answered with the expected data.'
 
         // End.
         return true;
-    },
-    /**
-     * COMMENTME
-     *
-     *
-     * @private
-     * @return {Boolean} Void.
-     */
-    startup: function()
-    {
-        this.debug('System startup.', 'info');
-
-        this.buildNavigation();
-
-        this.buildUserInfo();
-
-        if ('!' === Ext.History.getToken()) {
-            Ext.History.add('/');
-        }
-
-        this.doRequest(
-            Ext.History.getToken(), true
-            );
-
-        // End.
-        return true;
     }
+
 });
