@@ -41,10 +41,10 @@ class SystemController
 <li>
 <a href="admin">Admin</a>
 <ul>
-<li><a href="admin/users" icon="group">Users</a></li>
-<li><a href="admin/roles" icon="group">Roles</a></li>
-<li><a href="admin/countries" icon="globe">Countries</a></li>
-<li><a href="admin/locales" icon="globe">Locales</a></li>
+<li><a href="admin/users" icon="users">Users</a></li>
+<li><a href="admin/roles" icon="users">Roles</a></li>
+<li><a href="admin/countries" icon="globe-2">Countries</a></li>
+<li><a href="admin/locales" icon="globe-2">Locales</a></li>
 <li><a href="admin/translate" icon="flag">Translate</a></li>
 </ul>
 </li>';
@@ -119,7 +119,7 @@ class SystemController
         'id' => 1,
         'addressesId' => 0,
         'communicationsId' => 0,
-        'image' => 'https://lh4.googleusercontent.com/-5hmVYhkDcLA/AAAAAAAAAAI/AAAAAAAAALg/mSeImjP68c8/s48-c-k/photo.jpg',
+        'image' => './images/icons/black/user_icon&32.png',
         'firstname' => 'Boy',
         'middlename' => 'van',
         'lastname' => 'Moorsel',

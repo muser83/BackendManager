@@ -342,23 +342,33 @@ Ext.application({
      * dom.
      *
      * @public
+     * @param {boolean} returnId Whatever to return the navigation DOM id or Element.
      * @return Ext.CompositeElement
      */
-    getNavigationDOM: function()
+    getNavigationDOM: function(returnId)
     {
+        var id = 'application-header-navigation';
+
         // End.
-        return Ext.select('#application-header-navigation');
+        return (true === returnId)
+            ? id
+            : Ext.select('#' + id);
     },
     /**
      * Return a Ext.CompositeElement instance of the system header user info dom.
      *
      * @public
+     * @param {boolean} returnId Whatever to return the user info DOM id or Element.
      * @return Ext.CompositeElement
      */
-    getUserInfoDOM: function()
+    getUserInfoDOM: function(returnId)
     {
+        var id = 'application-header-userinfo';
+
         // End.
-        return Ext.select('#application-header-userinfo');
+        return (true === returnId)
+            ? id
+            : Ext.select('#' + id);
     },
     /**
      * System methods.
@@ -475,11 +485,6 @@ Ext.application({
         // End.
         return true;
     },
-    /*
-     * Continue from here
-     * Inspect the comment and document in the methods,
-     * check for var defines and logica.
-     */
     /**
      * Call the application.authentication.login action but does not destroy the
      * session on the server.
@@ -503,6 +508,9 @@ Ext.application({
                     : undefined
             }
         };
+
+        this.loggedon = false;
+        this.systemModel = this.getApplicationSystemModel().create();
 
         this.tasks.preLogoff.cancel();
 
@@ -832,6 +840,7 @@ Ext.application({
         return true;
     },
     /**
+     * COMMENTME
      * Create a user information template and inject this in the user info
      * container.
      * The user information will be received from the system information storage
@@ -843,50 +852,43 @@ Ext.application({
     buildUserInfo: function()
     {
         this.debug('Build user infomation.', 'info');
-
-        var imageId = Ext.id(),
-            fullnameId = Ext.id(),
-            logoffId = Ext.id(),
-            settingsId = Ext.id(),
+        var userInfoDOM = this.getUserInfoDOM(true),
             personModel = this.getPersonModel(),
-            userInfo = new Ext.Template(
-            '<img src="{src}" alt="{fullname}" id={imageId} height="41" width="41" />' +
-            '<p id="{fullnameId}">{fullname}</p>' +
-            '<span id="{logoffId}"><span class="application-icon icon-lock"></span>Logoff</span> ' +
-            '<span id="{settingsId}"><span class="application-icon icon-settings"></span>Settings</span>'
-            );
-
-        userInfo = userInfo.apply({
-            src: personModel.get('image'),
-            fullname: personModel.get('fullname'),
-            imageId: imageId,
-            fullnameId: fullnameId,
-            logoffId: logoffId,
-            settingsId: settingsId
+            fullname = personModel.get('fullname');
+        // TODO get the menu from the system model.
+        // Create a new button and add the to the user info DOM.
+        new Ext.button.Button({
+            icon: personModel.get('image'),
+            renderTo: userInfoDOM,
+            text: '<span style="color:#FFF;">' + fullname + '<span>',
+            scale: 'large',
+            style: {
+                background: 'none',
+                border: 'none',
+                color: '#FFFFFF'
+            },
+            menu: {
+                items: [{
+                        icon: '/images/icons/black/contact_card_icon&16.png',
+                        text: 'Account'
+                    }, {
+                        icon: '/images/icons/black/wrench_icon&16.png',
+                        text: 'Settings'
+                    }, {
+                        icon: '/images/icons/black/mail_icon&16.png',
+                        text: 'Messages'
+                    }, {
+                        icon: '/images/icons/black/user_icon&16.png',
+                        text: 'Change image'
+                    }, {
+                        icon: '/images/icons/black/bug_icon&16.png',
+                        text: 'Report bug'
+                    }, {
+                        icon: '/images/icons/black/padlock_closed_icon&16.png',
+                        text: 'Logoff'
+                    }]
+            }
         });
-
-        this.getUserInfoDOM().setHTML(userInfo).show(true);
-
-        // Define click handlers.
-        Ext.fly(logoffId).on('click', this.logoff, this);
-
-        Ext.fly(settingsId).on('click', function()
-        {
-            var settingsAction = {
-                module: 'account',
-                controller: 'settings',
-                action: '',
-                silent: true
-            };
-
-            this.dispatch(settingsAction);
-
-            // End.
-            return true;
-        }, this);
-
-        // End.
-        return;
 
     },
     /**
@@ -897,8 +899,8 @@ Ext.application({
      */
     resetLogoffTimer: function()
     {
-        var preLogoffTime = ((60 * 1000) * 1), // 30 min.
-            logoffTime = ((60 * 1000) * 2); // 45 min.
+        var preLogoffTime = ((60 * 1000) * 30), // 30 min.
+            logoffTime = ((60 * 1000) * 45); // 45 min.
 
         this.tasks.preLogoff.cancel();
         this.tasks.preLogoff.delay(preLogoffTime);
@@ -1048,16 +1050,17 @@ Ext.application({
 
         this.tasks.preLogoff = new Ext.util.DelayedTask(function()
         {
-            // TODO define a nice pre logoff message.
-            this.preLogoff('Pre logoff test.');
+            // Do not shutdown the system.
+            this.preLogoff("The system isn't used for 30 minutes or longer.");
+
             // End.
             return true;
         }, this);
 
         this.tasks.logoff = new Ext.util.DelayedTask(function()
         {
-            // TODO define a nice logoff message.
-            this.logoff('Logoff test.');
+            // Shutdown the system.
+            this.logoff("The system isn't used for 45 minutes or longer.");
             // End.
             return true;
         }, this);

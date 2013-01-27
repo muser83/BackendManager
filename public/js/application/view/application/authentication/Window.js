@@ -8,7 +8,7 @@
  */
 Ext.define('App.view.application.authentication.Window', {
     extend: 'Ext.window.Window',
-    icon: '/images/icons/user.png',
+    icon: '/images/icons/black/user_icon&16.png',
     title: 'Login',
     shrinkWrap: 3,
     constrain: true,
@@ -50,7 +50,7 @@ Ext.define('App.view.application.authentication.Window', {
             }
         }],
     buttons: [{
-            icon: '/images/icons/unlock.png',
+            icon: '/images/icons/black/padlock_open_icon&16.png',
             text: 'Login',
             action: 'authenticate'
         }],

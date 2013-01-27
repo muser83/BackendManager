@@ -139,7 +139,7 @@ class AuthenticationController
         }
 
         $session = new sessionContainer('dev');
-        $session->setExpirationHops(5);
+        $session->setExpirationHops(50);
         $session->offsetSet('isAuthenticated', true);
 
         return $this->forward()->dispatch('system', array('action' => 'get-user'));
