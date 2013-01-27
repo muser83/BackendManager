@@ -46,6 +46,12 @@ Ext.define('App.model.application.System', {
             persist: false,
             defaultValue: ''
         }, {
+            name: 'userNavigation',
+            type: 'object',
+            persist: false,
+            defaultValue: {
+            }
+        }, {
             name: 'toolbar',
             type: 'object',
             persist: false,

@@ -44,10 +44,18 @@ class SystemController
 <li><a href="admin/users" icon="users">Users</a></li>
 <li><a href="admin/roles" icon="users">Roles</a></li>
 <li><a href="admin/countries" icon="globe-2">Countries</a></li>
-<li><a href="admin/locales" icon="globe-2">Locales</a></li>
-<li><a href="admin/translate" icon="flag">Translate</a></li>
+<li><a href="admin/locales" icon="flag">Locales</a></li>
+<li><a href="admin/translate" icon="spechbubble-2">Translate</a></li>
 </ul>
 </li>';
+    private $userNavigation = array(
+        array('text' => 'Account', 'icon' => '/images/icons/black/contact_card_icon&16.png', 'action' => 'account'),
+        array('text' => 'Settings', 'icon' => '/images/icons/black/wrench_icon&16.png', 'action' => 'settings'),
+        array('text' => 'Messages', 'icon' => '/images/icons/black/mail_icon&16.png', 'action' => 'messages'),
+        array('text' => 'Change image', 'icon' => '/images/icons/black/user_icon&16.png', 'action' => 'change-image'),
+        array('text' => 'Report a bug', 'icon' => '/images/icons/black/bug_icon&16.png', 'action' => 'report-bug'),
+        array('text' => 'Logoff', 'icon' => '/images/icons/black/padlock_closed_icon&16.png', 'action' => 'logoff')
+    );
     private $toolbar = array(
         'applicationDashboard' => array(
             'items' => array(
@@ -59,50 +67,50 @@ class SystemController
             'items' => array(
                 '<b><div>Users</div></b>',
                 '-',
-                array('text' => 'Add', 'action' => 'add'),
-                array('text' => 'Edit', 'action' => 'edit', 'disabled' => true),
-                array('text' => 'Delete', 'action' => 'delete', 'disabled' => true)
+                array('text' => 'Add', 'icon' => '/images/icons/black/plus_icon&16.png', 'action' => 'add'),
+                array('text' => 'Edit', 'icon' => '/images/icons/black/pencil_icon&16.png', 'action' => 'edit', 'disabled' => true),
+                array('text' => 'Delete', 'icon' => '/images/icons/black/delete_icon&16.png', 'action' => 'delete', 'disabled' => true)
             )
         ),
         'adminRoles' => array(
             'items' => array(
                 '<b><div>Roles</div></b>',
                 '-',
-                array('text' => 'Add', 'action' => 'add'),
-                array('text' => 'Edit', 'action' => 'edit', 'disabled' => true),
-                array('text' => 'Delete', 'action' => 'delete', 'disabled' => true)
+                array('text' => 'Add', 'icon' => '/images/icons/black/plus_icon&16.png', 'action' => 'add'),
+                array('text' => 'Edit', 'icon' => '/images/icons/black/pencil_icon&16.png', 'action' => 'edit', 'disabled' => true),
+                array('text' => 'Delete', 'icon' => '/images/icons/black/delete_icon&16.png', 'action' => 'delete', 'disabled' => true)
             )
         ),
         'adminCountries' => array(
             'items' => array(
                 '<b><div>Countries</div></b>',
                 '-',
-                array('text' => 'Add', 'action' => 'add'),
-                array('text' => 'Edit', 'action' => 'edit', 'disabled' => true),
-                array('text' => 'Delete', 'action' => 'delete', 'disabled' => true),
+                array('text' => 'Add', 'icon' => '/images/icons/black/plus_icon&16.png', 'action' => 'add'),
+                array('text' => 'Edit', 'icon' => '/images/icons/black/pencil_icon&16.png', 'action' => 'edit', 'disabled' => true),
+                array('text' => 'Delete', 'icon' => '/images/icons/black/delete_icon&16.png', 'action' => 'delete', 'disabled' => true),
                 '-',
-                array('text' => 'Continents', 'action' => 'continents'),
-                array('text' => 'Currencies', 'action' => 'currencies'),
+                array('text' => 'Continents', 'icon' => '/images/icons/black/pin_map_icon&16.png', 'action' => 'continents'),
+                array('text' => 'Currencies', 'icon' => '/images/icons/black/cur_euro_icon&16.png', 'action' => 'currencies'),
             )
         ),
         'adminLocales' => array(
             'items' => array(
                 '<b><div>Locales</div></b>',
                 '-',
-                array('text' => 'Add', 'action' => 'add'),
-                array('text' => 'Edit', 'action' => 'edit', 'disabled' => true),
-                array('text' => 'Delete', 'action' => 'delete', 'disabled' => true),
+                array('text' => 'Add', 'icon' => '/images/icons/black/plus_icon&16.png', 'action' => 'add'),
+                array('text' => 'Edit', 'icon' => '/images/icons/black/pencil_icon&16.png', 'action' => 'edit', 'disabled' => true),
+                array('text' => 'Delete', 'icon' => '/images/icons/black/delete_icon&16.png', 'action' => 'delete', 'disabled' => true),
                 '-',
-                array('text' => 'Languages', 'action' => 'languages')
+                array('text' => 'Languages', 'icon' => '/images/icons/black/text_letter_t_icon&16.png', 'action' => 'languages')
             )
         ),
         'adminTranslate' => array(
             'items' => array(
                 '<b><div>Translate</div></b>',
                 '-',
-                array('text' => 'Add', 'action' => 'add'),
-                array('text' => 'Edit', 'action' => 'edit', 'disabled' => true),
-                array('text' => 'Delete', 'action' => 'delete', 'disabled' => true)
+                array('text' => 'Add', 'icon' => '/images/icons/black/plus_icon&16.png', 'action' => 'add'),
+                array('text' => 'Edit', 'icon' => '/images/icons/black/pencil_icon&16.png', 'action' => 'edit', 'disabled' => true),
+                array('text' => 'Delete', 'icon' => '/images/icons/black/delete_icon&16.png', 'action' => 'delete', 'disabled' => true)
             )
         ),
     );
@@ -198,6 +206,7 @@ class SystemController
             'userId' => 1,
             'personId' => 1,
             'navigation' => $this->navigation,
+            'userNavigation' => $this->userNavigation,
             'toolbar' => $this->toolbar,
             'settings' => $this->settings,
             'user' => $this->user,

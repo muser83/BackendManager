@@ -853,8 +853,12 @@ Ext.application({
     {
         this.debug('Build user infomation.', 'info');
         var userInfoDOM = this.getUserInfoDOM(true),
+            userNavigation = this.getSystemModel().get('userNavigation'),
             personModel = this.getPersonModel(),
             fullname = personModel.get('fullname');
+
+        console.log(userNavigation);
+
         // TODO get the menu from the system model.
         // Create a new button and add the to the user info DOM.
         new Ext.button.Button({
@@ -868,25 +872,7 @@ Ext.application({
                 color: '#FFFFFF'
             },
             menu: {
-                items: [{
-                        icon: '/images/icons/black/contact_card_icon&16.png',
-                        text: 'Account'
-                    }, {
-                        icon: '/images/icons/black/wrench_icon&16.png',
-                        text: 'Settings'
-                    }, {
-                        icon: '/images/icons/black/mail_icon&16.png',
-                        text: 'Messages'
-                    }, {
-                        icon: '/images/icons/black/user_icon&16.png',
-                        text: 'Change image'
-                    }, {
-                        icon: '/images/icons/black/bug_icon&16.png',
-                        text: 'Report bug'
-                    }, {
-                        icon: '/images/icons/black/padlock_closed_icon&16.png',
-                        text: 'Logoff'
-                    }]
+                items: userNavigation
             }
         });
 
