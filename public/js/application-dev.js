@@ -852,18 +852,16 @@ Ext.application({
     buildUserInfo: function()
     {
         this.debug('Build user infomation.', 'info');
-        var userInfoDOM = this.getUserInfoDOM(true),
+        var userInfoButton,
+            userInfoDOMId = this.getUserInfoDOM(true),
             userNavigation = this.getSystemModel().get('userNavigation'),
             personModel = this.getPersonModel(),
             fullname = personModel.get('fullname');
 
-        console.log(userNavigation);
-
-        // TODO get the menu from the system model.
         // Create a new button and add the to the user info DOM.
-        new Ext.button.Button({
+        userInfoButton = new Ext.button.Button({
             icon: personModel.get('image'),
-            renderTo: userInfoDOM,
+            renderTo: userInfoDOMId,
             text: '<span style="color:#FFF;">' + fullname + '<span>',
             scale: 'large',
             style: {
@@ -875,6 +873,19 @@ Ext.application({
                 items: userNavigation
             }
         });
+
+        // TMP
+        var userInfoDOMId = this.getUserInfoDOM(true),
+            accountQuery = userInfoDOMId + ' buttun[action=account]',
+            settingsQuery = userInfoDOMId + ' buttun[action=settings]',
+            messagesQuery = userInfoDOMId + ' buttun[action=messages]',
+            changeimageQuery = userInfoDOMId + ' buttun[action=changeimage]',
+            reportbugQuery = userInfoDOMId + ' buttun[action=reportbug]',
+            logoffQuery = userInfoButton.menu.child('[action=logoff]');
+
+        logoffQuery.on('click', this.logoff, this);
+
+        this.getUserInfoDOM().show(true);
 
     },
     /**

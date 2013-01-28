@@ -67,14 +67,15 @@ Ext.define('App.navigation.Navigation', {
             item.first('a').on('click', function(event)
             {
                 event.preventDefault();
+
+                hideSiblingsTask.delay(10, false, false, [list.parent()]);
+                showTask.delay(210, false, false, [list]);
             });
 
             item.first('a').createChild({
                 tag: 'span',
                 cls: 'application-arrow'
             });
-
-            item.last('a').addCls('test');
 
             minListWidth = item.getWidth();
 
