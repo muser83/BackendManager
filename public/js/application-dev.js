@@ -500,7 +500,7 @@ Ext.application({
         var loginAction = {
             module: 'application',
             controller: 'authentication',
-            action: 'login',
+            action: '',
             silent: true,
             args: {
                 msg: Ext.isString(msg)
@@ -535,7 +535,7 @@ Ext.application({
         var loginAction = {
             module: 'application',
             controller: 'authentication',
-            action: 'login', // TODO Do not call the login action, but only the startup action.
+            action: '',
             silent: true,
             args: {
                 logoutFirst: true,
@@ -853,12 +853,14 @@ Ext.application({
     {
         this.debug('Build user infomation.', 'info');
         var userInfoButton,
+            menuItems,
+            menuItemAction,
             userInfoDOMId = this.getUserInfoDOM(true),
             userNavigation = this.getSystemModel().get('userNavigation'),
             personModel = this.getPersonModel(),
             fullname = personModel.get('fullname');
 
-        // Create a new button and add the to the user info DOM.
+        // Create a new button and add it to the user info DOM.
         userInfoButton = new Ext.button.Button({
             icon: personModel.get('image'),
             renderTo: userInfoDOMId,
@@ -874,16 +876,17 @@ Ext.application({
             }
         });
 
-        // TMP
-        var userInfoDOMId = this.getUserInfoDOM(true),
-            accountQuery = userInfoDOMId + ' buttun[action=account]',
-            settingsQuery = userInfoDOMId + ' buttun[action=settings]',
-            messagesQuery = userInfoDOMId + ' buttun[action=messages]',
-            changeimageQuery = userInfoDOMId + ' buttun[action=changeimage]',
-            reportbugQuery = userInfoDOMId + ' buttun[action=reportbug]',
-            logoffQuery = userInfoButton.menu.child('[action=logoff]');
-
-        logoffQuery.on('click', this.logoff, this);
+        // Walk each user navigation items.
+        menuItems = userInfoButton.menu.items;
+        menuItems.each(function(item, index)
+        {
+            menuItemAction = item.action;
+            if (menuItemAction && this[menuItemAction]) {
+                // MenuItemAction is a defined system method.
+                // Add the system method to the user menu item click event.
+                item.on('click', this[menuItemAction], this);
+            }
+        }, this);
 
         this.getUserInfoDOM().show(true);
 
@@ -1157,12 +1160,19 @@ Ext.application({
         switch (response.status) {
             case -1:
                 this.debug('Connection with the server is forced closed.', 'warning', {
-                    status: response.status || '',
+                    url: options.url || ''
+                });
+                break;
+            case 0:
+                this.debug('Connection with the server was not possible, ' +
+                    'possibly the server or your internet connection is down.', 'warning', {
                     url: options.url || ''
                 });
                 break;
             case 401:
-                this.debug('The user is not authenticated by the server.', 'warning');
+                this.debug('The user is not authenticated by the server.', 'warning', {
+                    url: options.url || ''
+                });
 
                 // TODO, if a user is logged in, add a message to the logoff.
                 // System logout.
@@ -1254,6 +1264,91 @@ The server didn\'t answered with the expected data.'
             return true;
         }, this);
         // TODO Save the systemModel.
+
+        // End.
+        return true;
+    },
+    /**
+     * COMMENTME
+     *
+     *
+     * @public
+     * @return {Boolean} Void.
+     */
+    account: function()
+    {
+        alert('User account.');
+
+        // End.
+        return true;
+    },
+    /**
+     * COMMENTME
+     *
+     *
+     * @public
+     * @return {Boolean} Void.
+     */
+    settings: function()
+    {
+        alert('System settings.');
+
+        // End.
+        return true;
+    },
+    /**
+     * COMMENTME
+     *
+     *
+     * @public
+     * @return {Boolean} Void.
+     */
+    changeImage: function()
+    {
+        alert('Change user image.');
+
+
+        // End.
+        return true;
+    },
+    /**
+     * COMMENTME
+     *
+     *
+     * @public
+     * @return {Boolean} Void.
+     */
+    messages: function()
+    {
+        alert('Personal messages.');
+
+        // End.
+        return true;
+    },
+    /**
+     * COMMENTME
+     *
+     *
+     * @public
+     * @return {Boolean} Void.
+     */
+    about: function()
+    {
+        alert('About BackendManager.');
+
+        // End.
+        return true;
+    },
+    /**
+     * COMMENTME
+     *
+     *
+     * @public
+     * @return {Boolean} Void.
+     */
+    reportBug: function()
+    {
+        alert('Report a bug.');
 
         // End.
         return true;

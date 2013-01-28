@@ -47,19 +47,12 @@ Ext.define('App.controller.application.Authentication', {
     /**
      * COMMENTME
      *
-     * @return Boolean Void
-     */
-    startupAction: function()
-    {
-        // End.
-        return true;
-    },
-    /**
-     * COMMENTME
      *
-     * @return Boolean Void
+     * @public
+     * @param {Object} args
+     * @return {Boolean} Void.
      */
-    loginAction: function(args)
+    startupAction: function(args)
     {
         var window = this.getApplicationAuthenticationWindowView().create(),
             loginForm = this.getApplicationAuthenticationFromLoginView()
@@ -89,10 +82,14 @@ Ext.define('App.controller.application.Authentication', {
     /**
      * COMMENTME
      *
-     * @return Boolean Void
+     *
+     * @public
+     * @return {Boolean} Void.
      */
     authenticateAction: function(target)
     {
+        // TODO Use refs instead of arguments
+
         var window = target.up('window'),
             loginForm = window.down('form').getForm(),
             userModel = loginForm.getRecord(),

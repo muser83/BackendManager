@@ -51,10 +51,13 @@ class SystemController
     private $userNavigation = array(
         array('text' => 'Account', 'icon' => '/images/icons/black/contact_card_icon&16.png', 'action' => 'account'),
         array('text' => 'Settings', 'icon' => '/images/icons/black/wrench_icon&16.png', 'action' => 'settings'),
+        array('text' => 'Change image', 'icon' => '/images/icons/black/user_icon&16.png', 'action' => 'changeImage'),
         array('text' => 'Messages', 'icon' => '/images/icons/black/mail_icon&16.png', 'action' => 'messages'),
-        array('text' => 'Change image', 'icon' => '/images/icons/black/user_icon&16.png', 'action' => 'changeimage'),
-        array('text' => 'Report a bug', 'icon' => '/images/icons/black/bug_icon&16.png', 'action' => 'reportbug'),
-        array('text' => 'Logoff', 'icon' => '/images/icons/black/padlock_closed_icon&16.png', 'action' => 'logoff')
+        '-',
+        array('text' => 'Logoff', 'icon' => '/images/icons/black/padlock_closed_icon&16.png', 'action' => 'logoff'),
+        '-',
+        array('text' => 'About', 'icon' => '/images/icons/black/tag_icon&16.png', 'action' => 'about'),
+        array('text' => 'Report a bug', 'icon' => '/images/icons/black/bug_icon&16.png', 'action' => 'reportBug')
     );
     private $toolbar = array(
         'applicationDashboard' => array(
