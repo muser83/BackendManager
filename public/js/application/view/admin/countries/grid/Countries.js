@@ -64,9 +64,11 @@ Ext.define('App.view.admin.countries.grid.Countries', {
             }
         }, {
             text: 'Name',
+            locked: true,
             dataIndex: 'name',
             hideable: false,
-            flex: 1,
+            width: 200,
+//            flex: 1,
             editor: {
                 xtype: 'textfield',
                 allowBlank: false

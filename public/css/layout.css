@@ -143,7 +143,7 @@ body
     left:inherit;
     position:absolute;
     top:inherit;
-    z-index:900;
+    z-index:99999;
     -webkit-box-shadow: 5px 5px 5px 0px rgba(00, 00, 00, 0.1);
     -moz-box-shadow: 5px 5px 5px 0px rgba(00, 00, 00, 0.1);
     box-shadow: 5px 5px 5px 0px rgba(00, 00, 00, 0.1);
@@ -299,7 +299,6 @@ body
 /*******************************************************************************
  * Application Icons
  ******************************************************************************/
-
 .application-icon
 {
     height:16px;
@@ -308,11 +307,9 @@ body
     display:inline-block;
     vertical-align: text-top;
 }
-
 /*******************************************************************************
  * Navigation Icons
  ******************************************************************************/
-
 .application-navigation-anchor-icon
 {
     height: 16px;
@@ -320,7 +317,6 @@ body
     margin:0px;
     padding-left:19px;
 }
-
 /*******************************************************************************
  * Icon paths
  ******************************************************************************/
@@ -628,19 +624,61 @@ body
 .icon-wrench-plus{background:url('../images/icons/black/wrench_plus_icon&16.png') no-repeat;}
 .icon-youtube{background:url('../images/icons/black/youtube_icon&16.png') no-repeat;}
 .icon-zoom{background:url('../images/icons/black/zoom_icon&16.png') no-repeat;}
-
+/*******************************************************************************
+ * Replace ExtJs theme icons
+ ******************************************************************************/
+/* Toolbar */
+.x-item-disabled .x-tbar-page-first,
+.x-tbar-page-first
+{background: url(../images/icons/black/playback_prev_icon&16.png) no-repeat !important;}
+.x-item-disabled .x-tbar-page-prev,
+.x-tbar-page-prev
+{background: url(../images/icons/black/playback_playback_icon&16.png) no-repeat !important;}
+.x-item-disabled .x-tbar-page-next,
+.x-tbar-page-next
+{background: url(../images/icons/black/playback_play_icon&16.png) no-repeat !important;}
+.x-item-disabled .x-tbar-page-last,
+.x-tbar-page-last
+{background: url(../images/icons/black/playback_next_icon&16.png) no-repeat !important;}
+.x-item-disabled .x-tbar-loading,
+.x-tbar-loading
+{background: url(../images/icons/black/playback_reload_icon&16.png) no-repeat !important;}
+/* Load mask */
+.x-mask-msg div
+{
+    background: #1E5E92 url(../images/layout/header-loader&16.gif) no-repeat 5px center !important;
+    color: #FFFFFF !important;
+}
+/* Grid */
+.col-move-top
+{background-image: url(../images/icons/black/&9/arrow_bottom_icon&9.png) !important;}
+.col-move-bottom
+{background-image: url(../images/icons/black/&9/arrow_top_icon&9.png) !important;}
+.x-dd-drop-nodrop .x-dd-drop-icon
+{background-image: url(../images/icons/black/cancel_icon&16.png) !important;}
+.x-dd-drop-ok .x-dd-drop-icon
+{background-image: url(../images/icons/black/checkmark_icon&16.png) !important;}
+/* Grid menu */
+.x-menu-item-arrow
+{background-image: url(../images/icons/black/&9/playback_play_icon9x12.png) !important;}
+.x-cols-icon .x-menu-item-icon
+{background-image: url(../images/icons/black/3x3_grid_icon&16.png) !important;}
+.x-hmenu-unlock .x-menu-item-icon
+{background-image: url(../images/icons/black/padlock_open_icon&16.png) !important;}
+.x-hmenu-unlock .x-menu-item-icon
+{background-image: url(../images/icons/black/padlock_open_icon&16.png) !important;}
+.x-hmenu-lock .x-menu-item-icon
+{background-image: url(../images/icons/black/padlock_closed_icon&16.png) !important;}
 /*******************************************************************************
  * Custom style classed
  ******************************************************************************/
-.logout-message{
+.logout-message
+{
     color: #FF0000;
 }
-
-
 /*******************************************************************************
  * Css Fixes
  ******************************************************************************/
-
 .x-fix-msg-msg
 {
     white-space: pre-line;

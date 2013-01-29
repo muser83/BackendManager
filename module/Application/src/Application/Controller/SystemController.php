@@ -130,7 +130,7 @@ class SystemController
         'id' => 1,
         'addressesId' => 0,
         'communicationsId' => 0,
-        'image' => './images/icons/black/user_icon&32.png',
+        'image' => './images/icons/black/&32/user_icon&32.png',
         'firstname' => 'Boy',
         'middlename' => 'van',
         'lastname' => 'Moorsel',
