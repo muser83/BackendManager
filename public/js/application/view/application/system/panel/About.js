@@ -1,6 +1,6 @@
 /**
- * Window.js
- * Created on Dec 2, 2012 9:41:42 PM
+ * About.js
+ * Created on Jan 29, 2013 6:53:05 PM
  *
  * @author    Boy van Moorsel <development@wittestier.nl>
  * @license   -
@@ -27,57 +27,46 @@
  * Ext.util.Observable
  * Ext.util.Renderable
  */
-Ext.define('App.view.application.Window', {
-    extend: 'Ext.window.Window',
-//    icon: '',
-//    title: '',
-    closable: true,
-    draggable: true,
-    resizable: false,
-//    plain: false,
-    modal: true,
-    shrinkWrap: 3,
-//    height: undefined,
-//    width: undefined,
-//    padding: undefined,
-//    margin: undefined,
+Ext.define('App.view.application.system.panel.About', {
+    extend: 'Ext.panel.Panel',
+    border: false,
+    shrinkWrap: 2,
+    height: 330,
+    width: 575,
+//    padding: 0,
+//    margin: 0,
 //    maxHeight: undefined,
 //    maxWidth: undefined,
-//    minHeight: 50,
-//    minWidth: 50,
-//    x: undefined,
-//    y: undefined,
+//    minHeight: undefined,
+//    minWidth: undefined,
+//    style: undefined,
+//    layout: undefined,
 //    plugins: [],
+//    renderData: undefined,
+//    renderTo: undefined,
+//    contentEl: undefined,
+//    html: '',
+//    data: undefine,
+//    tpl: '',
+//    listeners: {
+//    },
+//    defaults: {
+//    },
 //    tools: [],
-//    buttonAlign: undefined,
-//    buttons: undefined,
-    /* Ext.window.Window*/
-//    animateTarget: null,
-//    autoRender: true,
-//    baseCls: 'x-window',
-//    collapsed: false,
-//    collapsible: false,
-//    constrain: false,
-//    constrainHeader: false,
-//    defaultFocus: undefined,
-//    expandOnShow: true,
-//    ghost: undefined, // Function
-//    hidden: true,
-//    hideMode: 'offsets',
-//    hideShadowOnDeactivate: false,
-//    maximizable: false,
-//    maximized: false,
-//    minimizable: false,
-//    onEsc: undefined, // Function
-//    overlapHeader: true,
+//    items: [],
     /* Ext.panel.Panel */
 //    animCollapse: true,
 //    bbar: undefined,
+//    buttonAlign: undefined,
+//    buttons: undefined,
+//    closable: false,
 //    closeAction: 'destroy',
 //    collapseDirection: 'top',
 //    collapseFirst: true,
 //    collapseMode: undefined,
+//    collapsed: false,
 //    collapsedCls: 'collapsed',
+//    collapsible: false,
 //    dockedItems: undefined,
 //    fbar: undefined,
 //    floatable: true,
@@ -90,6 +79,7 @@ Ext.define('App.view.application.Window', {
 //    lbar: undefined,
 //    manageHeight: true,
 //    minButtonWidth: 75,
+//    overlapHeader: undefined,
 //    placeholder: undefined,
 //    placeholderCollapseHideMode: undefined,
 //    rbar: undefined,
@@ -97,11 +87,11 @@ Ext.define('App.view.application.Window', {
 //    titleAlign: 'left',
 //    titleCollapse: false,
     /* Ext.panel.AbstractPanel */
+//    baseCls: 'x-panel',
 //    bodyBorder: undefined,
 //    bodyCls: undefined,
 //    bodyPadding: undefined,
 //    bodyStyle: undefined,
-//    border: true,
     /* Ext.container.Container */
 //    anchorSize: undefined,
     /* Ext.container.AbstractContainer */
@@ -109,49 +99,47 @@ Ext.define('App.view.application.Window', {
 //    autoDestroy: true,
 //    bubbleEvents: ['add', 'remove'],
 //    defaultType: 'panel',
-//    defaults: undefined,
 //    detachOnRemove: true,
-//    items: undefined,
-//    layout: undefined,
 //    suspendLayout: false,
     /* Ext.Component */
 //    autoScroll: false,
 //    columnWidth: undefined,
 //    constrainTo: undefined,
 //    defaultAlign: 'tl-bl?',
+//    draggable: false,
 //    floating: false,
 //    formBind: false,
 //    overflowX: 'hidden',
 //    overflowY: 'hidden',
 //    region: undefined,
+//    resizable: false,
 //    resizeHandles: 'all',
 //    toFrontOnShow: true,
     /* Ext.AbstractComponent */
 //    autoEl: undefined,
+//    autoRender: false,
 //    autoShow: false,
 //    childEls: undefined,
 //    cls: '',
 //    componentCls: undefined,
 //    componentLayout: undefined,
-//    contentEl: undefined,
-//    data: undefined,
 //    disabled: false,
 //    disabledCls: 'x-item-disabled',
-//    html: '',
+//    hidden: false,
+//    hideMode: 'display',
 //    id: undefined,
 //    itemId: undefined,
-//    loader: undefined,
+    loader: {
+        url: 'http://backendmanager.dev/~system/about',
+        autoLoad: true,
+        renderer: 'html'
+    },
 //    overCls: '',
-//    renderData: undefined,
 //    renderSelectors: undefined,
-//    renderTo: undefined,
-//    style: undefined,
 //    styleHtmlCls: 'x-html',
-//    styleHtmlContent: false,
-//    tpl: undefined,
+    styleHtmlContent: true,
 //    tplWriteMode: 'overwrite',
 //    ui: 'default',
-//    xtype: undefined,
     /*
      * MIXINS
      */
@@ -186,7 +174,6 @@ Ext.define('App.view.application.Window', {
     /* Ext.util.Animate */
     /* Ext.util.ElementContainer */
     /* Ext.util.Observable */
-//    listeners: undefined,
     /* Ext.util.Renderable */
     /* */
     initComponent: function()

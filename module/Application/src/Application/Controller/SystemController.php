@@ -12,8 +12,9 @@
 namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController,
-    Zend\Json\Json,
+    Zend\View\Model\ViewModel,
     Zend\View\Model\JsonModel,
+    Zend\Json\Json,
     Zend\Session\Container AS sessionContainer,
     Doctrine\ORM\EntityManager;
 
@@ -255,6 +256,19 @@ class SystemController
             'user' => $user
             )
         );
+    }
+
+    /**
+     * COMMENTME
+     *
+     * @return \Zend\View\Model\ViewModel
+     */
+    public function aboutAction()
+    {
+        $result = new ViewModel();
+        $result->setTerminal(true);
+
+        return $result;
     }
 
 }

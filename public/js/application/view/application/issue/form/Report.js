@@ -1,6 +1,6 @@
 /**
- * Window.js
- * Created on Dec 2, 2012 9:41:42 PM
+ * Report.js
+ * Created on Jan 29, 2013 11:54:05 PM
  *
  * @author    Boy van Moorsel <development@wittestier.nl>
  * @license   -
@@ -15,8 +15,10 @@
  * ---- Ext.container.Container
  * ----- Ext.panel.AbstractPanel
  * ------ Ext.panel.Panel
+ * ------- Ext.form.Panel
  *
  * MIXINS:
+ * Ext.form.FieldAncestor
  *
  * INHERITED MIXINS:
  * Ext.container.DockingContainer
@@ -27,57 +29,92 @@
  * Ext.util.Observable
  * Ext.util.Renderable
  */
-Ext.define('App.view.application.Window', {
-    extend: 'Ext.window.Window',
+Ext.define('App.view.application.issue.form.Report', {
+    extend: 'Ext.form.Panel',
 //    icon: '',
 //    title: '',
-    closable: true,
-    draggable: true,
-    resizable: false,
-//    plain: false,
-    modal: true,
+    border: false,
     shrinkWrap: 3,
-//    height: undefined,
-//    width: undefined,
+//    height: 350,
+//    width: 500,
 //    padding: undefined,
 //    margin: undefined,
 //    maxHeight: undefined,
 //    maxWidth: undefined,
-//    minHeight: 50,
-//    minWidth: 50,
-//    x: undefined,
-//    y: undefined,
+//    minHeight: undefined,
+//    minWidth: undefined,
+//    style: undefined,
+//    layout: undefined,
 //    plugins: [],
+//    renderData: undefined,
+//    renderTo: undefined,
+//    contentEl: undefined,
+//    html: '',
+//    data: undefine,
+//    tpl: undefined,
+    listeners: {
+    },
+    defaults: {
+    },
 //    tools: [],
-//    buttonAlign: undefined,
-//    buttons: undefined,
-    /* Ext.window.Window*/
-//    animateTarget: null,
-//    autoRender: true,
-//    baseCls: 'x-window',
-//    collapsed: false,
-//    collapsible: false,
-//    constrain: false,
-//    constrainHeader: false,
-//    defaultFocus: undefined,
-//    expandOnShow: true,
-//    ghost: undefined, // Function
-//    hidden: true,
-//    hideMode: 'offsets',
-//    hideShadowOnDeactivate: false,
-//    maximizable: false,
-//    maximized: false,
-//    minimizable: false,
-//    onEsc: undefined, // Function
-//    overlapHeader: true,
+    items: [{
+            xtype: 'fieldcontainer',
+//            layout: '',
+            fieldDefaults: {
+                labelAlign: 'top',
+                labelWidth: 450,
+                width: 450,
+                margin: 10
+            },
+            items: [{
+                    xtype: 'textfield',
+                    name: 'title',
+                    fieldLabel: 'Title'
+                }, {
+                    xtype: 'textareafield',
+                    name: 'description',
+                    fieldLabel: 'Description',
+                    emptyText: 'Describe the inappropriate behaviour or the error messages.'
+                }, {
+                    xtype: 'textareafield',
+                    name: 'reproduce',
+                    fieldLabel: 'How to reproduce',
+                    emptyText: 'It\'s very important that you describe what you did before the bug appeared.'
+                }, {
+                    xtype: 'displayfield',
+                    labelAlign: 'left',
+                    labelWidth: 150,
+                    name: '',
+                    fieldLabel: 'This bug is reported by',
+                    value: 'Boy van Moorsel'
+                }, {
+                    xtype: 'checkboxfield',
+                    name: 'relaunch',
+                    checked: true,
+                    boxLabel: 'Include system configuration and personal settings.'
+                }, {
+                    xtype: 'checkboxfield',
+                    name: 'relaunch',
+                    checked: true,
+                    boxLabel: 'Relaunch the system after the bug is reported.'
+                }]
+        }],
+    /* Ext.form.Panel */
+//    pollForChanges: false,
+//    pollInterval: 500,
     /* Ext.panel.Panel */
 //    animCollapse: true,
 //    bbar: undefined,
+//    buttonAlign: undefined,
+//    buttons: undefined,
+//    closable: false,
 //    closeAction: 'destroy',
 //    collapseDirection: 'top',
 //    collapseFirst: true,
 //    collapseMode: undefined,
+//    collapsed: false,
 //    collapsedCls: 'collapsed',
+//    collapsible: false,
 //    dockedItems: undefined,
 //    fbar: undefined,
 //    floatable: true,
@@ -90,6 +127,7 @@ Ext.define('App.view.application.Window', {
 //    lbar: undefined,
 //    manageHeight: true,
 //    minButtonWidth: 75,
+//    overlapHeader: undefined,
 //    placeholder: undefined,
 //    placeholderCollapseHideMode: undefined,
 //    rbar: undefined,
@@ -97,11 +135,11 @@ Ext.define('App.view.application.Window', {
 //    titleAlign: 'left',
 //    titleCollapse: false,
     /* Ext.panel.AbstractPanel */
+//    baseCls: 'x-panel',
 //    bodyBorder: undefined,
 //    bodyCls: undefined,
 //    bodyPadding: undefined,
 //    bodyStyle: undefined,
-//    border: true,
     /* Ext.container.Container */
 //    anchorSize: undefined,
     /* Ext.container.AbstractContainer */
@@ -109,49 +147,43 @@ Ext.define('App.view.application.Window', {
 //    autoDestroy: true,
 //    bubbleEvents: ['add', 'remove'],
 //    defaultType: 'panel',
-//    defaults: undefined,
 //    detachOnRemove: true,
-//    items: undefined,
-//    layout: undefined,
 //    suspendLayout: false,
     /* Ext.Component */
 //    autoScroll: false,
 //    columnWidth: undefined,
 //    constrainTo: undefined,
 //    defaultAlign: 'tl-bl?',
+//    draggable: false,
 //    floating: false,
 //    formBind: false,
 //    overflowX: 'hidden',
 //    overflowY: 'hidden',
 //    region: undefined,
+//    resizable: false,
 //    resizeHandles: 'all',
 //    toFrontOnShow: true,
     /* Ext.AbstractComponent */
 //    autoEl: undefined,
+//    autoRender: false,
 //    autoShow: false,
 //    childEls: undefined,
 //    cls: '',
 //    componentCls: undefined,
 //    componentLayout: undefined,
-//    contentEl: undefined,
-//    data: undefined,
 //    disabled: false,
 //    disabledCls: 'x-item-disabled',
-//    html: '',
+//    hidden: false,
+//    hideMode: 'display',
 //    id: undefined,
 //    itemId: undefined,
 //    loader: undefined,
 //    overCls: '',
-//    renderData: undefined,
 //    renderSelectors: undefined,
-//    renderTo: undefined,
-//    style: undefined,
 //    styleHtmlCls: 'x-html',
 //    styleHtmlContent: false,
-//    tpl: undefined,
 //    tplWriteMode: 'overwrite',
 //    ui: 'default',
-//    xtype: undefined,
     /*
      * MIXINS
      */
@@ -186,7 +218,6 @@ Ext.define('App.view.application.Window', {
     /* Ext.util.Animate */
     /* Ext.util.ElementContainer */
     /* Ext.util.Observable */
-//    listeners: undefined,
     /* Ext.util.Renderable */
     /* */
     initComponent: function()

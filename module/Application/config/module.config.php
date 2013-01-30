@@ -67,10 +67,11 @@ return array(
         'not_found_template' => 'error/404',
         'exception_template' => 'error/index',
         'template_map' => array(
-            'layout/layout' => __DIR__ . '/../view/layout/layout.phtml',
             'application/index/index' => __DIR__ . '/../view/application/index/index.phtml',
+            'application/system/about' => __DIR__ . '/../view/application/system/about.phtml',
             'error/404' => __DIR__ . '/../view/error/404.phtml',
             'error/index' => __DIR__ . '/../view/error/index.phtml',
+            'layout/layout' => __DIR__ . '/../view/layout/layout.phtml',
         ),
         'template_path_stack' => array(
             __DIR__ . '/../view',
@@ -113,8 +114,7 @@ return array(
                 'identity_class' => 'Application\Entity\Users',
                 'identity_property' => 'identity',
                 'credential_property' => 'credential',
-                'credentialcallable' => function(User $user, $credential)
-                {
+                'credentialcallable' => function(User $user, $credential) {
                     // Check credential.
 
                     var_dump($user);

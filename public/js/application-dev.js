@@ -59,6 +59,9 @@ Ext.require([
     // Ux
     // View
     'Ext.view.AbstractView',
+    'App.view.application.Window',
+    'App.view.application.system.panel.About',
+    'App.view.application.issue.form.Report',
     // Window
     'Ext.window.MessageBox',
     // Ajax
@@ -117,6 +120,14 @@ Ext.application({
     models: [
         'application.System',
         'application.User'
+    ],
+    /**
+     * Array of views.
+     */
+    views: [
+        'application.Window',
+        'application.system.panel.About',
+        'application.issue.form.Report'
     ],
     /**
      * App.view.Viewport Viewport class.
@@ -1326,15 +1337,23 @@ The server didn\'t answered with the expected data.'
         return true;
     },
     /**
-     * COMMENTME
-     *
+     * Open the about window.
+     * The about content will be loaded from /~system/about/
      *
      * @public
      * @return {Boolean} Void.
      */
     about: function()
     {
-        alert('About BackendManager.');
+        var window = this.getApplicationWindowView().create({
+            icon: '/images/icons/black/tag_icon&16.png',
+            title: 'About BackenManager'
+        }),
+        aboutPanel = this.getApplicationSystemPanelAboutView().create();
+
+
+        window.add(aboutPanel);
+        window.show();
 
         // End.
         return true;
@@ -1348,7 +1367,22 @@ The server didn\'t answered with the expected data.'
      */
     reportBug: function()
     {
-        alert('Report a bug.');
+        var window = this.getApplicationWindowView().create({
+            icon: '/images/icons/black/bug_icon&16.png',
+            title: 'Report a bug',
+            buttons: [{
+                    text: 'Cancel'
+                }, {
+                    text: 'Report'
+                }]
+        }),
+        reportIssueForm = this.getApplicationIssueFormReportView().create();
+
+        window.add(reportIssueForm);
+        window.show();
+
+
+        // Dispatch the report issue action silent.
 
         // End.
         return true;

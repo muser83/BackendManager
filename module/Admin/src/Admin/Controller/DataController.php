@@ -74,7 +74,7 @@ class DataController
      */
     public function getList()
     {
-        sleep(10);
+//        sleep(10);
 
         try {
             $entityClass = $this->getDataEntity();
