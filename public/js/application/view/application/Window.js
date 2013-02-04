@@ -6,32 +6,11 @@
  * @license   -
  * @copyright 2012 witteStier.nl
  */
-/**
- * HIERARCHY:
- * Ext.Base
- * - Ext.AbstractComponent
- * -- Ext.Component
- * --- Ext.container.AbstractContainer
- * ---- Ext.container.Container
- * ----- Ext.panel.AbstractPanel
- * ------ Ext.panel.Panel
- *
- * MIXINS:
- *
- * INHERITED MIXINS:
- * Ext.container.DockingContainer
- * Ext.state.Statefull
- * Ext.util.Animate
- * Ext.util.ElementContainer
- * Ext.util.Floating
- * Ext.util.Observable
- * Ext.util.Renderable
- */
 Ext.define('App.view.application.Window', {
     extend: 'Ext.window.Window',
 //    icon: '',
 //    title: '',
-    closable: true,
+//    closable: true,
     draggable: true,
     resizable: false,
 //    plain: false,
@@ -50,7 +29,11 @@ Ext.define('App.view.application.Window', {
 //    plugins: [],
 //    tools: [],
 //    buttonAlign: undefined,
-//    buttons: undefined,
+    buttons: {
+        icon: '/images/icons/black/cancel_icon&16.png',
+        text: 'Cancel',
+        action: ''
+    },
     /* Ext.window.Window*/
 //    animateTarget: null,
 //    autoRender: true,

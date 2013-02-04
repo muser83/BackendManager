@@ -6,29 +6,6 @@
  * @license   -
  * @copyright 2012 witteStier.nl
  */
-/**
- * HIERARCHY:
- * Ext.Base
- * - Ext.AbstractComponent
- * -- Ext.Component
- * --- Ext.container.AbstractContainer
- * ---- Ext.container.Container
- * ----- Ext.panel.AbstractPanel
- * ------ Ext.panel.Panel
- * ------- Ext.form.Panel
- *
- * MIXINS:
- * Ext.form.FieldAncestor
- *
- * INHERITED MIXINS:
- * Ext.container.DockingContainer
- * Ext.state.Statefull
- * Ext.util.Animate
- * Ext.util.ElementContainer
- * Ext.util.Floating
- * Ext.util.Observable
- * Ext.util.Renderable
- */
 Ext.define('App.view.application.issue.form.Report', {
     extend: 'Ext.form.Panel',
 //    icon: '',
@@ -67,9 +44,14 @@ Ext.define('App.view.application.issue.form.Report', {
                 margin: 10
             },
             items: [{
-                    xtype: 'textfield',
-                    name: 'title',
-                    fieldLabel: 'Title'
+                    xtype: 'combobox',
+                    editable: false,
+                    name: 'priority',
+                    fieldLabel: 'Priority',
+                    store: 'App.store.application.Priority',
+                    queryMode: 'local',
+                    displayField: 'desc',
+                    valueField: 'id'
                 }, {
                     xtype: 'textareafield',
                     name: 'description',

@@ -12,5 +12,6 @@ if ('production' == APPLICATION_ENV) {
 } else {
     $this->headScript()
         ->appendFile('http://eulibrary.msi.com/ext/ext-debug.js')
-        ->appendFile('js/application-dev.js');
+        ->appendFile('js/application-dev.js')
+        ->appendFile('js/application/i18n/nl_NL.js');
 }

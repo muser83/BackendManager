@@ -8,6 +8,7 @@
  * @license   LGPL
  * @copyright 2012 witteStier.nl
  */
+
 namespace Admin;
 
 // End.
@@ -16,6 +17,8 @@ return array(
         'invokables' => array(
             // Define all invokable module controller.
             'Data' => 'Admin\Controller\DataController',
+            'Countries' => 'Admin\Controller\CountriesController',
+            'Locales' => 'Admin\Controller\LocalesController',
             'Admin\Controller\Index' => 'Admin\Controller\IndexController'
         ),
     ),

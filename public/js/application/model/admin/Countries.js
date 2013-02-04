@@ -12,7 +12,7 @@ Ext.define('App.model.admin.Countries', {
     },
     proxy: {
         type: 'rest',
-        url: '/admin/data/countries',
+        url: '/admin/countries',
 //        startParam: 'start',
 //        limitParam: 'limit',
 //        pageParam: 'page',
@@ -44,22 +44,16 @@ Ext.define('App.model.admin.Countries', {
 //        extraParams: {},
         reader: {
             type: 'json',
-            root: 'data',
-//            idProperty: 'id',
+            root: 'countries',
 //            implicitIncludes: true,
-//            readRecordsOnFailure: true,
-//            useSimpleAccessors: false,
-//            messageProperty: 'message',
-//            metaProperty: 'metaData',
-//            successProperty: 'success',
-//            totalProperty: 'total'
+            messageProperty: 'message'
         },
         writer: {
             type: 'json',
             writeAllFields: true,
-//            allowSingle: true,
+            allowSingle: false,
             encode: true,
-            root: 'data',
+            root: 'countries',
             getRecordData: function(record) {
                 // End.
                 return record.getData(true);

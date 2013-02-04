@@ -67,11 +67,39 @@ Ext.require([
     // Ajax
     'Ext.Ajax',
     // Models
-    'App.model.application.System'
+    'App.model.application.System',
+    'App.model.application.Priority'
 ]);
+
+Ext.define('Ext.app.Application.I18n', {
+    override: 'Ext.application.Application',
+    loadSystemInfoLoadErrorTitle: 'Systeem fout',
+    loadSystemInfoLoadErrorMsg: 'De vereiste systeem opslag kan niet worden geladen.',
+    loadSystemInfoLoadErrorBtnOk: 'Start systeem opniew op'
+});
 
 // Bootstrap system.
 Ext.application({
+    errorDefaultTitle: 'System error',
+    errorDefaultMsg: 'Undefined error message',
+    errorDefaultMsgFuffix: '\n\'Report issue\' to help debugging this system.\n\
+\'Continue\' otherwise.',
+    errorDefaultBtnYes: 'Relaunch System',
+    errorDefaultBtnNo: 'Report issue',
+    errorDefaultBtnCancel: 'Continue',
+    dispatchInvalidControllerErrorTitle: 'System dispatch error.',
+    dispatchInvalidControllerErrorMsg: 'Could not load system module.',
+    dispatchInvalidControllerErrorBtnYes: 'Relaunch System',
+    dispatchInvalidControllerErrorBtnNo: 'Report this issue',
+    loadSystemInfoLoadErrorTitle: 'System error',
+    loadSystemInfoLoadErrorMsg: 'The required system storage could not be loaded',
+    loadSystemInfoLoadErrorBtnOk: 'Relaunch System',
+    requestExceptionDefaultErrorTitle: 'System load error.',
+    requestExceptionDefaultErrorMsg: 'Error while loading data from the server.\n\
+The server didn\'t answered with the expected data.',
+    logoffMsg: 'The system isn\'t used for 45 minutes or longer.',
+    preLogoffMsg: 'The system isn\'t used for 30 minutes or longer.',
+    /*------------------------------------------------------------------------*/
     /**
      * Whatever the system is in development.
      */
@@ -121,6 +149,7 @@ Ext.application({
         'application.System',
         'application.User'
     ],
+    stores: ['App.store.application.Priority'], // Tmp will be removed while the userNavigation methods are replaced to controllers.
     /**
      * Array of views.
      */
@@ -606,14 +635,14 @@ Ext.application({
                     closable: false,
                     modal: true,
                     multiline: false,
-                    title: 'System error',
-                    msg: 'The required system storage could not be loaded',
+                    title: this.loadSystemInfoLoadErrorTitle,
+                    msg: this.loadSystemInfoLoadErrorMsg,
                     icon: Ext.Msg.ERROR,
                     cls: 'x-fix-msg-msg',
                     animateTarget: Ext.get('application-header-logo'),
                     buttons: Ext.Msg.OK,
                     buttonText: {
-                        ok: 'Relaunch System'
+                        ok: this.loadSystemInfoLoadErrorBtnOk
                     },
                     fn: function(buttonId)
                     {
@@ -729,14 +758,14 @@ Ext.application({
 
         if (!controller) {
             Ext.Error.raise({
-                title: 'System dispatch error.',
-                msg: 'Could not dispatch controller ' + controllerName + '.',
+                title: this.dispatchInvalidControllerErrorTitle,
+                msg: this.dispatchInvalidControllerErrorMsg,
                 closable: false,
                 addSuffix: false,
                 buttons: Ext.Msg.YESNO,
                 buttonText: {
-                    yes: 'Relaunch System',
-                    no: 'Report issue'
+                    yes: this.dispatchInvalidControllerErrorBtnYes,
+                    no: this.dispatchInvalidControllerErrorBtnNo
                 }
             });
 
@@ -941,16 +970,16 @@ Ext.application({
             closable: true,
             modal: true,
             multiline: false,
-            title: 'System error',
-            msg: 'Undefined error message',
+            title: this.errorDefaultTitle,
+            msg: this.errorDefaultMsg,
             icon: Ext.Msg.ERROR,
             cls: 'x-fix-msg-msg',
             animateTarget: Ext.get('application-header-logo'),
             buttons: Ext.Msg.YESNOCANCEL,
             buttonText: {
-                yes: 'Relaunch System',
-                no: 'Report issue',
-                cancel: 'Continue'
+                yes: this.errorDefaultBtnYes,
+                no: this.errorDefaultBtnNo,
+                cancel: this.errorDefaultBtnCancel
             },
             fn: function(buttonId)
             {
@@ -979,12 +1008,10 @@ Ext.application({
         {
             Ext.apply(errorDefault, error);
             if (error.addSuffix) {
-                error.msg += '\n\'Report issue\' to help debugging this system.\n\
-\'Continue\' otherwise.';
+                errorDefault.msg += self.errorDefaultMsgFuffix;
             }
 
             if (!error.showError || false !== error.showError) {
-
                 self.debug('Throw system error:', 'error', {
                     errorMsg: error.msg
                 });
@@ -1062,7 +1089,7 @@ Ext.application({
         this.tasks.preLogoff = new Ext.util.DelayedTask(function()
         {
             // Do not shutdown the system.
-            this.preLogoff("The system isn't used for 30 minutes or longer.");
+            this.preLogoff(this.preLogoffMsg);
 
             // End.
             return true;
@@ -1071,7 +1098,7 @@ Ext.application({
         this.tasks.logoff = new Ext.util.DelayedTask(function()
         {
             // Shutdown the system.
-            this.logoff("The system isn't used for 45 minutes or longer.");
+            this.logoff(this.logoffMsg);
             // End.
             return true;
         }, this);
@@ -1104,6 +1131,13 @@ Ext.application({
                 return true;
             }
         });
+
+        // WORKAROUND
+        // Override this application instance to enable the translation/ i18n
+        // functionality.
+        // I was not able to override the Ext.application.Applicaton or
+        // Ext.Application instance. This a work-around, please improve.
+        Ext.override(this, i18nApplication);
 
         // End.
         return true;
@@ -1196,9 +1230,9 @@ Ext.application({
                 });
 
                 Ext.Error.raise({
-                    title: 'System load error.',
-                    msg: 'Error while loading data from the server.\n\
-The server didn\'t answered with the expected data.'
+                    addSuffix: true,
+                    title: this.requestExceptionDefaultErrorTitle,
+                    msg: this.requestExceptionDefaultErrorMsg
                 });
         }
 

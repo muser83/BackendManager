@@ -1,18 +1,18 @@
 /**
- * Locales.js
- * Created on Dec 27, 2012 12:17:48 AM
+ * Priority.js
+ * Created on Feb 4, 2013 1:06:45 AM
  *
  * @author    Boy van Moorsel <development@wittestier.nl>
  * @license   -
  * @copyright 2012 witteStier.nl
  */
-Ext.define('App.model.admin.Locales', {
-    extend: 'App.model.Locales',
+Ext.define('App.model.application.Priority', {
+    extend: 'App.model.Priority',
     listners: {
-    },
-    proxy: {
-        type: 'ajax',
-        url: '/admin/locales',
+    }
+//    proxy: {
+//        type: 'ajax',
+//        url: '',
 //        startParam: 'start',
 //        limitParam: 'limit',
 //        pageParam: 'page',
@@ -45,22 +45,25 @@ Ext.define('App.model.admin.Locales', {
 //        },
 //        extraParams: {
 //        },
-        reader: {// Json reader defaults.
-            type: 'json',
-            root: 'locales',
+//        reader: {
+//            type: 'json',
+//            root: 'data',
+//            idProperty: 'id',
 //            implicitIncludes: true,
-            messageProperty: 'message'
-        },
-        writer: {
-            type: 'json',
-            writeAllFields: true,
-            allowSingle: false,
-            encode: true,
-            root: 'locales',
-            getRecordData: function(record) {
-                // End.
-                return record.getData(true);
-            }
-        }
-    }
+//            readRecordsOnFailure: true,
+//            useSimpleAccessors: false,
+//            messageProperty: 'message',
+//            metaProperty: 'metaData',
+//            successProperty: 'success',
+//            totalProperty: 'total'
+//        },
+//        writer: {
+//            type: 'json',
+//            nameProperty: 'name',
+//            writeAllFields: true,
+//            allowSingle: true,
+//            encode: false,
+//            root: 'data'
+//        }
+//    }
 });
