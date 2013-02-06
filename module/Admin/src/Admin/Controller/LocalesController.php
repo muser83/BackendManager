@@ -91,8 +91,6 @@ class LocalesController
             );
         }
 
-        $this->getResponse()->setStatusCode(404);
-
         // End.
         return new JsonModel(
             array(

@@ -45,46 +45,6 @@ Ext.define('App.controller.Abstract', {
     /**
      * COMMENTME
      *
-     * @returns {App.view.*} View with toolbar.
-     */
-    getToolbar: function()
-    {
-        var toolbarConfig = this.getToolbarConfig();
-
-        Ext.apply(toolbarConfig, {
-//            enableOverflow: true // This option causes errors on centerview.removeAll
-        });
-
-        // End.
-        return Ext.create('Ext.toolbar.Toolbar', toolbarConfig);
-    },
-    /**
-     * COMMENTME
-     * @param {Ext.data.Store} store To the grid binded store.
-     * @return {Ext.PagingToolbar} Configured paging toolbar.
-     */
-    getPagingToolbar: function(store)
-    {
-        var toolbarConfig = this.getToolbarConfig();
-
-        Ext.apply(toolbarConfig, {
-            store: store,
-//            enableOverflow: true, // This option causes errors on centerview.removeAll
-            displayInfo: false,
-            prependButtons: true
-        });
-
-        toolbarConfig.items.push('->');
-
-        Ext.apply(toolbarConfig, {
-        });
-
-        // End.
-        return Ext.create('Ext.toolbar.Paging', toolbarConfig);
-    },
-    /**
-     * COMMENTME
-     *
      * @return {Object} toolbar configuration.
      */
     getToolbarConfig: function()
@@ -104,6 +64,136 @@ Ext.define('App.controller.Abstract', {
         return toolbarConfig;
     },
     /**
+     * COMMENTME
+     *
+     * @returns {App.view.*} View with toolbar.
+     */
+    getToolbar: function()
+    {
+        var toolbarConfig = this.getToolbarConfig(),
+            toolbar;
+
+        // Set default toolbar configuration.
+        Ext.apply(toolbarConfig, {
+        });
+
+        toolbar = Ext.create('Ext.toolbar.Toolbar', toolbarConfig);
+        toolbar.add('->');
+        this.addToolbarDocumentation(toolbar);
+
+        // End.
+        return toolbar;
+    },
+    /**
+     * COMMENTME
+     * @param {Ext.data.Store} store To the grid binded store.
+     * @return {Ext.PagingToolbar} Configured paging toolbar.
+     */
+    getPagingToolbar: function(store)
+    {
+        var toolbarConfig = this.getToolbarConfig(),
+            pagingToolbar;
+
+        // Set default toolbar configuration.
+        Ext.apply(toolbarConfig, {
+            store: store,
+            displayInfo: false,
+            prependButtons: true
+        });
+
+        toolbarConfig.items.push('->');
+
+        pagingToolbar = Ext.create('Ext.toolbar.Paging', toolbarConfig);
+
+        this.addPagingSearchFilter(pagingToolbar);
+        this.addToolbarDocumentation(pagingToolbar);
+
+        // End.
+        return pagingToolbar;
+    },
+    /**
+     * COMMENTME
+     *
+     * @public
+     * @param {Ext.toolbar.Toolbar} toolbar description
+     * @return {Boolean} Void.
+     */
+    addToolbarDocumentation: function(toolbar)
+    {
+        toolbar.add({
+            icon: '/images/icons/black/book_icon&16.png',
+            listeners: {
+                click: {
+                    scope: this,
+                    fn: this.showPageDocumentation
+                }
+            }
+        });
+
+        // End.
+        return true;
+    },
+    /**
+     * Add a search button as last item in the toolbar.
+     * When the search button is clicked a search field appears which removes
+     * all grid rows where the search value does not match the row values.
+     *
+     * @public
+     * @param {Ext.toolbar.Paging} pagingToolbar description
+     * @return {Boolean} Void.
+     */
+    addPagingSearchFilter: function(pagingToolbar)
+    {
+        var store = pagingToolbar.getStore(),
+            filterValue,
+            filterQuery,
+            allFieldsFilter,
+            searchMatch;
+
+        pagingToolbar.add({
+            icon: '/images/icons/black/zoom_icon&16.png',
+            menu: [
+                {
+                    xtype: 'textfield',
+                    width: 500,
+                    listeners: {
+                        change: {// specialkey
+                            scope: this,
+                            fn: function(textfield, event)
+                            {
+                                store.clearFilter();
+
+                                filterValue = textfield.getValue();
+                                filterQuery = RegExp(filterValue, 'i');
+                                allFieldsFilter = new Ext.util.Filter({
+                                    filterFn: function(model)
+                                    {
+                                        searchMatch = false;
+                                        Ext.Object.each(model.getData(), function(fieldname, value)
+                                        {
+                                            searchMatch = searchMatch || filterQuery.test(String(value));
+                                        }, this);
+
+                                        // End.
+                                        return searchMatch;
+                                    }
+                                });
+
+                                store.filter(allFieldsFilter);
+
+                                // End.
+                                return true;
+                            }
+                        }
+                    }
+                }
+            ]
+        });
+
+        // End.
+        return true;
+    },
+    /**
      * Disable the given toolbar item.
      *
      * @public
@@ -112,7 +202,18 @@ Ext.define('App.controller.Abstract', {
      */
     disableToolbarItem: function(component)
     {
+        var centerIsGrid = this.isGrid(this.getCenter());
+
+        // Disable the toolbar item.
         component.disable();
+
+        if (centerIsGrid) {
+            // enable the toolbar item on grid selection change.
+            this.getCenter().addListener('selectionchange', function(grid, selected)
+            {
+                component.setDisabled(!selected.length);
+            }, this);
+        }
 
         // End.
         return true;
@@ -149,6 +250,47 @@ Ext.define('App.controller.Abstract', {
         });
     },
     /**
+     * COMMENTME
+     *
+     * @public
+     * @return {Boolean} Void.
+     */
+    showPageDocumentation: function()
+    {
+        var window,
+            documentationPanel,
+            pageName = this.getName();
+
+        window = Ext.create('Ext.window.Window', {
+            icon: '/images/icons/black/book_icon&16.png',
+            title: 'Documentation',
+            closable: true,
+            draggable: true,
+            modal: true,
+            shrinkWrap: 3
+        });
+
+        documentationPanel = Ext.create('Ext.panel.Panel', {
+            border: false,
+            resizable: true,
+            styleHtmlContent: true,
+            shrinkWrap: 3,
+            height: 350,
+            width: 600,
+            loader: {
+                url: '/~docs/' + pageName,
+                autoLoad: true,
+                renderer: 'html'
+            }
+        });
+
+        window.add(documentationPanel);
+        window.show();
+
+        // End.
+        return true;
+    },
+    /**
      * Return whatever the toolbar contains an item with this action.
      *
      * @private
@@ -173,9 +315,7 @@ Ext.define('App.controller.Abstract', {
                     // End. Stop the iteration.
                     return false;
                 }
-
             }
-
         }, this);
 
         // End.
@@ -191,5 +331,30 @@ Ext.define('App.controller.Abstract', {
     {
         // End.
         return this.self.getName().replace(/\.|App.controller/g, '');
+    },
+    /**
+     * Return whatever the given component matches the selector string.
+     *
+     * @private
+     * @param {Ext.Component} component description1
+     * @param {String} selector description2
+     * @return {Boolean} Void.
+     */
+    componentIs: function(component, selector)
+    {
+        // End.
+        return component.is(selector);
+    },
+    /**
+     * Return whatever the given component is a grid panel.
+     *
+     * @private
+     * @param {Ext.Component} component description
+     * @return {Boolean} Void.
+     */
+    isGrid: function(component)
+    {
+        // End.
+        return this.componentIs(component, 'gridpanel');
     }
 });

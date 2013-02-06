@@ -130,7 +130,7 @@ Ext.define('App.view.application.system.panel.About', {
 //    id: undefined,
 //    itemId: undefined,
     loader: {
-        url: 'http://backendmanager.dev/~system/about',
+        url: '/~system/about',
         autoLoad: true,
         renderer: 'html'
     },

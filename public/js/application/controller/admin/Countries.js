@@ -48,6 +48,8 @@ Ext.define('App.controller.admin.Countries', {
                 'click': this.currenciesAction
             }
         });
+
+        // End.
         return true;
     },
     /**

@@ -14,20 +14,20 @@ namespace Application;
 return array(
     'controllers' => array(
         'invokables' => array(
-            'Additional' => 'Application\Controller\AdditionalController',
             'Authentication' => 'Application\Controller\AuthenticationController',
-            'Application\Controller\Index' => 'Application\Controller\IndexController',
+            'Docs' => 'Application\Controller\DocsController',
+            'Index' => 'Application\Controller\IndexController',
             'System' => 'Application\Controller\SystemController'
         ),
     ),
     'router' => array(
         'routes' => array(
-            'home' => array(
+            'default' => array(
                 'type' => 'Literal',
                 'options' => array(
                     'route' => '/',
                     'defaults' => array(
-                        'controller' => 'Application\Controller\Index',
+                        'controller' => 'Index',
                         'action' => 'index',
                     ),
                 ),
@@ -37,7 +37,6 @@ return array(
                 'options' => array(
                     'route' => '/~',
                     'defaults' => array(
-//                        '__NAMESPACE__' => 'Application\Controller',
                         'controller' => 'Index',
                         'action' => 'index',
                     ),
@@ -52,7 +51,30 @@ return array(
                                 'controller' => '[a-zA-Z][a-zA-Z0-9_-]*',
                                 'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                             ),
+                        ),
+                    ),
+                ),
+            ),
+            'docs' => array(
+                'type' => 'literal',
+                'options' => array(
+                    'route' => '/~docs',
+                    'defaults' => array(
+                        'controller' => 'Docs',
+                        'action' => 'index',
+                    ),
+                ),
+                'may_terminate' => true,
+                'child_routes' => array(
+                    'docsPage' => array(
+                        'type' => 'segment',
+                        'options' => array(
+                            'route' => '/:page',
+                            'constraints' => array(
+                                'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                            ),
                             'defaults' => array(
+                                'page' => 'default',
                             ),
                         ),
                     ),

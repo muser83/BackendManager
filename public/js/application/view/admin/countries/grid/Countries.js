@@ -119,6 +119,8 @@ Ext.define('App.view.admin.countries.grid.Countries', {
     emptyText: 'No countries found.',
     listeners: {
         'selectionchange': function(countriesGrid, selected) {
+            console.log('fc', countriesGrid, selected);
+
 //            this.down('toolbar button[action=edit]').setDisabled(
 //                !selected.length);
 
