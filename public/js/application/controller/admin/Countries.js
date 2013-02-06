@@ -34,10 +34,12 @@ Ext.define('App.controller.admin.Countries', {
                 'click': this.addAction
             },
             '#adminCountriesToolbar button[action=edit]': {
-                'click': this.editAction
+                'click': this.editAction,
+                'beforerender': this.disableToolbarItem
             },
             '#adminCountriesToolbar button[action=delete]': {
-                'click': this.deleteAction
+                'click': this.deleteAction,
+                'beforerender': this.disableToolbarItem
             },
             '#adminCountriesToolbar button[action=continents]': {
                 'click': this.continentsAction
@@ -56,12 +58,16 @@ Ext.define('App.controller.admin.Countries', {
     startupAction: function()
     {
         var rowEditor = this.getRowEditor(),
-            countriesStore = this.getAdminCountriesStore().load();
-        var countriesGrid = this.getAdminCountriesGridCountriesView().create({
+            countriesStore = this.getAdminCountriesStore().load(),
+            countriesGrid = this.getAdminCountriesGridCountriesView().create({
             store: countriesStore,
             tbar: this.getPagingToolbar(countriesStore),
             plugins: [rowEditor]
         });
+
+//        rowEditor.on('beforeedit', function(editor){
+//            return false;
+//        }, this);
 
         rowEditor.on('edit', function(editor, e) {
             e.record.save();

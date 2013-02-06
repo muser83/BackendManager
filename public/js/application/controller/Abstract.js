@@ -91,45 +91,105 @@ Ext.define('App.controller.Abstract', {
     {
         var toolbarConfig,
             allToolbarConfig = this.application.systemModel.get('toolbar'),
-            toolbarName = this.getIdPrefix();
+            toolbarName = this.getName();
 
         toolbarConfig = allToolbarConfig[toolbarName] || {
         };
 
         Ext.apply(toolbarConfig, {
-            id: toolbarName + 'Toolbar'
+            itemId: toolbarName + 'Toolbar'
         });
 
         // End.
         return toolbarConfig;
     },
     /**
-     * COMMENTME
+     * Disable the given toolbar item.
      *
+     * @public
+     * @param {Ext.Component} component description
+     * @return {Boolean} Void.
+     */
+    disableToolbarItem: function(component)
+    {
+        component.disable();
+
+        // End.
+        return true;
+    },
+    /**
+     * Return a instance of the Ext.grid.plugin.RowEditing plugin.
+     * If the toolbar config does not contain an item with a edit action
+     * the editing will be stopped.
      *
      * @public
      * @return {Ext.grid.plugin.RowEditing} RowEditor plugin.
      */
     getRowEditor: function()
     {
+        var hasEditAction = this.toolbarHasAction('edit');
+
         // End.
         return Ext.create('Ext.grid.plugin.RowEditing', {
-            pluginId: this.getIdPrefix() + 'Editor',
+            pluginId: this.getName() + 'Editor',
             clicksToMoveEditor: 1,
             errorSummary: false,
-            autoCancel: false
+            listeners: {
+                beforeedit: {
+                    scope: this,
+                    fn: function(editor)
+                    {
+                        if (!hasEditAction) {
+                            // End. Return false to stop the editing.
+                            return false;
+                        }
+                    }
+                }
+            }
         });
     },
     /**
-     * COMMENTME
+     * Return whatever the toolbar contains an item with this action.
      *
+     * @private
+     * @param {String} action description
+     * @return {Boolean} Whatever the toolbar has the action item or not.
+     */
+    toolbarHasAction: function(action)
+    {
+        var hasItem = false,
+            toolbarConfig = this.getToolbarConfig(),
+            toolbarItems = toolbarConfig.items,
+            itemAction;
+
+        Ext.Object.each(toolbarItems, function(index, itemConfig)
+        {
+            if ((itemConfig === Object(itemConfig))) {
+                itemAction = itemConfig.action || '';
+
+                if (itemAction === action) {
+                    hasItem = true;
+
+                    // End. Stop the iteration.
+                    return false;
+                }
+
+            }
+
+        }, this);
+
+        // End.
+        return hasItem;
+    },
+    /**
+     * Return this current controller name without the App.controller prefix.
      *
      * @private
      * @return {String} Element id prefix.
      */
-    getIdPrefix: function()
+    getName: function()
     {
         // End.
         return this.self.getName().replace(/\.|App.controller/g, '');
-    },
+    }
 });

@@ -72,8 +72,8 @@ class SystemController
                 '<b><div>Users</div></b>',
                 '-',
                 array('text' => 'Add', 'icon' => '/images/icons/black/plus_icon&16.png', 'action' => 'add'),
-                array('text' => 'Edit', 'icon' => '/images/icons/black/pencil_icon&16.png', 'action' => 'edit', 'disabled' => true),
-                array('text' => 'Delete', 'icon' => '/images/icons/black/delete_icon&16.png', 'action' => 'delete', 'disabled' => true)
+                array('text' => 'Edit', 'icon' => '/images/icons/black/pencil_icon&16.png', 'action' => 'edit'),
+                array('text' => 'Delete', 'icon' => '/images/icons/black/delete_icon&16.png', 'action' => 'delete')
             )
         ),
         'adminRoles' => array(
@@ -81,8 +81,8 @@ class SystemController
                 '<b><div>Roles</div></b>',
                 '-',
                 array('text' => 'Add', 'icon' => '/images/icons/black/plus_icon&16.png', 'action' => 'add'),
-                array('text' => 'Edit', 'icon' => '/images/icons/black/pencil_icon&16.png', 'action' => 'edit', 'disabled' => true),
-                array('text' => 'Delete', 'icon' => '/images/icons/black/delete_icon&16.png', 'action' => 'delete', 'disabled' => true)
+                array('text' => 'Edit', 'icon' => '/images/icons/black/pencil_icon&16.png', 'action' => 'edit'),
+                array('text' => 'Delete', 'icon' => '/images/icons/black/delete_icon&16.png', 'action' => 'delete')
             )
         ),
         'adminCountries' => array(
@@ -90,8 +90,8 @@ class SystemController
                 '<b><div>Countries</div></b>',
                 '-',
                 array('text' => 'Add', 'icon' => '/images/icons/black/plus_icon&16.png', 'action' => 'add'),
-                array('text' => 'Edit', 'icon' => '/images/icons/black/pencil_icon&16.png', 'action' => 'edit', 'disabled' => true),
-                array('text' => 'Delete', 'icon' => '/images/icons/black/delete_icon&16.png', 'action' => 'delete', 'disabled' => true),
+                array('text' => 'Edit', 'icon' => '/images/icons/black/pencil_icon&16.png', 'action' => 'edit'),
+                array('text' => 'Delete', 'icon' => '/images/icons/black/delete_icon&16.png', 'action' => 'delete'),
                 '-',
                 array('text' => 'Continents', 'icon' => '/images/icons/black/pin_map_icon&16.png', 'action' => 'continents'),
                 array('text' => 'Currencies', 'icon' => '/images/icons/black/cur_euro_icon&16.png', 'action' => 'currencies'),
@@ -102,8 +102,8 @@ class SystemController
                 '<b><div>Locales</div></b>',
                 '-',
                 array('text' => 'Add', 'icon' => '/images/icons/black/plus_icon&16.png', 'action' => 'add'),
-                array('text' => 'Edit', 'icon' => '/images/icons/black/pencil_icon&16.png', 'action' => 'edit', 'disabled' => true),
-                array('text' => 'Delete', 'icon' => '/images/icons/black/delete_icon&16.png', 'action' => 'delete', 'disabled' => true),
+                array('text' => 'Edit', 'icon' => '/images/icons/black/pencil_icon&16.png', 'action' => 'edit'),
+                array('text' => 'Delete', 'icon' => '/images/icons/black/delete_icon&16.png', 'action' => 'delete'),
                 '-',
                 array('text' => 'Languages', 'icon' => '/images/icons/black/text_letter_t_icon&16.png', 'action' => 'languages')
             )
@@ -113,8 +113,8 @@ class SystemController
                 '<b><div>Translate</div></b>',
                 '-',
                 array('text' => 'Add', 'icon' => '/images/icons/black/plus_icon&16.png', 'action' => 'add'),
-                array('text' => 'Edit', 'icon' => '/images/icons/black/pencil_icon&16.png', 'action' => 'edit', 'disabled' => true),
-                array('text' => 'Delete', 'icon' => '/images/icons/black/delete_icon&16.png', 'action' => 'delete', 'disabled' => true)
+                array('text' => 'Edit', 'icon' => '/images/icons/black/pencil_icon&16.png', 'action' => 'edit'),
+                array('text' => 'Delete', 'icon' => '/images/icons/black/delete_icon&16.png', 'action' => 'delete')
             )
         ),
     );
