@@ -11,6 +11,7 @@ return array(
     'ZendDeveloperTools' => $vendorDir . '/zendframework/zend-developer-tools/src/',
     'Symfony\\Component\\Console\\' => $vendorDir . '/symfony/console/',
     'Redmine' => $vendorDir . '/kbsali/redmine-api/lib/',
+    'Michelf' => $vendorDir . '/michelf/php-markdown/',
     'Doctrine\\ORM\\' => $vendorDir . '/doctrine/orm/lib/',
     'Doctrine\\DBAL\\' => $vendorDir . '/doctrine/dbal/lib/',
     'Doctrine\\Common\\Lexer\\' => $vendorDir . '/doctrine/lexer/lib/',

@@ -13,6 +13,7 @@ namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController,
     Zend\View\Model\ViewModel,
+    Michelf\Markdown,
     Admin\Doctrine\Helper AS EntityHelper;
 
 /**
@@ -29,11 +30,54 @@ class DocsController
      */
     public function indexAction()
     {
-        $result = new ViewModel();
-        $result->setTerminal(true);
+        $params = $this->params();
+        $documentId = $params->fromRoute('documentId');
+        $mdDocumentation = $this->getMdDocumentation($documentId);
+        $htmlDocumentation = Markdown::defaultTransform($mdDocumentation);
+
+        $viewModel = new ViewModel();
+        $viewModel->setTerminal(true);
+        $viewModel->setVariable('htmlDocumentation', $htmlDocumentation);
 
         // End.
-        return $result;
+        return $viewModel;
+    }
+
+    /**
+     * COMMENTME
+     * 
+     * @param string $documentId
+     */
+    private function getMdDocumentation($documentId)
+    {
+        $unCamelcaseId = strtolower(
+            preg_replace('/([A-Z])/', '-$1', (string) $documentId)
+        );
+
+        $idSegments = explode('-', $unCamelcaseId);
+        $module = isset($idSegments[0])
+            ? $idSegments[0]
+            : '';
+        $document = isset($idSegments[1])
+            ? $idSegments[1]
+            : '';
+
+        $documentFile = sprintf(
+            '%s/../../../../%s/src/%s/Docs/%s.md', __DIR__, $module, $module, $document
+        );
+
+        if (!file_exists($documentFile)) {
+            // The requested documentation does not exist.
+            // Return the doc-not-found document.
+            $documentFile = sprintf('%s/../Docs/doc-not-found.md', __DIR__);
+        }
+
+        // Get the markdown source.
+        $mdDocumentation = file_get_contents($documentFile);
+
+        // End.
+        return $mdDocumentation;
     }
 
 }
+

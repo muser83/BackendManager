@@ -66,15 +66,15 @@ return array(
                 ),
                 'may_terminate' => true,
                 'child_routes' => array(
-                    'docsPage' => array(
+                    'docsId' => array(
                         'type' => 'segment',
                         'options' => array(
-                            'route' => '/:page',
+                            'route' => '/:documentId',
                             'constraints' => array(
                                 'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                             ),
                             'defaults' => array(
-                                'page' => 'default',
+                                'documentId' => 'applicationDefault',
                             ),
                         ),
                     ),

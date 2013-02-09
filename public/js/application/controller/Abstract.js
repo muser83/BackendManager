@@ -259,7 +259,7 @@ Ext.define('App.controller.Abstract', {
     {
         var window,
             documentationPanel,
-            pageName = this.getName();
+            documentId = this.getName();
 
         window = Ext.create('Ext.window.Window', {
             icon: '/images/icons/black/book_icon&16.png',
@@ -278,7 +278,7 @@ Ext.define('App.controller.Abstract', {
             height: 350,
             width: 600,
             loader: {
-                url: '/~docs/' + pageName,
+                url: '/~docs/' + documentId,
                 autoLoad: true,
                 renderer: 'html'
             }
