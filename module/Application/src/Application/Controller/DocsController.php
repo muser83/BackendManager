@@ -24,7 +24,7 @@ class DocsController
 {
 
     /**
-     * Common action description.
+     * Return the HTML documentation based on the given document id.
      *
      * @return Zend\View\Model\JsonModel
      */
@@ -44,7 +44,9 @@ class DocsController
     }
 
     /**
-     * COMMENTME
+     * Return the markdown documentation based on the given document id.
+     * If the documentation file could not be found the application module
+     * doc-not-found.md content will be returned.
      * 
      * @param string $documentId
      */
