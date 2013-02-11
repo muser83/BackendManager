@@ -53,25 +53,19 @@ class DocsController
     private function getMdDocumentation($documentId)
     {
         $unCamelcaseId = strtolower(
-            preg_replace('/([A-Z])/', '-$1', (string) $documentId)
+            preg_replace('/([A-Z])/', '/$1', (string) $documentId)
         );
 
-        $idSegments = explode('-', $unCamelcaseId);
-        $module = isset($idSegments[0])
-            ? $idSegments[0]
-            : '';
-        $document = isset($idSegments[1])
-            ? $idSegments[1]
-            : '';
-
         $documentFile = sprintf(
-            '%s/../../../../%s/src/%s/Docs/%s.md', __DIR__, $module, $module, $document
+            '%s/../../../../../public/docs/%s.md', __DIR__, $unCamelcaseId
         );
 
         if (!file_exists($documentFile)) {
             // The requested documentation does not exist.
             // Return the doc-not-found document.
-            $documentFile = sprintf('%s/../Docs/doc-not-found.md', __DIR__);
+            $documentFile = sprintf(
+                '%s/../../../../../public/docs/application/doc-not-found.md', __DIR__
+            );
         }
 
         // Get the markdown source.

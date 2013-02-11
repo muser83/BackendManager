@@ -61,6 +61,7 @@ Ext.require([
     'Ext.view.AbstractView',
     'App.view.application.Window',
     'App.view.application.system.panel.About',
+    'App.view.application.system.panel.Docs',
     'App.view.application.issue.form.Report',
     // Window
     'Ext.window.MessageBox',
@@ -155,6 +156,7 @@ The server didn\'t answered with the expected data.',
      */
     views: [
         'application.Window',
+        'application.system.panel.Docs',
         'application.system.panel.About',
         'application.issue.form.Report'
     ],
@@ -1383,7 +1385,13 @@ The server didn\'t answered with the expected data.',
             icon: '/images/icons/black/tag_icon&16.png',
             title: 'About BackenManager'
         }),
-        aboutPanel = this.getApplicationSystemPanelAboutView().create();
+        aboutPanel = this.getApplicationSystemPanelAboutView().create({
+            loader: {
+                url: '/~docs/systemAbout',
+                autoLoad: true,
+                renderer: 'html'
+            }
+        });
 
 
         window.add(aboutPanel);
@@ -1420,6 +1428,37 @@ The server didn\'t answered with the expected data.',
 
         // End.
         return true;
-    }
+    },
+    /**
+     * COMMENTME
+     *
+     *
+     * @private
+     * @param {string} documentId description
+     * @return {Boolean} Void.
+     */
+    openDocs: function(documentId)
+    {
+        var window,
+            documentationPanel;
 
+        window = this.getApplicationWindowView().create({
+            icon: '/images/icons/black/book_icon&16.png',
+            title: 'Documentation'
+        });
+
+        documentationPanel = this.getApplicationSystemPanelDocsView().create({
+            loader: {
+                url: '/~docs/' + documentId,
+                autoLoad: true,
+                renderer: 'html'
+            }
+        });
+
+        window.add(documentationPanel);
+        window.show();
+
+        // End.
+        return true;
+    }
 });

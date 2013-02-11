@@ -1,19 +1,19 @@
 /**
- * About.js
- * Created on Jan 29, 2013 6:53:05 PM
+ * Docs.js
+ * Created on Feb 11, 2013 12:36:02 AM
  *
  * @author    Boy van Moorsel <development@wittestier.nl>
- * @license   -
- * @copyright 2012 witteStier.nl
+ * @license   license.wittestier.nl
+ * @copyright 2013 WitteStier - copyright.wittestier.nl
  */
-Ext.define('App.view.application.system.panel.About', {
+Ext.define('App.view.application.system.panel.Docs', {
     extend: 'Ext.panel.Panel',
     border: false,
-    shrinkWrap: 2,
-    height: 330,
-    width: 575,
-//    padding: 0,
-//    margin: 0,
+//    shrinkWrap: 2,
+    height: 500,
+    width: 450,
+//    padding: undefined,
+//    margin: undefined,
 //    maxHeight: undefined,
 //    maxWidth: undefined,
 //    minHeight: undefined,
@@ -26,7 +26,7 @@ Ext.define('App.view.application.system.panel.About', {
 //    contentEl: undefined,
 //    html: '',
 //    data: undefine,
-//    tpl: '',
+//    tpl: undefined,
 //    listeners: {
 //    },
 //    defaults: {
@@ -81,7 +81,7 @@ Ext.define('App.view.application.system.panel.About', {
 //    detachOnRemove: true,
 //    suspendLayout: false,
     /* Ext.Component */
-//    autoScroll: false,
+    autoScroll: true,
 //    columnWidth: undefined,
 //    constrainTo: undefined,
 //    defaultAlign: 'tl-bl?',
@@ -91,8 +91,8 @@ Ext.define('App.view.application.system.panel.About', {
 //    overflowX: 'hidden',
 //    overflowY: 'hidden',
 //    region: undefined,
-//    resizable: false,
-//    resizeHandles: 'all',
+    resizable: true,
+    resizeHandles: 'sw',
 //    toFrontOnShow: true,
     /* Ext.AbstractComponent */
 //    autoEl: undefined,

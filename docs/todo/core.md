@@ -14,7 +14,7 @@
    IF the silent flag is raised:  
 *  Do not shutdown the current controller
 *  Do not overwrite the current controller
-4.
+4. Fix: the 404 page.
 5.
 6.
 7.

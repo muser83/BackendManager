@@ -258,17 +258,5 @@ class SystemController
         );
     }
 
-    /**
-     * COMMENTME
-     *
-     * @return \Zend\View\Model\ViewModel
-     */
-    public function aboutAction()
-    {
-        $result = new ViewModel();
-        $result->setTerminal(true);
-
-        return $result;
-    }
-
 }
+

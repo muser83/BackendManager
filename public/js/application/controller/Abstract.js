@@ -257,35 +257,9 @@ Ext.define('App.controller.Abstract', {
      */
     showPageDocumentation: function()
     {
-        var window,
-            documentationPanel,
-            documentId = this.getName();
+        var documentId = this.getName();
 
-        window = Ext.create('Ext.window.Window', {
-            icon: '/images/icons/black/book_icon&16.png',
-            title: 'Documentation',
-            closable: true,
-            draggable: true,
-            modal: true,
-            shrinkWrap: 3
-        });
-
-        documentationPanel = Ext.create('Ext.panel.Panel', {
-            border: false,
-            resizable: true,
-            styleHtmlContent: true,
-            shrinkWrap: 3,
-            height: 350,
-            width: 600,
-            loader: {
-                url: '/~docs/' + documentId,
-                autoLoad: true,
-                renderer: 'html'
-            }
-        });
-
-        window.add(documentationPanel);
-        window.show();
+        this.application.openDocs(documentId);
 
         // End.
         return true;

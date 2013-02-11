@@ -7,8 +7,8 @@
 
 # ToDo
 
-1.
-2.
+1. Fix: the countries docs links, use md for the links.
+2. Create the other pages documentations.
 3.
 4.
 5.

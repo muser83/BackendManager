@@ -21,7 +21,10 @@ This is a setext h2
 ### axt headings
 # This is a axt header 1
 ## This is a axt header 2
-###### This is a axt header 5
+### This is a axt header 3
+#### This is a axt header 4
+##### This is a axt header 5
+###### This is a axt header 6
 
 ## Blockquotes
 ___
