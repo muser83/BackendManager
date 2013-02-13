@@ -135,8 +135,13 @@ Ext.define('App.view.Viewport', {
     items: [
         {
             region: 'north',
-            contentEl: 'application-header',
-            height: 46
+            contentEl: 'application-header'
+        }, {
+            region: 'south'
+        }, {
+            region: 'east'
+        }, {
+            region: 'west'
         }, {
             region: 'center',
             layout: 'fit',

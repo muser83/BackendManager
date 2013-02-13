@@ -63,19 +63,21 @@ Ext.define('App.controller.admin.Countries', {
             countriesStore = this.getAdminCountriesStore().load(),
             countriesGrid = this.getAdminCountriesGridCountriesView().create({
             store: countriesStore,
-            tbar: this.getPagingToolbar(countriesStore),
             plugins: [rowEditor]
         });
-
-//        rowEditor.on('beforeedit', function(editor){
-//            return false;
-//        }, this);
 
         rowEditor.on('edit', function(editor, e) {
             e.record.save();
         }, this);
 
-        this.setCenter(countriesGrid);
+        this.addView(countriesGrid, {
+            region: 'center',
+            flush: true,
+            toolbar: true,
+            pagingToolbar: true,
+            searchFilter: true,
+            documentation: true
+        });
 
         // End.
         return true;

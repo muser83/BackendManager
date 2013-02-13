@@ -15,7 +15,10 @@
 4. Rewrite all controllers and view, so the only use itemIds and ComponentQuery.
 5. Add browser info to the report bug.
 6. Make a file uploader, always show all uploaded file for that user.
-
+7. Bug report and manage service.
+8. Personal messaging service.
+9. System data and settings handler.
+10. Authentication and Authorization.
 
 ## Core
 1. Fix: the saveSystemData when the system shuts-down.

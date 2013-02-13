@@ -50,7 +50,6 @@ Ext.define('App.controller.admin.Locales', {
             localesStore = this.getAdminLocalesStore().load();
         var localesGrid = this.getAdminLocalesGridLocalesView().create({
             store: localesStore,
-            tbar: this.getPagingToolbar(localesStore),
             plugins: [rowEditor]
         });
 
@@ -58,7 +57,14 @@ Ext.define('App.controller.admin.Locales', {
             e.record.save();
         }, this);
 
-        this.setCenter(localesGrid);
+        this.addView(localesGrid, {
+            region: 'center',
+            flush: true,
+            toolbar: true,
+            pagingToolbar: true,
+            searchFilter: true,
+            documentation: true
+        });
 
         // End.
         return true;

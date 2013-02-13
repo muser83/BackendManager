@@ -44,7 +44,14 @@ Ext.define('App.controller.admin.Roles', {
             tbar: this.getToolbar()
         });
 
-        this.setCenter(rolesGrid);
+        this.addView(rolesGrid, {
+            region: 'center',
+            flush: true,
+            toolbar: true,
+            pagingToolbar: true,
+            searchFilter: true,
+            documentation: true
+        });
 
         // End.
         return true;

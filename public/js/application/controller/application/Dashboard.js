@@ -42,7 +42,14 @@ Ext.define('App.controller.application.Dashboard', {
             tbar: this.getToolbar()
         });
 
-        this.setCenter(dashboardPanel);
+        this.addView(dashboardPanel, {
+            region: 'center',
+            flush: true,
+            toolbar: true,
+            pagingToolbar: true,
+            searchFilter: true,
+            documentation: true
+        });
         return true;
     }
 

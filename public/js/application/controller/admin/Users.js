@@ -38,11 +38,18 @@ Ext.define('App.controller.admin.Users', {
      */
     startupAction: function()
     {
-        var translateGrid = this.getAdminUsersGridUsersView().create({
+        var usersGrid = this.getAdminUsersGridUsersView().create({
             tbar: this.getToolbar()
         });
 
-        this.setCenter(translateGrid);
+        this.addView(usersGrid, {
+            region: 'center',
+            flush: true,
+            toolbar: true,
+            pagingToolbar: true,
+            searchFilter: true,
+            documentation: true
+        });
 
         // End.
         return true;
