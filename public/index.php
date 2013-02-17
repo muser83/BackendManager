@@ -3,7 +3,7 @@
 // Define application environment
 defined('APPLICATION_ENV') || define('APPLICATION_ENV', (getenv('APPLICATION_ENV')
             ? getenv('APPLICATION_ENV')
-            : 'development'));
+            : 'development')); // development, testing, production.
 
 /**
  * This makes our life easier when dealing with paths. Everything is relative

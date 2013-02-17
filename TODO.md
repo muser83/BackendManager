@@ -1,5 +1,5 @@
 ## Done
-
+4. Fix: the 404 page.
 
 
 ***
@@ -18,7 +18,7 @@
 7. Bug report and manage service.
 8. Personal messaging service.
 9. System data and settings handler.
-10. Authentication and Authorization.
+> 10. Authentication and Authorization.
 
 ## Core
 1. Fix: the saveSystemData when the system shuts-down.
@@ -28,7 +28,7 @@
    IF the silent flag is raised:  
 *  Do not shutdown the current controller
 *  Do not overwrite the current controller
-4. Fix: the 404 page.
+
 
 
 ## User module

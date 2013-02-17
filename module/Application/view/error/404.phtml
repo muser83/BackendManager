@@ -1,61 +1,26 @@
-<h1><?php echo $this->translate('A 404 error occurred') ?></h1>
-<h2><?php echo $this->message ?></h2>
-<a href="/">Get me out of here.</a>
+<?php
 
-<?php if (isset($this->reason) && $this->reason): ?>
+$requestedWith = isset($_SERVER['HTTP_X_REQUESTED_WITH'])
+    ? $_SERVER['HTTP_X_REQUESTED_WITH']
+    : false;
 
-    <?php
-    $reasonMessage = '';
-    switch ($this->reason) {
-        case 'error-controller-cannot-dispatch':
-            $reasonMessage = $this->translate('The requested controller was unable to dispatch the request.');
-            break;
-        case 'error-controller-not-found':
-            $reasonMessage = $this->translate('The requested controller could not be mapped to an existing controller class.');
-            break;
-        case 'error-controller-invalid':
-            $reasonMessage = $this->translate('The requested controller was not dispatchable.');
-            break;
-        case 'error-router-no-match':
-            $reasonMessage = $this->translate('The requested URL could not be matched by routing.');
-            break;
-        default:
-            $reasonMessage = $this->translate('We cannot determine at this time why a 404 was generated.');
-            break;
-    }
+if ($requestedWith && ('XMLHttpRequest' === $requestedWith)):
+    // Very bad but working work-around.
+    $this->layout()->setTemplate('error/404');
+
+    header('Content-type: application/json');
+
+    print json_encode(array(
+        'success' => false,
+        'message' => "You try to load data from a unknown, not found source."
+    ));
+else:
     ?>
+    <script type="text/javascript">
+        var loader = document.getElementById('application-header-loader');
+        loader.style.visibility = 'hidden';
 
-    <p><?php echo $reasonMessage ?></p>
-
-<?php endif ?>
-
-<?php if (isset($this->controller) && $this->controller): ?>
-
-    <dl>
-        <dt><?php echo $this->translate('Controller') ?>:</dt>
-        <dd><?php echo $this->escapeHtml($this->controller) ?>
-            <?php
-            if (isset($this->controller_class) && $this->controller_class && $this->controller_class != $this->controller
-            ) {
-                echo '(' . sprintf($this->translate('resolves to %s'), $this->escapeHtml($this->controller_class)) . ')';
-            }
-            ?>
-        </dd>
-    </dl>
-
-<?php endif ?>
-
-<?php if (isset($this->exception) && $this->exception): ?>
-
-    <h2><?php echo $this->translate('Exception') ?>:</h2>
-
-    <p><b><?php echo $this->escapeHtml($this->exception->getMessage()) ?></b></p>
-
-    <h3><?php echo $this->translate('Stack trace') ?>:</h3>
-
-    <pre>
-    <?php echo $this->exception->getTraceAsString() ?>
-    </pre>
-
-    <?php
- endif ?>
+        alert('You try to open a unknown, not found page.\n Click OK to relaunch the system.');
+        document.location = '/';
+    </script>
+<?php endif; ?>

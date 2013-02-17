@@ -130,24 +130,24 @@ return array(
                 ),
             ),
         ),
-        'authentication' => array(
-            'orm_default' => array(
-                'object_manager' => 'Doctrine\ORM\Entity\Manager',
-                'identity_class' => 'Application\Entity\Users',
-                'identity_property' => 'identity',
-                'credential_property' => 'credential',
-                'credentialcallable' => function(User $user, $credential) {
-                    // Check credential.
-
-                    var_dump($user);
-                    var_dump($credential);
-                    print '<hr />';
-                    die('credentialcallable');
-
-                    // End.
-                    return;
-                },
-            ),
-        ),
+//        'authentication' => array(
+//            'orm_default' => array(
+//                'object_manager' => 'Doctrine\ORM\Entity\Manager',
+//                'identity_class' => 'Application\Entity\Users',
+//                'identity_property' => 'identity',
+//                'credential_property' => 'credential',
+//                'credentialcallable' => function(User $user, $credential) {
+//                    // Check credential.
+//
+//                    var_dump($user);
+//                    var_dump($credential);
+//                    print '<hr />';
+//                    die('credentialcallable');
+//
+//                    // End.
+//                    return;
+//                },
+//            ),
+//        ),
     ),
 );
