@@ -19,6 +19,9 @@
 8. Personal messaging service.
 9. System data and settings handler.
 > 10. Authentication and Authorization.
+- Use doctrine AuthAdapter
+- Use Zend Crypt Password
+- Get the salt from the database
 
 ## Core
 1. Fix: the saveSystemData when the system shuts-down.

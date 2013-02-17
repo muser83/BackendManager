@@ -72,7 +72,7 @@ class AuthenticationController
     /**
      *
      */
-    public function _loginAction()
+    public function loginAction()
     {
         $request = $this->getRequest();
 
@@ -91,8 +91,8 @@ class AuthenticationController
 
         $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
         $adapter = $authService->getAdapter();
-        $adapter->setIdentityValue($postData['auth_identity']);
-        $adapter->setCredentialValue($postData['auth_credential']);
+        $adapter->setIdentityValue('WitteStier');
+        $adapter->setCredentialValue('123');
 
         $authResult = $authService->authenticate();
 
@@ -109,7 +109,7 @@ class AuthenticationController
      *
      * @return Zend\View\Model\ViewModel
      */
-    public function loginAction()
+    public function _loginAction()
     {
         $user = 'WitteStier';
         $pass = '123456';
@@ -156,3 +156,4 @@ class AuthenticationController
     }
 
 }
+
