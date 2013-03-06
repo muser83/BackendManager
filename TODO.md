@@ -9,7 +9,7 @@
 
 
 ## Application module
-1. Fix: Send a session destroy request to the server when the js logoff method is called.
+>1. Fix: Send a session destroy request to the server when the js logoff method is called.
 2. Create language files starting with the application and all controllers.
 3. Translate navigation, toolbars and messages from the server.
 4. Rewrite all controllers and view, so the only use itemIds and ComponentQuery.
