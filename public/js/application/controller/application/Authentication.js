@@ -28,10 +28,10 @@ Ext.define('App.controller.application.Authentication', {
     init: function(application)
     {
         this.control({
-            'window button[action=authenticate]': {
+            '#applicationAuthenticationWindow button[action=authenticate]': {
                 click: this.authenticateAction
             },
-            'window textfield': {
+            '#applicationAuthenticationWindow textfield': {
                 specialkey: function(field, event)
                 {
                     if (event.getKey() === event.ENTER) {
@@ -54,10 +54,10 @@ Ext.define('App.controller.application.Authentication', {
      */
     startupAction: function(args)
     {
-        var window = this.getApplicationAuthenticationWindowView().create(),
-            loginForm = this.getApplicationAuthenticationFromLoginView()
-            .create(),
-            userModel = this.getApplicationUserModel().create();
+        var loginForm = this.getApplicationAuthenticationFromLoginView().create(),
+            window = this.getApplicationAuthenticationWindowView().create({
+            itemId: 'applicationAuthenticationWindow'
+        });
 
         if (args.msg) {
             var logoutMessage = 'you are logged off because of the following reason:\n'
@@ -71,10 +71,15 @@ Ext.define('App.controller.application.Authentication', {
             });
         }
 
-        loginForm.loadRecord(userModel);
+        this.getApplicationUserModel().load(null, {
+            callback: function(userModel, operation)
+            {
+                loginForm.loadRecord(userModel);
 
-        window.add(loginForm);
-        window.show();
+                window.add(loginForm);
+                window.show();
+            }
+        });
 
         // End.
         return true;
@@ -82,39 +87,54 @@ Ext.define('App.controller.application.Authentication', {
     /**
      * COMMENTME
      *
-     *
      * @public
      * @return {Boolean} Void.
      */
-    authenticateAction: function(target)
+    authenticateAction: function()
     {
-        // TODO Use refs instead of arguments
-
-        var window = target.up('window'),
-            loginForm = window.down('form').getForm(),
+        var window = Ext.ComponentQuery.query('#applicationAuthenticationWindow'),
+            window = window[0],
+            loginFormPanel = window.down('form'),
+            loginForm = loginFormPanel.getForm(),
             userModel = loginForm.getRecord(),
-            credentialField = loginForm.findField('credential');
+            credentialField = loginForm.findField('credential'),
+            md5 = new App.crypt.Md5(),
+            hash;
+
+        var progressBar = Ext.create('Ext.ProgressBar', {
+            border: false,
+            dock: 'bottom'
+        });
 
         if (loginForm.isValid()) {
             loginForm.updateRecord(userModel);
+
+            loginFormPanel.disable();
+
+            window.addDocked(progressBar);
+            progressBar.wait({
+                interval: 10,
+                increment: 200,
+                text: 'Authentication...'
+            });
+
+            hash = md5.hash(userModel.get('credential'));
+            hash = md5.hash(hash);
+            userModel.set('credential', hash);
 
             userModel.save({
                 scope: this,
                 callback: function(userModel, operation)
                 {
-                    if (!operation.wasSuccessful()) {
+                    var responseUserModel = operation.getResultSet().records;
+                    responseUserModel = responseUserModel[0];
 
+                    if (true !== responseUserModel.get('is_active')) {
+                        progressBar.reset(true);
+                        loginFormPanel.enable();
                         credentialField.reset();
                         credentialField.markInvalid(
-                            operation.getError()
-                            );
-
-                        // End.
-                        return false;
-                    }
-
-                    if (true !== userModel.get('isActive')) {
-                        this.application.logoff();
+                            "Invalid username or password.");
 
                         // End.
                         return false;
@@ -129,6 +149,8 @@ Ext.define('App.controller.application.Authentication', {
                 }
             });
         }
+
+        // End.
         return true;
     },
     /**
@@ -136,10 +158,11 @@ Ext.define('App.controller.application.Authentication', {
      *
      * @return Boolean Void
      */
-    logoutAction: function()
+    logoffAction: function()
     {
-        // Show confirmation.
-        // Send logout request to the server.
+        this.application.logoff();
+
+        // End.
         return true;
     }
 

@@ -12,16 +12,13 @@ Ext.define('App.model.Person', {
             name: 'id',
             type: 'int'
         }, {
-            name: 'addressesId',
+            name: 'addresses_id',
             type: 'int',
             useNull: true
         }, {
-            name: 'communicationsId',
+            name: 'communications_id',
             type: 'int',
             useNull: true
-        }, {
-            name: 'image',
-            type: 'string'
         }, {
             name: 'firstname',
             type: 'string'

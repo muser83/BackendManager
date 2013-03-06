@@ -12,10 +12,9 @@
 namespace Application\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController,
-    Zend\View\Model\ViewModel,
     Zend\View\Model\JsonModel,
     Zend\Json\Json,
-    Zend\Session\Container AS sessionContainer,
+    Zend\Authentication\Storage\Session as AuthSession,
     Doctrine\ORM\EntityManager;
 
 /**
@@ -34,7 +33,6 @@ class SystemController
      * @var \Doctrine\ORM\EntityManager
      */
     private $entityManager;
-    private $isAuthenticated = false;
     private $navigation = '
 <li>
 <a href="#!">Dashboard</a>
@@ -52,13 +50,13 @@ class SystemController
     private $userNavigation = array(
         array('text' => 'Account', 'icon' => '/images/icons/black/contact_card_icon&16.png', 'action' => 'account'),
         array('text' => 'Settings', 'icon' => '/images/icons/black/wrench_icon&16.png', 'action' => 'settings'),
-        array('text' => 'Change image', 'icon' => '/images/icons/black/user_icon&16.png', 'action' => 'changeImage'),
+        array('text' => 'Change image', 'icon' => '/images/icons/black/user_icon&16.png', 'action' => 'account/changeImage'),
         array('text' => 'Messages', 'icon' => '/images/icons/black/mail_icon&16.png', 'action' => 'messages'),
         '-',
-        array('text' => 'Logoff', 'icon' => '/images/icons/black/padlock_closed_icon&16.png', 'action' => 'logoff'),
+        array('text' => 'Logoff', 'icon' => '/images/icons/black/padlock_closed_icon&16.png', 'action' => 'authentication/logoff'),
         '-',
         array('text' => 'About', 'icon' => '/images/icons/black/tag_icon&16.png', 'action' => 'about'),
-        array('text' => 'Report a bug', 'icon' => '/images/icons/black/bug_icon&16.png', 'action' => 'reportBug')
+        array('text' => 'Report a bug', 'icon' => '/images/icons/black/bug_icon&16.png', 'action' => 'issue')
     );
     private $toolbar = array(
         'applicationDashboard' => array(
@@ -140,32 +138,23 @@ class SystemController
     );
     private $user = array(
         'id' => 1,
-        'localesId' => 1,
-        'isVerified' => true,
-        'isActive' => true,
-        'identity' => 'WitteStier',
+        'locales_id' => 1,
+        'is_verified' => true,
+        'is_active' => true,
+        'identity' => '',
         'credential' => null,
         'salt' => null,
-        'verifyToken' => null,
+        'verify_token' => 'ajsdhflaksdhjflaksdhjflaskjdfh',
         'person' => array()
     );
-
-    /**
-     * Controller constructor
-     *
-     * @return boolean
-     */
-    public function __construct()
-    {
-        $session = new sessionContainer('dev');
-
-        if ($session->offsetExists('isAuthenticated')) {
-            $this->isAuthenticated = (bool) $session->offsetGet('isAuthenticated');
-        }
-
-        // End.
-        return true;
-    }
+    private $skeleton = array(
+        'user' => array(),
+        'locale' => array(),
+        'settings' => array(),
+        'navigation' => '',
+        'userMenu' => array(),
+        'toolbars' => array()
+    );
 
     /**
      * Set an instance of \Doctrine\ORM\EntityManager.
@@ -204,37 +193,30 @@ class SystemController
      */
     public function indexAction()
     {
-        $request = $this->getRequest();
+        $identity = $this->getIdentity();
 
-        $systemData = array(
-            'userId' => 1,
-            'personId' => 1,
-            'navigation' => $this->navigation,
-            'userNavigation' => $this->userNavigation,
-            'toolbar' => $this->toolbar,
-            'settings' => $this->settings,
-            'user' => $this->user,
-            'person' => $this->person
-        );
-
-        if ($request->isPost()) {
-            $systemData = Json::decode(
-                    $request->getPost('system', '{}'), Json::TYPE_ARRAY
-            );
-
+        if (!$identity) {
             // End.
-            return new JsonModel(
-                array(
-                'success' => true,
-                'system' => $systemData
-                )
-            );
+            return new JsonModel($this->getNoIdentityResponse());
         }
+
+        $localesModel = $identity->getLocales();
+        $settingsModel = $identity->getSettings();
+
+        $identity->excludeFields(array('locales', 'settings'));
+        $userModel = $identity;
+
+        $systemData = (object) $this->skeleton;
+        $systemData->user = $userModel->getSecureArrayCopy();
+        $systemData->locale = $localesModel->getArrayCopy();
+//        $systemData->settings = $settingsModel->getArrayCopy();
+        $systemData->navigation = $this->navigation;
+        $systemData->userMenu = $this->userNavigation;
+        $systemData->toolbars = $this->toolbar;
 
         return new JsonModel(
             array(
-            'success' => $this->isAuthenticated,
-            'messages' => 'Not authenticated.',
+            'success' => true,
             'system' => $systemData
             )
         );
@@ -247,15 +229,45 @@ class SystemController
      */
     public function getUserAction()
     {
-        $user = $this->user;
+        $identity = $this->getIdentity();
 
         return new JsonModel(
             array(
-            'success' => $this->isAuthenticated,
-            'messages' => 'test msg',
-            'user' => $user
+            'success' => true,
+            'user' => $identity->getSecureArrayCopy()
             )
         );
+    }
+
+    /**
+     * COMMENTME
+     * 
+     * @return \Application\Entity\Users|null
+     */
+    private function getIdentity()
+    {
+        $authSession = new AuthSession();
+
+        if ($authSession->isEmpty()) {
+            // End.
+            return null;
+        }
+
+        $identity = $authSession->read();
+
+        // End.
+        return $identity;
+    }
+
+    private function getNoIdentityResponse()
+    {
+        $responseConfig = array(
+            'success' => true,
+            'system' => $this->skeleton
+        );
+
+        // End.
+        return $responseConfig;
     }
 
 }

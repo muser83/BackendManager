@@ -14,8 +14,10 @@ namespace Application\Controller;
 use Zend\Mvc\Controller\AbstractActionController,
     Zend\Json\Json,
     Zend\View\Model\JsonModel,
-    Zend\Session\Container AS sessionContainer,
-    Doctrine\ORM\EntityManager;
+    Zend\Authentication\Storage\Session as AuthSession,
+    Zend\Validator\Csrf as CsrfValidator,
+    Doctrine\ORM\EntityManager,
+    Application\Entity\Users;
 
 /**
  * Controller description
@@ -26,6 +28,8 @@ use Zend\Mvc\Controller\AbstractActionController,
 class AuthenticationController
     extends AbstractActionController
 {
+
+    CONST AUTHENTICATION_SESSION_NAME = 'authentication';
 
     /**
      * Instance of \Doctrine\ORM\EntityManager.
@@ -77,71 +81,49 @@ class AuthenticationController
         $request = $this->getRequest();
 
         if (!$request->isPost() || (null === $request->getPost('user'))) {
-            return new JsonModel(
-                array(
-                'message' => 'No authentication credentials received.',
-                'success' => false
-                )
-            );
+            // End.
+            return $this->getIvalidLoginResponse(false);
         }
 
         $postData = Json::decode(
                 $request->getPost('user', '{}'), Json::TYPE_ARRAY
         );
 
-        $authService = $this->getServiceLocator()->get('Zend\Authentication\AuthenticationService');
-        $adapter = $authService->getAdapter();
-        $adapter->setIdentityValue('WitteStier');
-        $adapter->setCredentialValue('123');
+        // Check if the login attempt is valid.
+        $isValidAttempt = $this->isValidLogin($postData);
 
-        $authResult = $authService->authenticate();
-
-        if (!$authResult->isValid()) {
-            var_dump($authResult);
-            die('Not logged in.');
+        if (!$isValidAttempt) {
+            // End.
+//            return $this->getIvalidLoginResponse();
         }
 
-        die('Logged in.');
-    }
+        $user = new Users();
+        $user->populate($postData);
 
-    /**
-     * Common action description.
-     *
-     * @return Zend\View\Model\ViewModel
-     */
-    public function _loginAction()
-    {
-        $user = 'WitteStier';
-        $pass = '123456';
+        $repository = $this->getEntityManager()->getRepository('Application\Entity\Users');
+        $identity = $repository->findOneBy(array(
+            'identity' => $user->getIdentity()
+        ));
 
-        $request = $this->getRequest();
-
-        if (!$request->isPost() || (null === $request->getPost('user'))) {
-            return new JsonModel(
-                array(
-                'message' => 'No authentication credentials received.',
-                'success' => false
-                )
-            );
+        if (!$identity) {
+            // End.
+            return $this->getIvalidLoginResponse();
         }
 
-        $userModel = Json::decode(
-                $request->getPost('user', '{}'), Json::TYPE_ARRAY
-        );
+        // The user does exists, now check the credential.
+        $user->saltCredential($identity);
 
-        if (($user != $userModel['identity']) || ($pass != $userModel['credential'])) {
-            return new JsonModel(
-                array(
-                'message' => 'Invalid username or password.',
-                'success' => false
-                )
-            );
+        if ($user->getCredential() !== $identity->getCredential()) {
+            // End. the credentials do not match.
+            return $this->getIvalidLoginResponse(false);
         }
 
-        $session = new sessionContainer('dev');
-        $session->setExpirationHops(50);
-        $session->offsetSet('isAuthenticated', true);
+        // Store the identity in a session object.
+        $session = new AuthSession();
+//        $session->clear();
+        $session->write($identity);
 
+        // End. forward to the system controller.
         return $this->forward()->dispatch('system', array('action' => 'get-user'));
     }
 
@@ -153,6 +135,64 @@ class AuthenticationController
     public function logoutAction()
     {
         // Remove the session userObject
+    }
+
+    /**
+     * COMMENTME
+     * 
+     * @param array $postData
+     * @return boolean
+     */
+    private function isValidLogin(array $postData)
+    {
+        $csrfToken = isset($postData['verify_token'])
+            ? $postData['verify_token']
+            : null;
+
+        $csrf = new CsrfValidator();
+        $csrfIsValid = $csrf->isValid($csrfToken);
+        $csrf->getHash(true); // Flush csrf token.
+
+        $user = new Users();
+        $filter = $user->getInputFilter();
+        $filter->setData($postData);
+        $userIsValid = $filter->isValid();
+
+        // End.
+        return ((true === $csrfIsValid) && (true === $userIsValid));
+    }
+
+    /**
+     * COMMENTME
+     * 
+     * @param \Application\Entity\Users $user
+     * @param boolean $sleep
+     * @return \Zend\View\Model\JsonModel
+     */
+    private function getIvalidLoginResponse($sleep = true)
+    {
+        $csrf = new CsrfValidator();
+        $csrfToken = $csrf->getHash(true);
+
+        $user = new Users();
+        $user->setVerifyToken($csrfToken);
+        $user->excludeFields(array(
+            'id', 'locales_id', 'persons_id', 'settings_id', 'is_verified',
+            'is_active', 'salt', 'locales', 'persons', 'settings'
+        ));
+
+        $responseConfig = array(
+            'success' => true,
+            'user' => $user->getArrayCopy()
+        );
+
+        // Sleep for security reasons.
+        if ($sleep) {
+            sleep(2);
+        }
+
+        // Send a authentication shell.
+        return new JsonModel($responseConfig);
     }
 
 }

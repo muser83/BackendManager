@@ -7,36 +7,16 @@
  * @copyright 2012 witteStier.nl
  */
 Ext.define('App.model.application.User', {
-    extend: 'Ext.data.Model',
-    fields: [{
-            name: 'id',
-            type: 'int'
-        }, {
-            name: 'localesId',
-            type: 'int'
-        }, {
-            name: 'personsId',
-            type: 'int'
-        }, {
-            name: 'isVerified',
-            type: 'boolean',
-            defaultValue: false
-        }, {
-            name: 'isActive',
-            type: 'boolean',
-            defaultValue: false
-        }, {
-            name: 'identity',
-            type: 'string'
-        }, {
-            name: 'credential',
-            type: 'string'
-        }, {
-            name: 'salt',
-            type: 'string'
-        }, {
-            name: 'verifyToken',
-            type: 'string'
+    extend: 'App.model.User',
+    uses: [
+        'App.model.Person'
+    ],
+    hasOne: [{
+            model: 'App.model.Person',
+            getterName: 'getPerson',
+            setterName: 'setPerson',
+            associationKey: 'persons',
+            foreignKey: 'persons_id'
         }],
 //    validations: [],
     proxy: {

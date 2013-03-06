@@ -13,13 +13,6 @@ Ext.define('App.model.application.System', {
         'App.model.application.User'
     ],
     hasOne: [{
-            model: 'App.model.Person',
-            getterName: 'getPerson',
-            setterName: 'setPerson',
-            associationKey: 'person',
-            foreignKey: 'personId',
-            primaryKey: 'id'
-        }, {
             model: 'App.model.application.User',
             getterName: 'getUser',
             setterName: 'setUser',
@@ -29,15 +22,15 @@ Ext.define('App.model.application.System', {
         }],
 //    validations: [],
     fields: [{
-            name: 'bootTime',
+            name: 'boot_time',
             type: 'int',
             defaultValue: 0
         }, {
-            name: 'logonTime',
+            name: 'login_time',
             type: 'int',
             defaultValue: 0
         }, {
-            name: 'logoffTime',
+            name: 'logoff_time',
             type: 'int',
             defaultValue: 0
         }, {
@@ -46,13 +39,13 @@ Ext.define('App.model.application.System', {
             persist: false,
             defaultValue: ''
         }, {
-            name: 'userNavigation',
+            name: 'userMenu',
             type: 'object',
             persist: false,
             defaultValue: {
             }
         }, {
-            name: 'toolbar',
+            name: 'toolbars',
             type: 'object',
             persist: false,
             defaultValue: {

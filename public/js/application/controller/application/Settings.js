@@ -1,12 +1,13 @@
 /**
- * Issue.js
- * Created on Dec 27, 2012 12:17:48 AM
+ * Settings.js
+ * Created on Feb 27, 2013 10:50:30 PM
  *
  * @author    Boy van Moorsel <development@wittestier.nl>
- * @license   -
- * @copyright 2012 witteStier.nl
+ * @license   license.wittestier.nl
+ * @copyright 2013 WitteStier - copyright.wittestier.nl
  */
-Ext.define('App.controller.application.Issue', {
+
+Ext.define('App.controller.application.Settings', {
     extend: 'App.controller.Abstract',
     models: [],
     stores: [],
@@ -34,7 +35,8 @@ Ext.define('App.controller.application.Issue', {
      */
     startupAction: function()
     {
-        alert('Issue');
+        alert('settings');
+
         // End.
         return true;
     }

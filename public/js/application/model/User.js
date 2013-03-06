@@ -12,17 +12,17 @@ Ext.define('App.model.User', {
             name: 'id',
             type: 'int'
         }, {
-            name: 'localesId',
+            name: 'locales_id',
             type: 'int'
         }, {
-            name: 'personsId',
+            name: 'persons_id',
             type: 'int'
         }, {
-            name: 'isVerified',
+            name: 'is_verified',
             type: 'boolean',
             defaultValue: false
         }, {
-            name: 'isActive',
+            name: 'is_active',
             type: 'boolean',
             defaultValue: false
         }, {
@@ -35,7 +35,7 @@ Ext.define('App.model.User', {
             name: 'salt',
             type: 'string'
         }, {
-            name: 'verifyToken',
+            name: 'verify_token',
             type: 'string'
         }]
 });

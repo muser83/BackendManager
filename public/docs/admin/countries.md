@@ -1,4 +1,7 @@
-## Admin Countries
+# Admin Countries
+Documentation...
+
+## Countries toolbar
 ![Admin Countries](/images/docs/admin/countries.png)
 
 A. Page name.

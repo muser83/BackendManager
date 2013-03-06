@@ -1,5 +1,5 @@
 ## Done
-4. Fix: the 404 page.
+ 
 
 
 ***
@@ -18,10 +18,7 @@
 7. Bug report and manage service.
 8. Personal messaging service.
 9. System data and settings handler.
-> 10. Authentication and Authorization.
-- Use doctrine AuthAdapter
-- Use Zend Crypt Password
-- Get the salt from the database
+
 
 ## Core
 1. Fix: the saveSystemData when the system shuts-down.
@@ -29,8 +26,9 @@
    this shutdown method need to destroy all created view and the created data.
 3. Make it possible to dispatch silent:
    IF the silent flag is raised:  
-*  Do not shutdown the current controller
-*  Do not overwrite the current controller
+-  Do not shutdown the current controller
+-  Do not overwrite the current controller
+4. Create a abstract class for doctrine models that help to populate and get all data.
 
 
 

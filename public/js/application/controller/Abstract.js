@@ -406,7 +406,7 @@ Ext.define('App.controller.Abstract', {
     getToolbarConfig: function()
     {
         var toolbarConfig,
-            allToolbarConfig = this.application.systemModel.get('toolbar'),
+            allToolbarConfig = this.application.getSystemModel().get('toolbars'),
             toolbarName = this.getName();
 
         toolbarConfig = allToolbarConfig[toolbarName] || {
