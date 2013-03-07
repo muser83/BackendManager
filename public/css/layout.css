@@ -111,7 +111,13 @@ body
 .application-navigation-anchor
 {
     background-image: none;
-    background: -webkit-linear-gradient(top, #ffffff 0%,#dde7f3 57%,#DFE9F5 100%);
+    background: -moz-linear-gradient(top, #ffffff 0%, #dde7f3 57%, #dfe9f5 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(57%,#dde7f3), color-stop(100%,#dfe9f5));
+    background: -webkit-linear-gradient(top, #ffffff 0%,#dde7f3 57%,#dfe9f5 100%);
+    background: -o-linear-gradient(top, #ffffff 0%,#dde7f3 57%,#dfe9f5 100%);
+    background: -ms-linear-gradient(top, #ffffff 0%,#dde7f3 57%,#dfe9f5 100%);
+    background: linear-gradient(to bottom, #ffffff 0%,#dde7f3 57%,#dfe9f5 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dfe9f5',GradientType=0 );
     border-color: #99BCE8;
     border-bottom: 1px solid #DFE9F5;
     color: #4C4C4C;

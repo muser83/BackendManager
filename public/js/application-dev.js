@@ -22,7 +22,7 @@ Ext.require([
     // Button
     // Chart
     // Container
-    'Ext.container.Viewport',
+//    'Ext.container.Viewport',
     // Data
     'Ext.data.association.*',
     'Ext.data.proxy.*',
@@ -51,22 +51,23 @@ Ext.require([
     // Tab
     // Tip
     // Toolbar
-    'Ext.toolbar.Toolbar',
-    'Ext.toolbar.Paging',
+//    'Ext.toolbar.Toolbar',
+//    'Ext.toolbar.Paging',
     // Tree
     // Util
     'Ext.util.History',
     // Ux
     // View
-    'Ext.view.AbstractView',
+    'App.view.Viewport',
+//    'Ext.view.AbstractView',
     'App.view.application.Window',
     'App.view.application.system.panel.About',
     'App.view.application.system.panel.Docs',
     'App.view.application.issue.form.Report',
     // Window
-    'Ext.window.MessageBox',
+//    'Ext.window.MessageBox',
     // Ajax
-    'Ext.Ajax',
+//    'Ext.Ajax',
     // Models
     'App.model.application.System',
     'App.model.application.Priority'
@@ -159,7 +160,7 @@ The server didn\'t answered with the expected data.',
         'application.System',
         'application.User'
     ],
-    stores: ['App.store.application.Priority'], // Tmp will be removed while the userNavigation methods are replaced to controllers.
+//    stores: ['application.Priority'], // Tmp will be removed while the userNavigation methods are replaced to controllers.
     views: [// Move all views and controls to controllers.
         'application.Window',
         'application.system.panel.Docs',
