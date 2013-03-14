@@ -1,5 +1,5 @@
 {
-    "hash": "3baa06469d114f4e6dd6ba780dfbb675",
+    "hash": "abaf008f3ba875f70ccbeced6455ab95",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -280,12 +280,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/dbal.git",
-                "reference": "143c251041e6fed511b666ba865019f4e697e603"
+                "reference": "45bdac964a628b889a1c1eaff6e88e45874232de"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/dbal/zipball/143c251041e6fed511b666ba865019f4e697e603",
-                "reference": "143c251041e6fed511b666ba865019f4e697e603",
+                "url": "https://api.github.com/repos/doctrine/dbal/zipball/45bdac964a628b889a1c1eaff6e88e45874232de",
+                "reference": "45bdac964a628b889a1c1eaff6e88e45874232de",
                 "shasum": ""
             },
             "require": {
@@ -342,7 +342,7 @@
                 "persistence",
                 "queryobject"
             ],
-            "time": "2013-03-12 20:11:25"
+            "time": "2013-03-14 21:54:31"
         },
         {
             "name": "doctrine/doctrine-module",
@@ -639,12 +639,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/doctrine2.git",
-                "reference": "b53fffe25287e9135494ae8247ef5a096b5622fc"
+                "reference": "6ee9e2284ad12769b94e3554ae2832de62a4645f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/b53fffe25287e9135494ae8247ef5a096b5622fc",
-                "reference": "b53fffe25287e9135494ae8247ef5a096b5622fc",
+                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/6ee9e2284ad12769b94e3554ae2832de62a4645f",
+                "reference": "6ee9e2284ad12769b94e3554ae2832de62a4645f",
                 "shasum": ""
             },
             "require": {
@@ -702,50 +702,7 @@
                 "database",
                 "orm"
             ],
-            "time": "2013-03-14 20:18:54"
-        },
-        {
-            "name": "kbsali/redmine-api",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/kbsali/php-redmine-api.git",
-                "reference": "0.4.6"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/kbsali/php-redmine-api/zipball/0.4.6",
-                "reference": "0.4.6",
-                "shasum": ""
-            },
-            "require": {
-                "ext-curl": "*",
-                "php": ">=5.3.2"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Redmine": "lib/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Kevin Saliou",
-                    "email": "kevin@saliou.name",
-                    "homepage": "http://kbsali.github.com"
-                }
-            ],
-            "description": "Redmine API client",
-            "homepage": "https://github.com/kbsali/php-redmine-api",
-            "keywords": [
-                "api",
-                "redmine"
-            ],
-            "time": "2013-03-14 09:45:19"
+            "time": "2013-03-14 22:41:40"
         },
         {
             "name": "michelf/php-markdown",
@@ -799,46 +756,6 @@
             "time": "2013-02-03 21:14:12"
         },
         {
-            "name": "mysql-workbench-schema-exporter/mysql-workbench-schema-exporter",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/johmue/mysql-workbench-schema-exporter.git",
-                "reference": "05fc8fb7b512ddd8e2a5d6185f43599f53739091"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/johmue/mysql-workbench-schema-exporter/zipball/05fc8fb7b512ddd8e2a5d6185f43599f53739091",
-                "reference": "05fc8fb7b512ddd8e2a5d6185f43599f53739091",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "type": "cli",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Johannes Mueller",
-                    "email": "circus2@web.de",
-                    "role": "Developer"
-                }
-            ],
-            "description": "MySQL Workbench Schema Exporter",
-            "homepage": "https://github.com/johmue/mysql-workbench-schema-exporter",
-            "keywords": [
-                "cli",
-                "database",
-                "doctrine",
-                "mysql",
-                "workbench"
-            ],
-            "time": "2012-10-24 18:42:16"
-        },
-        {
             "name": "symfony/console",
             "version": "dev-master",
             "target-dir": "Symfony/Component/Console",
@@ -884,65 +801,6 @@
             "description": "Symfony Console Component",
             "homepage": "http://symfony.com",
             "time": "2013-03-06 17:50:21"
-        },
-        {
-            "name": "zendframework/zend-developer-tools",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zendframework/ZendDeveloperTools.git",
-                "reference": "341015914744a58501cd5e2cc53ee4fcb055348e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/ZendDeveloperTools/zipball/341015914744a58501cd5e2cc53ee4fcb055348e",
-                "reference": "341015914744a58501cd5e2cc53ee4fcb055348e",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.3",
-                "zendframework/zend-eventmanager": "2.*",
-                "zendframework/zend-mvc": "2.*",
-                "zendframework/zend-servicemanager": "2.*",
-                "zendframework/zend-stdlib": "2.*",
-                "zendframework/zend-version": "2.*"
-            },
-            "suggest": {
-                "bjyoungblood/bjy-profiler": "Version: dev-master, allows the usage of the (Zend) Db collector."
-            },
-            "type": "zf-module",
-            "autoload": {
-                "psr-0": {
-                    "ZendDeveloperTools": "src/"
-                },
-                "classmap": [
-                    "./Module.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Evan Coury",
-                    "email": "me@evancoury.com",
-                    "homepage": "http://blog.evan.pro/"
-                },
-                {
-                    "name": "Eric Boh",
-                    "email": "cossish@gmail.com"
-                }
-            ],
-            "description": "Module for developer and debug tools for working with the ZF2 MVC layer.",
-            "homepage": "https://github.com/zendframework/ZendDeveloperTools",
-            "keywords": [
-                "debug",
-                "developer",
-                "module",
-                "zf2"
-            ],
-            "time": "2013-03-06 22:15:40"
         },
         {
             "name": "zendframework/zendframework",
@@ -1064,11 +922,8 @@
     ],
     "minimum-stability": "dev",
     "stability-flags": {
-        "zendframework/zend-developer-tools": 20,
         "doctrine/doctrine-orm-module": 20,
-        "kbsali/redmine-api": 20,
-        "michelf/php-markdown": 20,
-        "mysql-workbench-schema-exporter/mysql-workbench-schema-exporter": 20
+        "michelf/php-markdown": 20
     },
     "platform": {
         "php": ">=5.3.3"

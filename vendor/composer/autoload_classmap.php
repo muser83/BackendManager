@@ -6,5 +6,4 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'ZendDeveloperTools\\Module' => $baseDir . '/vendor/zendframework/zend-developer-tools/Module.php',
 );
