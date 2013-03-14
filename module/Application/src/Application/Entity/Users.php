@@ -27,6 +27,18 @@ class Users
     extends Helper\Helper
     implements InputFilterAwareInterface
 {
+    /**
+     * Allowed attempts before lockout.
+     */
+
+    const ATTEMPTS_TO_LOCKOUT = 5; // 25
+
+    /**
+     * Lockout time in miliseconds.
+     * The total lockout time will be (attempts * lockout time.)
+     * Notice that attempts >= self::ATTEMPTS_TO_LOCKOUT
+     */
+    const LOCKOUT_TIME = 2400;
 
     /**
      * @ORM\Id
@@ -58,7 +70,7 @@ class Users
     protected $persons_id;
 
     /**
-     * @ORM\Column(type="integer", length=3, unique=false, nullable=false)
+     * @ORM\Column(type="integer", length=11, unique=false, nullable=false)
      *
      * @method Application\Entity\Users setSettingsId(integer $settings_id)
      * @method integer getSettingsId()
@@ -120,6 +132,33 @@ class Users
     protected $verify_token;
 
     /**
+     * @ORM\Column(type="integer", length=3, unique=false, nullable=false)
+     *
+     * @method Application\Entity\Users setAttempts(integer $attempts)
+     * @method integer getAttempts()
+     * @var integer
+     */
+    protected $attempts;
+
+    /**
+     * @ORM\Column(type="datetime")
+     *
+     * @method Users setLastAttempt(datetime $last_attempt)
+     * @method datetime getLastAttempt()
+     * @var datetime
+     */
+    protected $last_attempt;
+
+    /**
+     * @ORM\Column(type="datetime")
+     *
+     * @method Users setLastLogin(datetime $last_login)
+     * @method datetime getLastLogin()
+     * @var datetime
+     */
+    protected $last_login;
+
+    /**
      * @ORM\ManyToOne(targetEntity="Locales", cascade={"all"}, fetch="EAGER")
      * 
      * @method Application\Entity\Users setLocales()
@@ -153,7 +192,23 @@ class Users
      */
     private $inputFilter;
 
-    public function saltCredential($identity)
+    /**
+     * COMMENTME
+     * 
+     * @return \Application\Entity\Users
+     */
+    public function __construct()
+    {
+        // End.
+        return $this;
+    }
+
+    /**
+     * 
+     * @param Users $identity
+     * @return type
+     */
+    public function saltCredential(Users $identity)
     {
         $bcrypt = new Bcrypt();
         $bcrypt->setCost(15);
@@ -163,6 +218,61 @@ class Users
 
         // End.
         return $this->credential;
+    }
+
+    /**
+     * COMMENTME
+     * 
+     * @return boolean
+     */
+    public function isLockedOut()
+    {
+        $lockoutTime = $this->getLockoutDateTime()->getTimestamp();
+        $dt = new \DateTime();
+        $now = $dt->getTimestamp();
+
+        if (($this->attempts >= self::ATTEMPTS_TO_LOCKOUT) && ($now <= $lockoutTime)) {
+            // End.
+            return true;
+        }
+
+        // End.
+        return false;
+    }
+
+    /**
+     * COMMENTME
+     * 
+     * @return \DateTime
+     */
+    public function getLockoutDateTime()
+    {
+        $dt = new \DateTime();
+
+        if (!$this->last_attempt instanceof \DateTime) {
+            $this->last_attempt = $dt;
+        }
+
+        $lastAttemptTime = $this->last_attempt->getTimestamp();
+        $lockoutTime = $lastAttemptTime + ($this->attempts * (self::LOCKOUT_TIME / 1000));
+        $dt = new \DateTime();
+        $dt->setTimestamp($lockoutTime);
+
+        // End.
+        return $dt;
+    }
+
+    /**
+     * COMMENTME
+     * 
+     * @return integer
+     */
+    public function increaseAttept()
+    {
+        $this->attempts += 1;
+
+        // End.
+        return $this->attempts;
     }
 
     /**
@@ -247,6 +357,11 @@ class Users
         return $this->salt;
     }
 
+    /**
+     * COMMENTME
+     * 
+     * @return array
+     */
     public function getSecureArrayCopy()
     {
         $this->excludeFields(array(

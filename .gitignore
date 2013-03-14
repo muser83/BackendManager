@@ -5,6 +5,7 @@
 /vendor/symfony/
 /vendor/zendframework/
 /vendor/michelf/
+/vendor/mysql-workbench-schema-exporter/
 
 /DB.png
 /public/images/icons/white/

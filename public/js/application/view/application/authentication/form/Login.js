@@ -6,7 +6,7 @@
  * @license   -
  * @copyright 2012 witteStier.nl
  */
-Ext.define('App.view.application.authentication.from.Login', {
+Ext.define('App.view.application.authentication.form.Login', {
     extend: 'Ext.form.Panel',
     border: false,
     bodyPadding: 5,
@@ -23,19 +23,15 @@ Ext.define('App.view.application.authentication.from.Login', {
             name: 'identity',
             fieldLabel: 'Username',
             allowBlank: false,
+            maxLength: 100,
             vtype: 'alphanum'
         }, {
             xtype: 'textfield',
             inputType: 'password',
             name: 'credential',
             fieldLabel: 'Password',
-            allowBlank: false
-        }, {
-            xtype: 'checkbox',
-            name: 'auth_remember',
-            boxLabel: 'Remember my credentials',
-            inputValue: true,
-            uncheckedValue: false
+            allowBlank: false,
+            maxLength: 128
         }],
     initComponent: function() {
         this.callParent();

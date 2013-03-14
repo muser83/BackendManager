@@ -17,7 +17,8 @@ use Zend\Mvc\Controller\AbstractActionController,
     Zend\Authentication\Storage\Session as AuthSession,
     Zend\Validator\Csrf as CsrfValidator,
     Doctrine\ORM\EntityManager,
-    Application\Entity\Users;
+    Application\Entity\Users,
+    Application\Entity\Messages;
 
 /**
  * Controller description
@@ -30,6 +31,11 @@ class AuthenticationController
 {
 
     CONST AUTHENTICATION_SESSION_NAME = 'authentication';
+
+    private $invalidLoginResponseMessage = 'Invalid username or password.';
+    private $lockoutResponseMessage = 'Your account is temporary blocked until %s.';
+    private $lockoutMessageSubject = 'Your account is temporary blocked.';
+    private $lockoutMessage = 'Your account is temporary blocked until %s.';
 
     /**
      * Instance of \Doctrine\ORM\EntityManager.
@@ -94,14 +100,14 @@ class AuthenticationController
 
         if (!$isValidAttempt) {
             // End.
-//            return $this->getIvalidLoginResponse();
+            return $this->getIvalidLoginResponse();
         }
 
         $user = new Users();
         $user->populate($postData);
 
-        $repository = $this->getEntityManager()->getRepository('Application\Entity\Users');
-        $identity = $repository->findOneBy(array(
+        $identity = $this->getEntityManager()->getRepository('Application\Entity\Users')
+            ->findOneBy(array(
             'identity' => $user->getIdentity()
         ));
 
@@ -110,13 +116,40 @@ class AuthenticationController
             return $this->getIvalidLoginResponse();
         }
 
+        // Check if the user is locked out.
+        if ($identity->isLockedOut()) {
+            $this->invalidLoginResponseMessage = sprintf(
+                $this->lockoutResponseMessage, $identity->getLockoutDateTime()->format('r')
+            );
+
+            $this->increaseAttept($identity);
+
+            // End.
+            return $this->getIvalidLoginResponse();
+        }
+
         // The user does exists, now check the credential.
         $user->saltCredential($identity);
 
         if ($user->getCredential() !== $identity->getCredential()) {
+            $this->increaseAttept($identity);
+
             // End. the credentials do not match.
             return $this->getIvalidLoginResponse(false);
         }
+
+        if ($identity->getAttempts() >= $identity::ATTEMPTS_TO_LOCKOUT) {
+            $person = $identity->getPersons();
+            $message = new Messages(
+                $person, $this->lockoutMessageSubject, sprintf($this->lockoutMessage, $identity->getLockoutDateTime()->format('r'))
+            );
+
+            $this->entityManager->persist($message);
+            $this->entityManager->flush();
+        }
+
+        $identity->setAttempts(0);
+        $this->getEntityManager()->flush();
 
         // Store the identity in a session object.
         $session = new AuthSession();
@@ -178,21 +211,39 @@ class AuthenticationController
         $user->setVerifyToken($csrfToken);
         $user->excludeFields(array(
             'id', 'locales_id', 'persons_id', 'settings_id', 'is_verified',
-            'is_active', 'salt', 'locales', 'persons', 'settings'
+            'is_active', 'salt', 'attempts', 'last_attempt', 'last_login',
+            'locales', 'persons', 'settings'
         ));
 
         $responseConfig = array(
             'success' => true,
+            'message' => $this->invalidLoginResponseMessage,
             'user' => $user->getArrayCopy()
         );
 
         // Sleep for security reasons.
         if ($sleep) {
-            sleep(2);
+            sleep(1);
         }
 
         // Send a authentication shell.
         return new JsonModel($responseConfig);
+    }
+
+    /**
+     * COMMENTME
+     * 
+     * @param Application\Entity\Users $identity
+     * @return boolean
+     */
+    private function increaseAttept(\Application\Entity\Users $identity)
+    {
+        $identity->increaseAttept();
+        $identity->setLastAttempt(new \DateTime());
+        $this->getEntityManager()->flush();
+
+        // End.
+        return true;
     }
 
 }

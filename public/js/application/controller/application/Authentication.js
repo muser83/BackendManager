@@ -14,7 +14,7 @@ Ext.define('App.controller.application.Authentication', {
     stores: [],
     views: [
         'application.authentication.Window',
-        'application.authentication.from.Login'
+        'application.authentication.form.Login'
     ],
     listners: {
     },
@@ -54,7 +54,7 @@ Ext.define('App.controller.application.Authentication', {
      */
     startupAction: function(args)
     {
-        var loginForm = this.getApplicationAuthenticationFromLoginView().create(),
+        var loginForm = this.getApplicationAuthenticationFormLoginView().create(),
             window = this.getApplicationAuthenticationWindowView().create({
             itemId: 'applicationAuthenticationWindow'
         });
@@ -118,7 +118,9 @@ Ext.define('App.controller.application.Authentication', {
                 text: 'Authentication...'
             });
 
-            hash = md5.hash(userModel.get('credential'));
+            hash = md5.hash(
+                userModel.get('identity') +
+                userModel.get('credential'));
             hash = md5.hash(hash);
             userModel.set('credential', hash);
 
@@ -127,14 +129,17 @@ Ext.define('App.controller.application.Authentication', {
                 callback: function(userModel, operation)
                 {
                     var responseUserModel = operation.getResultSet().records;
-                    responseUserModel = responseUserModel[0];
+                    responseUserModel = responseUserModel[0],
+                        proxy = responseUserModel.getProxy(),
+                        reader = proxy.getReader(),
+                        raw = reader.rawData;
 
                     if (true !== responseUserModel.get('is_active')) {
                         progressBar.reset(true);
                         loginFormPanel.enable();
                         credentialField.reset();
                         credentialField.markInvalid(
-                            "Invalid username or password.");
+                            reader.getMessage(raw));
 
                         // End.
                         return false;

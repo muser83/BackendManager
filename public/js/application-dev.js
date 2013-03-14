@@ -993,6 +993,19 @@ The server didn\'t answered with the expected data.',
         // Ext.Application instance. This a work-around, please improve.
 //        Ext.override(this, i18nApplication);
 
+        // Apply custom VTypes.
+        // see http://docs.sencha.com/ext-js/4-1/#!/api/Ext.form.field.VTypes
+        Ext.apply(Ext.form.field.VTypes, {
+            // VType name
+            vname: function(value, field)
+            {
+                alert('vtype test');
+
+                // End.
+                return value;
+            }
+        });
+
         // End.
         return true;
     },
