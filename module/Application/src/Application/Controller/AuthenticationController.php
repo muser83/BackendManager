@@ -17,7 +17,7 @@ use Zend\Mvc\Controller\AbstractActionController,
     Zend\Authentication\Storage\Session as AuthSession,
     Zend\Validator\Csrf as CsrfValidator,
     Doctrine\ORM\EntityManager,
-    Application\Entity\Users,
+    Application\Entity\User,
     Application\Entity\Messages;
 
 /**
@@ -100,16 +100,19 @@ class AuthenticationController
 
         if (!$isValidAttempt) {
             // End.
-            return $this->getIvalidLoginResponse();
+//            return $this->getIvalidLoginResponse();
         }
 
-        $user = new Users();
+        $user = new User();
         $user->populate($postData);
 
-        $identity = $this->getEntityManager()->getRepository('Application\Entity\Users')
+        $identity = $this->getEntityManager()->getRepository('Application\Entity\User')
             ->findOneBy(array(
             'identity' => $user->getIdentity()
         ));
+
+        var_dump($identity->getArrayCopy());
+        die;
 
         if (!$identity) {
             // End.
@@ -186,7 +189,7 @@ class AuthenticationController
         $csrfIsValid = $csrf->isValid($csrfToken);
         $csrf->getHash(true); // Flush csrf token.
 
-        $user = new Users();
+        $user = new User();
         $filter = $user->getInputFilter();
         $filter->setData($postData);
         $userIsValid = $filter->isValid();
@@ -207,18 +210,24 @@ class AuthenticationController
         $csrf = new CsrfValidator();
         $csrfToken = $csrf->getHash(true);
 
-        $user = new Users();
+        $user = new User();
         $user->setVerifyToken($csrfToken);
-        $user->excludeFields(array(
-            'id', 'locales_id', 'persons_id', 'settings_id', 'is_verified',
-            'is_active', 'salt', 'attempts', 'last_attempt', 'last_login',
-            'locales', 'persons', 'settings'
-        ));
 
         $responseConfig = array(
             'success' => true,
             'message' => $this->invalidLoginResponseMessage,
-            'user' => $user->getArrayCopy()
+            // TODO Use whitelists.
+            // array('id', 'name') // whitelist
+            // array(
+            //     'exclude' => array()
+            // )
+            // If exclude is defined, the whitelist will not be used anymore.
+            'user' => $user->getArrayCopy(array(
+                'id', 'roles_id', 'locales_id', 'persons_id', 'is_verified',
+                'is_active', 'salt', 'attempts', 'last_attempt', 'last_login',
+                'messages', 'usersHasResources', 'role', 'locale', 'person',
+                'setting', 'priorities', 'roles'
+            ))
         );
 
         // Sleep for security reasons.

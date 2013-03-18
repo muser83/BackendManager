@@ -1,62 +1,51 @@
-<h1><?php echo $this->translate('An error occurred') ?></h1>
-<h2><?php echo $this->message ?></h2>
-
-<?php if (isset($this->display_exceptions) && $this->display_exceptions): ?>
-
-<?php if(isset($this->exception) && $this->exception instanceof Exception): ?>
-<hr/>
-<h2><?php echo $this->translate('Additional information') ?>:</h2>
-<h3><?php echo get_class($this->exception); ?></h3>
-<dl>
-    <dt><?php echo $this->translate('File') ?>:</dt>
-    <dd>
-        <pre class="prettyprint linenums"><?php echo $this->exception->getFile() ?>:<?php echo $this->exception->getLine() ?></pre>
-    </dd>
-    <dt><?php echo $this->translate('Message') ?>:</dt>
-    <dd>
-        <pre class="prettyprint linenums"><?php echo $this->exception->getMessage() ?></pre>
-    </dd>
-    <dt><?php echo $this->translate('Stack trace') ?>:</dt>
-    <dd>
-        <pre class="prettyprint linenums"><?php echo $this->exception->getTraceAsString() ?></pre>
-    </dd>
-</dl>
 <?php
-    $e = $this->exception->getPrevious();
-    if ($e) :
-?>
-<hr/>
-<h2><?php echo $this->translate('Previous exceptions') ?>:</h2>
-<ul class="unstyled">
-    <?php while($e) : ?>
-    <li>
-        <h3><?php echo get_class($e); ?></h3>
-        <dl>
-            <dt><?php echo $this->translate('File') ?>:</dt>
-            <dd>
-                <pre class="prettyprint linenums"><?php echo $e->getFile() ?>:<?php echo $e->getLine() ?></pre>
-            </dd>
-            <dt><?php echo $this->translate('Message') ?>:</dt>
-            <dd>
-                <pre class="prettyprint linenums"><?php echo $e->getMessage() ?></pre>
-            </dd>
-            <dt><?php echo $this->translate('Stack trace') ?>:</dt>
-            <dd>
-                <pre class="prettyprint linenums"><?php echo $e->getTraceAsString() ?></pre>
-            </dd>
-        </dl>
-    </li>
-    <?php
-        $e = $e->getPrevious();
-        endwhile;
+$requestedWith = isset($_SERVER['HTTP_X_REQUESTED_WITH'])
+    ? $_SERVER['HTTP_X_REQUESTED_WITH']
+    : false;
+
+if ($requestedWith && ('XMLHttpRequest' === $requestedWith)):
+    // Very bad but working work-around.
+    $this->layout()->setTemplate('error/index');
+
+    header('Content-type: application/json');
+
+    $response = array(
+        'success' => false,
+        'message' => "An error occurred"
+    );
+
+    if (isset($this->display_exceptions) && $this->display_exceptions) {
+        if (!isset($this->exception) || !$this->exception instanceof Exception) {
+            $response['exception'] = 'No Exception available';
+        } else {
+            $response['exception']['file'] = sprintf(
+                '%s:%s', $this->exception->getFile(), $this->exception->getLine()
+            );
+            $response['exception']['message'] = $this->exception->getMessage();
+            $response['exception']['trace'] = $this->exception->getTraceAsString();
+            $response['exception']['exception'] = get_class($this->exception);
+
+            if ($this->exception->getPrevious()) {
+                $response['exception']['previous'] = array();
+
+                foreach ($this->exception->getPrevious() as $i => $previous) {
+                    $response['exception']['previous'][$i]['file'] = sprintf(
+                        '%s:%s', $previous->getFile(), $previous->getLine()
+                    );
+                    $response['exception']['previous'][$i]['message'] = $previous->getMessage();
+                    $response['exception']['previous'][$i]['trace'] = $previous->getTraceAsString;
+                    $response['exception']['previous'][$i]['exception'] = get_class($previous);
+                }
+            }
+        }
+    }
+
+    print json_encode($response);
+else:
     ?>
-</ul>
+    TODO print data in view/error/index
+    <script type="text/javascript">
+        var loader = document.getElementById('application-header-loader');
+        loader.style.visibility = 'hidden';
+    </script>
 <?php endif; ?>
-
-<?php else: ?>
-
-<h3><?php echo $this->translate('No Exception available') ?></h3>
-
-<?php endif ?>
-
-<?php endif ?>
