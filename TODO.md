@@ -29,6 +29,8 @@
 -  Do not shutdown the current controller
 -  Do not overwrite the current controller
 4. Create a abstract class for doctrine models that help to populate and get all data.
+5. Show an error if an controller is dispatched and the system is not started-up.
+-  If the authentication request returns an exception, the report issue shows up.
 
 
 

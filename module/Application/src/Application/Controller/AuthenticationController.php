@@ -50,13 +50,13 @@ class AuthenticationController
      * @param \Doctrine\ORM\EntityManager $entityManager
      * @return \Album\Controller\AlbumController
      */
-//    public function setEntityManager(EntityManager $entityManager)
-//    {
-//        $this->entityManager = $entityManager;
-//
-//        // End.
-//        return $this;
-//    }
+    public function setEntityManager(EntityManager $entityManager)
+    {
+        $this->entityManager = $entityManager;
+
+        // End.
+        return $this;
+    }
 
     /**
      * Create and or get an instance of \Doctrine\ORM\EntityManager.
@@ -97,10 +97,9 @@ class AuthenticationController
 
         // Check if the login attempt is valid.
         $isValidAttempt = $this->isValidLogin($postData);
-
         if (!$isValidAttempt) {
             // End.
-//            return $this->getIvalidLoginResponse();
+            return $this->getIvalidLoginResponse();
         }
 
         $user = new User();
@@ -110,9 +109,6 @@ class AuthenticationController
             ->findOneBy(array(
             'identity' => $user->getIdentity()
         ));
-
-        var_dump($identity->getArrayCopy());
-        die;
 
         if (!$identity) {
             // End.
@@ -215,19 +211,7 @@ class AuthenticationController
 
         $responseConfig = array(
             'success' => true,
-            'message' => $this->invalidLoginResponseMessage,
-            // TODO Use whitelists.
-            // array('id', 'name') // whitelist
-            // array(
-            //     'exclude' => array()
-            // )
-            // If exclude is defined, the whitelist will not be used anymore.
-            'user' => $user->getArrayCopy(array(
-                'id', 'roles_id', 'locales_id', 'persons_id', 'is_verified',
-                'is_active', 'salt', 'attempts', 'last_attempt', 'last_login',
-                'messages', 'usersHasResources', 'role', 'locale', 'person',
-                'setting', 'priorities', 'roles'
-            ))
+            'user' => $user->getArrayCopy(array('identity', 'credential', 'verify_token'))
         );
 
         // Sleep for security reasons.

@@ -1,23 +1,44 @@
 <?php
 
+/**
+ * User.php
+ * Created on Nov 18, 2012 11:55:30 PM
+ *
+ * @author    Boy van Moorsel <development@wittestier.nl>
+ * @license   license.wittestier.nl
+ * @copyright 2013 WitteStier - copyright.wittestier.nl
+ */
+
 namespace Application\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
-use Zend\InputFilter\InputFilter,
+use Doctrine\ORM\Mapping as ORM,
+    Zend\InputFilter\InputFilter,
     Zend\InputFilter\Factory as InputFactory,
     Zend\InputFilter\InputFilterAwareInterface,
-    Zend\InputFilter\InputFilterInterface;
+    Zend\InputFilter\InputFilterInterface,
+    Zend\Crypt\Password\Bcrypt,
+    Zend\Math\Rand;
 
 /**
- * Application\Entity\User
- *
- * @ORM\Entity(repositoryClass="UserRepository")
- * @ORM\Table(name="users", indexes={@ORM\Index(name="fk_users_locales1_idx", columns={"locales_id"}), @ORM\Index(name="fk_users_persons1_idx", columns={"persons_id"}), @ORM\Index(name="fk_users_settings1_idx", columns={"settings_id"}), @ORM\Index(name="fk_users_roles1_idx", columns={"roles_id"})}, uniqueConstraints={@ORM\UniqueConstraint(name="identity_UNIQUE", columns={"identity"})})
+ * @ORM\Entity
+ * @ORM\Table(name="users")
  */
 class User
     implements InputFilterAwareInterface
 {
+    /**
+     * Allowed attempts before lockout.
+     */
+
+    const ATTEMPTS_TO_LOCKOUT = 5; // 25
+
+    /**
+     * Lockout time in miliseconds.
+     * The total lockout time will be (attempts * lockout time.)
+     * Notice that attempts >= self::ATTEMPTS_TO_LOCKOUT
+     */
+    const LOCKOUT_TIME = 2400;
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -26,22 +47,24 @@ class User
     protected $id;
 
     /**
-     * @ORM\Id
      * @ORM\Column(type="integer")
      */
     protected $roles_id;
 
     /**
-     * @ORM\Id
      * @ORM\Column(type="integer")
      */
     protected $locales_id;
 
     /**
-     * @ORM\Id
      * @ORM\Column(type="integer")
      */
     protected $persons_id;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    protected $settings_id;
 
     /**
      * @ORM\Column(type="boolean")
@@ -91,64 +114,39 @@ class User
     protected $last_login;
 
     /**
-     * @ORM\OneToMany(targetEntity="Message", mappedBy="user")
-     * @ORM\JoinColumn(name="users_id", referencedColumnName="id", nullable=false)
-     */
-    protected $messages;
-
-    /**
-     * @ORM\OneToMany(targetEntity="UsersHasResource", mappedBy="user")
-     * @ORM\JoinColumn(name="users_id", referencedColumnName="id", nullable=false)
-     */
-    protected $usersHasResources;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Role", inversedBy="usersRelatedByRolesId")
-     * @ORM\JoinColumn(name="roles_id", referencedColumnName="id", nullable=false)
-     */
-    protected $role;
-
-    /**
      * @ORM\ManyToOne(targetEntity="Locale", inversedBy="users")
      * @ORM\JoinColumn(name="locales_id", referencedColumnName="id", nullable=false)
      */
-    protected $locale;
+//    protected $locale;
 
     /**
      * @ORM\ManyToOne(targetEntity="Person", inversedBy="users")
      * @ORM\JoinColumn(name="persons_id", referencedColumnName="id", nullable=false)
      */
-    protected $person;
+//    protected $person;
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting", inversedBy="users")
      * @ORM\JoinColumn(name="settings_id", referencedColumnName="id")
      */
-    protected $setting;
+//    protected $setting;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Priority", mappedBy="users")
-     */
-    protected $priorities;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="Role", mappedBy="users")
-     */
-    protected $roles;
-
-    /**
-     * Instance of InputFilterInterface.
+     * COMMENTME
      *
      * @var InputFilter
      */
     private $_inputFilter;
 
+    /**
+     * COMMENTME
+     * 
+     * @return \Application\Entity\Users
+     */
     public function __construct()
     {
-        $this->messages = new ArrayCollection();
-        $this->usersHasResources = new ArrayCollection();
-        $this->priorities = new ArrayCollection();
-        $this->roles = new ArrayCollection();
+        // End.
+        return $this;
     }
 
     /**
@@ -244,6 +242,29 @@ class User
     }
 
     /**
+     * Set the value of settings_id.
+     *
+     * @param integer $settings_id
+     * @return \Application\Entity\User
+     */
+    public function setSettingsId($settings_id)
+    {
+        $this->settings_id = $settings_id;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of settings_id.
+     *
+     * @return integer
+     */
+    public function getSettingsId()
+    {
+        return $this->settings_id;
+    }
+
+    /**
      * Set the value of is_verified.
      *
      * @param boolean $is_verified
@@ -336,6 +357,24 @@ class User
     }
 
     /**
+     * Salt and crypt the credential.
+     * 
+     * @param Users $identity
+     * @return \Application\Entity\User
+     */
+    public function saltCredential(User $identity)
+    {
+        $bcrypt = new Bcrypt();
+        $bcrypt->setCost(15);
+        $bcrypt->setSalt($identity->getSalt());
+
+        $this->credential = $bcrypt->create($this->credential);
+
+        // End.
+        return $this;
+    }
+
+    /**
      * Set the value of salt.
      *
      * @param string $salt
@@ -355,6 +394,10 @@ class User
      */
     public function getSalt()
     {
+        if (!$this->salt) {
+            $this->salt = Rand::getBytes(Bcrypt::MIN_SALT_SIZE);
+        }
+
         return $this->salt;
     }
 
@@ -451,52 +494,6 @@ class User
     }
 
     /**
-     * Add Message entity to collection (one to many).
-     *
-     * @param \Application\Entity\Message $message
-     * @return \Application\Entity\User
-     */
-    public function addMessage(Message $message)
-    {
-        $this->messages[] = $message;
-
-        return $this;
-    }
-
-    /**
-     * Get Message entity collection (one to many).
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getMessages()
-    {
-        return $this->messages;
-    }
-
-    /**
-     * Add UsersHasResource entity to collection (one to many).
-     *
-     * @param \Application\Entity\UsersHasResource $usersHasResource
-     * @return \Application\Entity\User
-     */
-    public function addUsersHasResource(UsersHasResource $usersHasResource)
-    {
-        $this->usersHasResources[] = $usersHasResource;
-
-        return $this;
-    }
-
-    /**
-     * Get UsersHasResource entity collection (one to many).
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getUsersHasResources()
-    {
-        return $this->usersHasResources;
-    }
-
-    /**
      * Set Role entity (many to one).
      *
      * @param \Application\Entity\Role $role
@@ -586,52 +583,6 @@ class User
     public function getSetting()
     {
         return $this->setting;
-    }
-
-    /**
-     * Add Priority entity to collection.
-     *
-     * @param \Application\Entity\Priority $priority
-     * @return \Application\Entity\User
-     */
-    public function addPriority(Priority $priority)
-    {
-        $this->priorities[] = $priority;
-
-        return $this;
-    }
-
-    /**
-     * Get Priority entity collection.
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getPriorities()
-    {
-        return $this->priorities;
-    }
-
-    /**
-     * Add Role entity to collection.
-     *
-     * @param \Application\Entity\Role $role
-     * @return \Application\Entity\User
-     */
-    public function addRole(Role $role)
-    {
-        $this->roles[] = $role;
-
-        return $this;
-    }
-
-    /**
-     * Get Role entity collection.
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getRoles()
-    {
-        return $this->roles;
     }
 
     /**
@@ -761,14 +712,12 @@ class User
      */
     public function populate(array $data = array())
     {
-        $fields = get_object_vars($this);
-
         foreach ($data as $field => $value) {
             $setter = sprintf('set%s', ucfirst(
-                str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
+                    str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
             ));
 
-            if (array_key_exists($field, $fields)) {
+            if (method_exists($this, $setter)) {
                 $this->{$setter}($value);
             }
         }
@@ -781,34 +730,105 @@ class User
      * Return all entity fields with values.
      * Fields started with _ will be excluded.
      * 
-     * @param array $exclude This fields will not be copied.
+     * @param array $fields This fields will be copied
      * @return array
      */
-    public function getArrayCopy(array $exclude = array())
+    public function getArrayCopy(array $fields = array())
     {
-        $fields = get_object_vars($this);
-        $copyable = array();
+        $orginalFields = get_object_vars($this);
+        $copiedFields = array();
 
-        foreach ($fields as $name => $value) {
-            if ('_' == $name[0]) {
+        foreach ($orginalFields as $field => $value) {
+            switch (true) {
+                case ('_' == $field[0]):
                 // Field is private
-                continue;
+                case (!in_array($field, $fields) && !empty($fields)):
+                    // Exclude field
+                    continue;
+                    break;
+                default:
+                    $copiedFields[$field] = $value;
             }
+        }
 
-            if (in_array($name, $exclude)) {
-                // Exclude field $name
-                continue;
-            }
-
-            $copyable[$name] = $value;
+        // End.
+        return $copiedFields;
     }
 
-    // End.
-    return $copyable;
-    }
-
-    public function __sleep()
+    /**
+     * COMMENTME
+     * 
+     * @return boolean
+     */
+    public function isLockedOut()
     {
-        return array('id', 'roles_id', 'locales_id', 'persons_id', 'settings_id', 'is_verified', 'is_active', 'identity', 'credential', 'salt', 'verify_token', 'attempts', 'last_attempt', 'last_login');
+        $lockoutTime = $this->getLockoutDateTime()->getTimestamp();
+        $dt = new \DateTime();
+        $now = $dt->getTimestamp();
+
+        if (($this->attempts >= self::ATTEMPTS_TO_LOCKOUT) && ($now <= $lockoutTime)) {
+            // End.
+            return true;
+        }
+
+        // End.
+        return false;
     }
+
+    /**
+     * COMMENTME
+     * 
+     * @return \DateTime
+     */
+    public function getLockoutDateTime()
+    {
+        $dt = new \DateTime();
+
+        if (!$this->last_attempt instanceof \DateTime) {
+            $this->last_attempt = $dt;
+        }
+
+        $lastAttemptTime = $this->last_attempt->getTimestamp();
+        $lockoutTime = $lastAttemptTime + ($this->attempts * (self::LOCKOUT_TIME / 1000));
+        $dt->setTimestamp($lockoutTime);
+
+        // End.
+        return $dt;
+    }
+
+    /**
+     * COMMENTME
+     * 
+     * @return integer
+     */
+    public function increaseAttept()
+    {
+        $this->attempts += 1;
+
+        // End.
+        return $this->attempts;
+    }
+
+    /**
+     * COMMENTME
+     * 
+     * @return array
+     */
+    public function getSecureArrayCopy()
+    {
+        $privateFields = array('credential', 'salt', 'verify_token');
+        $secureFields = array();
+
+        foreach ($this->getArrayCopy() as $field => $value) {
+            if (in_array($field, $privateFields)) {
+                continue;
+            }
+
+            $secureFields[$field] = $value;
+        }
+
+        return $secureFields;
+    }
+
 }
+
