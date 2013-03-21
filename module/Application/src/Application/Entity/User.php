@@ -1,43 +1,22 @@
 <?php
 
-/**
- * User.php
- * Created on Nov 18, 2012 11:55:30 PM
- *
- * @author    Boy van Moorsel <development@wittestier.nl>
- * @license   license.wittestier.nl
- * @copyright 2013 WitteStier - copyright.wittestier.nl
- */
-
 namespace Application\Entity;
 
-use Doctrine\ORM\Mapping as ORM,
-    Zend\InputFilter\InputFilter,
+use Doctrine\ORM\Mapping as ORM;
+use Zend\InputFilter\InputFilter,
     Zend\InputFilter\Factory as InputFactory,
     Zend\InputFilter\InputFilterAwareInterface,
-    Zend\InputFilter\InputFilterInterface,
-    Zend\Crypt\Password\Bcrypt,
-    Zend\Math\Rand;
+    Zend\InputFilter\InputFilterInterface;
 
 /**
- * @ORM\Entity
- * @ORM\Table(name="users")
+ * Application\Entity\User
+ *
+ * @ORM\Entity()
+ * @ORM\Table(name="users", indexes={@ORM\Index(name="fk_users_persons_idx", columns={"persons_id"}), @ORM\Index(name="fk_users_locales1_idx", columns={"locales_id"}), @ORM\Index(name="fk_users_roles1_idx", columns={"roles_id"}), @ORM\Index(name="fk_users_settings1_idx", columns={"settings_id"})}, uniqueConstraints={@ORM\UniqueConstraint(name="identity_UNIQUE", columns={"identity"}), @ORM\UniqueConstraint(name="persons_id_UNIQUE", columns={"persons_id"})})
  */
 class User
     implements InputFilterAwareInterface
 {
-    /**
-     * Allowed attempts before lockout.
-     */
-
-    const ATTEMPTS_TO_LOCKOUT = 5; // 25
-
-    /**
-     * Lockout time in miliseconds.
-     * The total lockout time will be (attempts * lockout time.)
-     * Notice that attempts >= self::ATTEMPTS_TO_LOCKOUT
-     */
-    const LOCKOUT_TIME = 2400;
 
     /**
      * @ORM\Id
@@ -47,34 +26,36 @@ class User
     protected $id;
 
     /**
+     * @ORM\Id
      * @ORM\Column(type="integer")
      */
     protected $roles_id;
 
     /**
+     * @ORM\Id
      * @ORM\Column(type="integer")
      */
     protected $locales_id;
 
     /**
+     * @ORM\Id
      * @ORM\Column(type="integer")
      */
     protected $persons_id;
 
     /**
+     * @ORM\Id
      * @ORM\Column(type="integer")
      */
     protected $settings_id;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     protected $is_verified;
 
     /**
-     * If false (0) the user is not allowed to authenticate.
-     *
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     protected $is_active;
 
@@ -94,12 +75,12 @@ class User
     protected $salt;
 
     /**
-     * @ORM\Column(type="string", length=25)
+     * @ORM\Column(type="string", length=25, nullable=true)
      */
     protected $verify_token;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=true)
      */
     protected $attempts;
 
@@ -111,42 +92,42 @@ class User
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    protected $last_login;
+    protected $last_active;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Role", inversedBy="users")
+     * @ORM\JoinColumn(name="roles_id", referencedColumnName="id", nullable=false)
+     */
+    protected $role;
 
     /**
      * @ORM\ManyToOne(targetEntity="Locale", inversedBy="users")
      * @ORM\JoinColumn(name="locales_id", referencedColumnName="id", nullable=false)
      */
-//    protected $locale;
+    protected $locale;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Person", inversedBy="users")
+     * @ORM\OneToOne(targetEntity="Person", inversedBy="user")
      * @ORM\JoinColumn(name="persons_id", referencedColumnName="id", nullable=false)
      */
-//    protected $person;
+    protected $person;
 
     /**
      * @ORM\ManyToOne(targetEntity="Setting", inversedBy="users")
-     * @ORM\JoinColumn(name="settings_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="settings_id", referencedColumnName="id", nullable=false)
      */
-//    protected $setting;
+    protected $setting;
 
     /**
-     * COMMENTME
+     * Instance of InputFilterInterface.
      *
      * @var InputFilter
      */
     private $_inputFilter;
 
-    /**
-     * COMMENTME
-     * 
-     * @return \Application\Entity\Users
-     */
     public function __construct()
     {
-        // End.
-        return $this;
+        
     }
 
     /**
@@ -357,24 +338,6 @@ class User
     }
 
     /**
-     * Salt and crypt the credential.
-     * 
-     * @param Users $identity
-     * @return \Application\Entity\User
-     */
-    public function saltCredential(User $identity)
-    {
-        $bcrypt = new Bcrypt();
-        $bcrypt->setCost(15);
-        $bcrypt->setSalt($identity->getSalt());
-
-        $this->credential = $bcrypt->create($this->credential);
-
-        // End.
-        return $this;
-    }
-
-    /**
      * Set the value of salt.
      *
      * @param string $salt
@@ -394,10 +357,6 @@ class User
      */
     public function getSalt()
     {
-        if (!$this->salt) {
-            $this->salt = Rand::getBytes(Bcrypt::MIN_SALT_SIZE);
-        }
-
         return $this->salt;
     }
 
@@ -471,26 +430,26 @@ class User
     }
 
     /**
-     * Set the value of last_login.
+     * Set the value of last_active.
      *
-     * @param datetime $last_login
+     * @param datetime $last_active
      * @return \Application\Entity\User
      */
-    public function setLastLogin($last_login)
+    public function setLastActive($last_active)
     {
-        $this->last_login = $last_login;
+        $this->last_active = $last_active;
 
         return $this;
     }
 
     /**
-     * Get the value of last_login.
+     * Get the value of last_active.
      *
      * @return datetime
      */
-    public function getLastLogin()
+    public function getLastActive()
     {
-        return $this->last_login;
+        return $this->last_active;
     }
 
     /**
@@ -540,20 +499,21 @@ class User
     }
 
     /**
-     * Set Person entity (many to one).
+     * Set Person entity (one to one).
      *
      * @param \Application\Entity\Person $person
      * @return \Application\Entity\User
      */
     public function setPerson(Person $person = null)
     {
+        $person->setUser($this);
         $this->person = $person;
 
         return $this;
     }
 
     /**
-     * Get Person entity (many to one).
+     * Get Person entity (one to one).
      *
      * @return \Application\Entity\Person
      */
@@ -637,19 +597,19 @@ class User
             ),
             array(
                 'name' => 'settings_id',
-                'required' => false,
+                'required' => true,
                 'filters' => array(),
                 'validators' => array(),
             ),
             array(
                 'name' => 'is_verified',
-                'required' => true,
+                'required' => false,
                 'filters' => array(),
                 'validators' => array(),
             ),
             array(
                 'name' => 'is_active',
-                'required' => true,
+                'required' => false,
                 'filters' => array(),
                 'validators' => array(),
             ),
@@ -673,13 +633,13 @@ class User
             ),
             array(
                 'name' => 'verify_token',
-                'required' => true,
+                'required' => false,
                 'filters' => array(),
                 'validators' => array(),
             ),
             array(
                 'name' => 'attempts',
-                'required' => true,
+                'required' => false,
                 'filters' => array(),
                 'validators' => array(),
             ),
@@ -690,7 +650,7 @@ class User
                 'validators' => array(),
             ),
             array(
-                'name' => 'last_login',
+                'name' => 'last_active',
                 'required' => false,
                 'filters' => array(),
                 'validators' => array(),
@@ -712,6 +672,7 @@ class User
      */
     public function populate(array $data = array())
     {
+
         foreach ($data as $field => $value) {
             $setter = sprintf('set%s', ucfirst(
                     str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
@@ -755,80 +716,11 @@ class User
         return $copiedFields;
     }
 
-    /**
-     * COMMENTME
-     * 
-     * @return boolean
-     */
-    public function isLockedOut()
+    public function __sleep()
     {
-        $lockoutTime = $this->getLockoutDateTime()->getTimestamp();
-        $dt = new \DateTime();
-        $now = $dt->getTimestamp();
-
-        if (($this->attempts >= self::ATTEMPTS_TO_LOCKOUT) && ($now <= $lockoutTime)) {
-            // End.
-            return true;
-        }
-
-        // End.
-        return false;
+        return array('id', 'roles_id', 'locales_id', 'persons_id', 'settings_id', 'is_verified', 'is_active', 'identity', 'credential', 'salt', 'verify_token', 'attempts', 'last_attempt', 'last_active');
     }
 
-    /**
-     * COMMENTME
-     * 
-     * @return \DateTime
-     */
-    public function getLockoutDateTime()
-    {
-        $dt = new \DateTime();
-
-        if (!$this->last_attempt instanceof \DateTime) {
-            $this->last_attempt = $dt;
-        }
-
-        $lastAttemptTime = $this->last_attempt->getTimestamp();
-        $lockoutTime = $lastAttemptTime + ($this->attempts * (self::LOCKOUT_TIME / 1000));
-        $dt->setTimestamp($lockoutTime);
-
-        // End.
-        return $dt;
-    }
-
-    /**
-     * COMMENTME
-     * 
-     * @return integer
-     */
-    public function increaseAttept()
-    {
-        $this->attempts += 1;
-
-        // End.
-        return $this->attempts;
-    }
-
-    /**
-     * COMMENTME
-     * 
-     * @return array
-     */
-    public function getSecureArrayCopy()
-    {
-        $privateFields = array('credential', 'salt', 'verify_token');
-        $secureFields = array();
-
-        foreach ($this->getArrayCopy() as $field => $value) {
-            if (in_array($field, $privateFields)) {
-                continue;
-            }
-
-            $secureFields[$field] = $value;
-        }
-
-        return $secureFields;
-    }
-
+    // Custom methods //////////////////////////////////////////////////////////
 }
 
