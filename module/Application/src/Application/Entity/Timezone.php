@@ -18,7 +18,6 @@ use Zend\InputFilter\InputFilter,
 class Timezone
     implements InputFilterAwareInterface
 {
-
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -37,12 +36,6 @@ class Timezone
     protected $name;
 
     /**
-     * @ORM\OneToMany(targetEntity="Locale", mappedBy="timezone")
-     * @ORM\JoinColumn(name="timezones_id", referencedColumnName="id", nullable=false)
-     */
-    protected $locales;
-
-    /**
      * Instance of InputFilterInterface.
      *
      * @var InputFilter
@@ -51,7 +44,6 @@ class Timezone
 
     public function __construct()
     {
-        $this->locales = new ArrayCollection();
     }
 
     /**
@@ -124,29 +116,6 @@ class Timezone
     }
 
     /**
-     * Add Locale entity to collection (one to many).
-     *
-     * @param \Application\Entity\Locale $locale
-     * @return \Application\Entity\Timezone
-     */
-    public function addLocale(Locale $locale)
-    {
-        $this->locales[] = $locale;
-
-        return $this;
-    }
-
-    /**
-     * Get Locale entity collection (one to many).
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getLocales()
-    {
-        return $this->locales;
-    }
-
-    /**
      * Not used, Only defined to be compatible with InputFilterAwareInterface.
      * 
      * @param \Zend\InputFilter\InputFilterInterface $inputFilter
@@ -170,7 +139,6 @@ class Timezone
             return $this->_inputFilter;
         }
         $factory = new InputFactory();
-
         $filters = array(
             array(
                 'name' => 'id',
@@ -191,9 +159,7 @@ class Timezone
                 'validators' => array(),
             ),
         );
-
         $this->_inputFilter = $factory->createInputFilter($filters);
-
         // End.
         return $this->_inputFilter;
     }
@@ -207,17 +173,14 @@ class Timezone
      */
     public function populate(array $data = array())
     {
-
         foreach ($data as $field => $value) {
             $setter = sprintf('set%s', ucfirst(
-                    str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
+                str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
             ));
-
             if (method_exists($this, $setter)) {
                 $this->{$setter}($value);
             }
         }
-
         // End.
         return true;
     }
@@ -231,21 +194,19 @@ class Timezone
      */
     public function getArrayCopy(array $fields = array())
     {
-        $orginalFields = get_object_vars($this);
+        $dataFields = array('id', 'is_visible', 'name');
+        $relationFields = array();
         $copiedFields = array();
-
-        foreach ($orginalFields as $field => $value) {
-            switch (true) {
-                case ('_' == $field[0]):
-                // Field is private
-                case (!in_array($field, $fields) && !empty($fields)):
-                    // Exclude field
-                    continue;
-                    break;
-                default:
-                    $copiedFields[$field] = $value;
+        foreach ($dataFields as $field) {
+            if (!in_array($field, $fields) && !empty($fields)) {
+                continue;
             }
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))));
+            $copiedFields[$field] = $this->{$getter}();
         }
+        // foreach ($relationFields as $field => $relation) {
+            // $copiedFields[$field] = $relation->getArrayCopy();
+        // }
 
         // End.
         return $copiedFields;
@@ -255,7 +216,5 @@ class Timezone
     {
         return array('id', 'is_visible', 'name');
     }
-
     // Custom methods //////////////////////////////////////////////////////////
 }
-

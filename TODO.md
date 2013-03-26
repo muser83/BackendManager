@@ -1,5 +1,5 @@
 ## Done
- 
+ >10. Use Senca CDN.
 
 
 ***
@@ -17,7 +17,8 @@
 6. Make a file uploader, always show all uploaded file for that user.
 7. Bug report and manage service.
 8. Personal messaging service.
-9. System data and settings handler.
+9. System data and settings handler
+
 
 
 ## Core
@@ -28,7 +29,6 @@
    IF the silent flag is raised:  
 -  Do not shutdown the current controller
 -  Do not overwrite the current controller
-4. Create a abstract class for doctrine models that help to populate and get all data.
 5. Show an error if an controller is dispatched and the system is not started-up.
 -  If the authentication request returns an exception, the report issue shows up.
 

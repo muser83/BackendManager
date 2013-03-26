@@ -18,7 +18,6 @@ use Zend\InputFilter\InputFilter,
 class Continent
     implements InputFilterAwareInterface
 {
-
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -37,12 +36,6 @@ class Continent
     protected $name;
 
     /**
-     * @ORM\OneToMany(targetEntity="Country", mappedBy="continent")
-     * @ORM\JoinColumn(name="continents_id", referencedColumnName="id", nullable=false)
-     */
-    protected $countries;
-
-    /**
      * Instance of InputFilterInterface.
      *
      * @var InputFilter
@@ -51,7 +44,6 @@ class Continent
 
     public function __construct()
     {
-        $this->countries = new ArrayCollection();
     }
 
     /**
@@ -124,29 +116,6 @@ class Continent
     }
 
     /**
-     * Add Country entity to collection (one to many).
-     *
-     * @param \Application\Entity\Country $country
-     * @return \Application\Entity\Continent
-     */
-    public function addCountry(Country $country)
-    {
-        $this->countries[] = $country;
-
-        return $this;
-    }
-
-    /**
-     * Get Country entity collection (one to many).
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getCountries()
-    {
-        return $this->countries;
-    }
-
-    /**
      * Not used, Only defined to be compatible with InputFilterAwareInterface.
      * 
      * @param \Zend\InputFilter\InputFilterInterface $inputFilter
@@ -170,7 +139,6 @@ class Continent
             return $this->_inputFilter;
         }
         $factory = new InputFactory();
-
         $filters = array(
             array(
                 'name' => 'id',
@@ -191,9 +159,7 @@ class Continent
                 'validators' => array(),
             ),
         );
-
         $this->_inputFilter = $factory->createInputFilter($filters);
-
         // End.
         return $this->_inputFilter;
     }
@@ -207,17 +173,14 @@ class Continent
      */
     public function populate(array $data = array())
     {
-
         foreach ($data as $field => $value) {
             $setter = sprintf('set%s', ucfirst(
-                    str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
+                str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
             ));
-
             if (method_exists($this, $setter)) {
                 $this->{$setter}($value);
             }
         }
-
         // End.
         return true;
     }
@@ -231,21 +194,19 @@ class Continent
      */
     public function getArrayCopy(array $fields = array())
     {
-        $orginalFields = get_object_vars($this);
+        $dataFields = array('id', 'is_visible', 'name');
+        $relationFields = array();
         $copiedFields = array();
-
-        foreach ($orginalFields as $field => $value) {
-            switch (true) {
-                case ('_' == $field[0]):
-                // Field is private
-                case (!in_array($field, $fields) && !empty($fields)):
-                    // Exclude field
-                    continue;
-                    break;
-                default:
-                    $copiedFields[$field] = $value;
+        foreach ($dataFields as $field) {
+            if (!in_array($field, $fields) && !empty($fields)) {
+                continue;
             }
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))));
+            $copiedFields[$field] = $this->{$getter}();
         }
+        // foreach ($relationFields as $field => $relation) {
+            // $copiedFields[$field] = $relation->getArrayCopy();
+        // }
 
         // End.
         return $copiedFields;
@@ -255,7 +216,5 @@ class Continent
     {
         return array('id', 'is_visible', 'name');
     }
-
     // Custom methods //////////////////////////////////////////////////////////
 }
-

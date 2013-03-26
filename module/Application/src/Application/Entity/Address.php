@@ -17,7 +17,6 @@ use Zend\InputFilter\InputFilter,
 class Address
     implements InputFilterAwareInterface
 {
-
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -26,13 +25,13 @@ class Address
     protected $id;
 
     /**
-     * @ORM\Id
+     * 
      * @ORM\Column(type="integer")
      */
     protected $countries_id;
 
     /**
-     * @ORM\Id
+     * 
      * @ORM\Column(type="integer")
      */
     protected $provinces_id;
@@ -40,7 +39,7 @@ class Address
     /**
      * @ORM\Column(type="string", length=100)
      */
-    protected $addresses;
+    protected $address;
 
     /**
      * @ORM\Column(type="string", length=25, nullable=true)
@@ -53,19 +52,13 @@ class Address
     protected $city;
 
     /**
-     * @ORM\OneToOne(targetEntity="Person", mappedBy="address")
-     * @ORM\JoinColumn(name="addresses_id", referencedColumnName="id", nullable=false)
-     */
-    protected $person;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Country", inversedBy="addresses")
+     * @ORM\ManyToOne(targetEntity="Country", fetch="EAGER")
      * @ORM\JoinColumn(name="countries_id", referencedColumnName="id", nullable=false)
      */
     protected $country;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Province", inversedBy="addresses")
+     * @ORM\ManyToOne(targetEntity="Province", fetch="EAGER")
      * @ORM\JoinColumn(name="provinces_id", referencedColumnName="id", nullable=false)
      */
     protected $province;
@@ -79,7 +72,6 @@ class Address
 
     public function __construct()
     {
-        
     }
 
     /**
@@ -152,26 +144,26 @@ class Address
     }
 
     /**
-     * Set the value of addresses.
+     * Set the value of address.
      *
-     * @param string $addresses
+     * @param string $address
      * @return \Application\Entity\Address
      */
-    public function setAddresses($addresses)
+    public function setAddress($address)
     {
-        $this->addresses = $addresses;
+        $this->address = $address;
 
         return $this;
     }
 
     /**
-     * Get the value of addresses.
+     * Get the value of address.
      *
      * @return string
      */
-    public function getAddresses()
+    public function getAddress()
     {
-        return $this->addresses;
+        return $this->address;
     }
 
     /**
@@ -218,29 +210,6 @@ class Address
     public function getCity()
     {
         return $this->city;
-    }
-
-    /**
-     * Set Person entity (one to one).
-     *
-     * @param \Application\Entity\Person $person
-     * @return \Application\Entity\Address
-     */
-    public function setPerson(Person $person)
-    {
-        $this->person = $person;
-
-        return $this;
-    }
-
-    /**
-     * Get Person entity (one to one).
-     *
-     * @return \Application\Entity\Person
-     */
-    public function getPerson()
-    {
-        return $this->person;
     }
 
     /**
@@ -313,7 +282,6 @@ class Address
             return $this->_inputFilter;
         }
         $factory = new InputFactory();
-
         $filters = array(
             array(
                 'name' => 'id',
@@ -334,7 +302,7 @@ class Address
                 'validators' => array(),
             ),
             array(
-                'name' => 'addresses',
+                'name' => 'address',
                 'required' => true,
                 'filters' => array(),
                 'validators' => array(),
@@ -352,9 +320,7 @@ class Address
                 'validators' => array(),
             ),
         );
-
         $this->_inputFilter = $factory->createInputFilter($filters);
-
         // End.
         return $this->_inputFilter;
     }
@@ -368,17 +334,14 @@ class Address
      */
     public function populate(array $data = array())
     {
-
         foreach ($data as $field => $value) {
             $setter = sprintf('set%s', ucfirst(
-                    str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
+                str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
             ));
-
             if (method_exists($this, $setter)) {
                 $this->{$setter}($value);
             }
         }
-
         // End.
         return true;
     }
@@ -392,21 +355,19 @@ class Address
      */
     public function getArrayCopy(array $fields = array())
     {
-        $orginalFields = get_object_vars($this);
+        $dataFields = array('id', 'countries_id', 'provinces_id', 'address', 'postalcode', 'city');
+        $relationFields = array('country', 'province');
         $copiedFields = array();
-
-        foreach ($orginalFields as $field => $value) {
-            switch (true) {
-                case ('_' == $field[0]):
-                // Field is private
-                case (!in_array($field, $fields) && !empty($fields)):
-                    // Exclude field
-                    continue;
-                    break;
-                default:
-                    $copiedFields[$field] = $value;
+        foreach ($dataFields as $field) {
+            if (!in_array($field, $fields) && !empty($fields)) {
+                continue;
             }
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))));
+            $copiedFields[$field] = $this->{$getter}();
         }
+        // foreach ($relationFields as $field => $relation) {
+            // $copiedFields[$field] = $relation->getArrayCopy();
+        // }
 
         // End.
         return $copiedFields;
@@ -414,9 +375,7 @@ class Address
 
     public function __sleep()
     {
-        return array('id', 'countries_id', 'provinces_id', 'addresses', 'postalcode', 'city');
+        return array('id', 'countries_id', 'provinces_id', 'address', 'postalcode', 'city');
     }
-
     // Custom methods //////////////////////////////////////////////////////////
 }
-

@@ -10,15 +10,14 @@ use Zend\InputFilter\InputFilter,
     Zend\InputFilter\InputFilterInterface;
 
 /**
- * Application\Entity\Langauge
+ * Application\Entity\Language
  *
  * @ORM\Entity()
- * @ORM\Table(name="langauges", uniqueConstraints={@ORM\UniqueConstraint(name="name_UNIQUE", columns={"name"}), @ORM\UniqueConstraint(name="iso6391_UNIQUE", columns={"iso6391"}), @ORM\UniqueConstraint(name="local_name_UNIQUE", columns={"local_name"})})
+ * @ORM\Table(name="languages", uniqueConstraints={@ORM\UniqueConstraint(name="name_UNIQUE", columns={"name"}), @ORM\UniqueConstraint(name="iso6391_UNIQUE", columns={"iso6391"}), @ORM\UniqueConstraint(name="local_name_UNIQUE", columns={"local_name"})})
  */
-class Langauge
+class Language
     implements InputFilterAwareInterface
 {
-
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -47,12 +46,6 @@ class Langauge
     protected $iso6391;
 
     /**
-     * @ORM\OneToMany(targetEntity="Locale", mappedBy="langauge")
-     * @ORM\JoinColumn(name="langauges_id", referencedColumnName="id", nullable=false)
-     */
-    protected $locales;
-
-    /**
      * Instance of InputFilterInterface.
      *
      * @var InputFilter
@@ -61,14 +54,13 @@ class Langauge
 
     public function __construct()
     {
-        $this->locales = new ArrayCollection();
     }
 
     /**
      * Set the value of id.
      *
      * @param integer $id
-     * @return \Application\Entity\Langauge
+     * @return \Application\Entity\Language
      */
     public function setId($id)
     {
@@ -91,7 +83,7 @@ class Langauge
      * Set the value of is_visible.
      *
      * @param boolean $is_visible
-     * @return \Application\Entity\Langauge
+     * @return \Application\Entity\Language
      */
     public function setIsVisible($is_visible)
     {
@@ -114,7 +106,7 @@ class Langauge
      * Set the value of name.
      *
      * @param string $name
-     * @return \Application\Entity\Langauge
+     * @return \Application\Entity\Language
      */
     public function setName($name)
     {
@@ -137,7 +129,7 @@ class Langauge
      * Set the value of local_name.
      *
      * @param string $local_name
-     * @return \Application\Entity\Langauge
+     * @return \Application\Entity\Language
      */
     public function setLocalName($local_name)
     {
@@ -160,7 +152,7 @@ class Langauge
      * Set the value of iso6391.
      *
      * @param string $iso6391
-     * @return \Application\Entity\Langauge
+     * @return \Application\Entity\Language
      */
     public function setIso6391($iso6391)
     {
@@ -177,29 +169,6 @@ class Langauge
     public function getIso6391()
     {
         return $this->iso6391;
-    }
-
-    /**
-     * Add Locale entity to collection (one to many).
-     *
-     * @param \Application\Entity\Locale $locale
-     * @return \Application\Entity\Langauge
-     */
-    public function addLocale(Locale $locale)
-    {
-        $this->locales[] = $locale;
-
-        return $this;
-    }
-
-    /**
-     * Get Locale entity collection (one to many).
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getLocales()
-    {
-        return $this->locales;
     }
 
     /**
@@ -226,7 +195,6 @@ class Langauge
             return $this->_inputFilter;
         }
         $factory = new InputFactory();
-
         $filters = array(
             array(
                 'name' => 'id',
@@ -259,9 +227,7 @@ class Langauge
                 'validators' => array(),
             ),
         );
-
         $this->_inputFilter = $factory->createInputFilter($filters);
-
         // End.
         return $this->_inputFilter;
     }
@@ -275,17 +241,14 @@ class Langauge
      */
     public function populate(array $data = array())
     {
-
         foreach ($data as $field => $value) {
             $setter = sprintf('set%s', ucfirst(
-                    str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
+                str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
             ));
-
             if (method_exists($this, $setter)) {
                 $this->{$setter}($value);
             }
         }
-
         // End.
         return true;
     }
@@ -299,21 +262,19 @@ class Langauge
      */
     public function getArrayCopy(array $fields = array())
     {
-        $orginalFields = get_object_vars($this);
+        $dataFields = array('id', 'is_visible', 'name', 'local_name', 'iso6391');
+        $relationFields = array();
         $copiedFields = array();
-
-        foreach ($orginalFields as $field => $value) {
-            switch (true) {
-                case ('_' == $field[0]):
-                // Field is private
-                case (!in_array($field, $fields) && !empty($fields)):
-                    // Exclude field
-                    continue;
-                    break;
-                default:
-                    $copiedFields[$field] = $value;
+        foreach ($dataFields as $field) {
+            if (!in_array($field, $fields) && !empty($fields)) {
+                continue;
             }
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))));
+            $copiedFields[$field] = $this->{$getter}();
         }
+        // foreach ($relationFields as $field => $relation) {
+            // $copiedFields[$field] = $relation->getArrayCopy();
+        // }
 
         // End.
         return $copiedFields;
@@ -323,7 +284,5 @@ class Langauge
     {
         return array('id', 'is_visible', 'name', 'local_name', 'iso6391');
     }
-
     // Custom methods //////////////////////////////////////////////////////////
 }
-

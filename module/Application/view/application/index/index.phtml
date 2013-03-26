@@ -1,17 +1,17 @@
 <?php
 
 $this->headLink()->appendStylesheet(
-    'http://eulibrary.msi.com/ext/resources/css/ext-all.css'
+    'http://cdn.sencha.io/ext-4.2.0-gpl/resources/css/ext-all.css'
 );
 
 // Add javasctipt files
 if ('production' == APPLICATION_ENV) {
     $this->headScript()
-        ->appendFile('http://eulibrary.msi.com/ext/ext.js')
+        ->appendFile('http://cdn.sencha.io/ext-4.2.0-gpl/ext.js')
         ->appendFile('js/application.js');
 } else {
     $this->headScript()
-        ->appendFile('http://eulibrary.msi.com/ext/ext-debug.js')
+        ->appendFile('http://cdn.sencha.io/ext-4.2.0-gpl/ext-debug.js')
         ->appendFile('js/application-dev.js')
         ->appendFile('js/application/i18n/nl_NL.js');
 }

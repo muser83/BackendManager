@@ -13,12 +13,11 @@ use Zend\InputFilter\InputFilter,
  * Application\Entity\Locale
  *
  * @ORM\Entity()
- * @ORM\Table(name="locales", indexes={@ORM\Index(name="fk_locales_countries1_idx", columns={"countries_id"}), @ORM\Index(name="fk_locales_currencies1_idx", columns={"currencies_id"}), @ORM\Index(name="fk_locales_langauges1_idx", columns={"langauges_id"}), @ORM\Index(name="fk_locales_charsets1_idx", columns={"charsets_id"}), @ORM\Index(name="fk_locales_timezones1_idx", columns={"timezones_id"})}, uniqueConstraints={@ORM\UniqueConstraint(name="name_UNIQUE", columns={"name"})})
+ * @ORM\Table(name="locales", indexes={@ORM\Index(name="fk_locales_countries1_idx", columns={"countries_id"}), @ORM\Index(name="fk_locales_currencies1_idx", columns={"currencies_id"}), @ORM\Index(name="fk_locales_charsets1_idx", columns={"charsets_id"}), @ORM\Index(name="fk_locales_timezones1_idx", columns={"timezones_id"}), @ORM\Index(name="fk_locales_languages1_idx", columns={"languages_id"})}, uniqueConstraints={@ORM\UniqueConstraint(name="name_UNIQUE", columns={"name"})})
  */
 class Locale
     implements InputFilterAwareInterface
 {
-
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -27,31 +26,31 @@ class Locale
     protected $id;
 
     /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     */
-    protected $langauges_id;
-
-    /**
-     * @ORM\Id
+     * 
      * @ORM\Column(type="integer")
      */
     protected $countries_id;
 
     /**
-     * @ORM\Id
+     * 
+     * @ORM\Column(type="integer")
+     */
+    protected $languages_id;
+
+    /**
+     * 
      * @ORM\Column(type="integer")
      */
     protected $currencies_id;
 
     /**
-     * @ORM\Id
+     * 
      * @ORM\Column(type="integer")
      */
     protected $charsets_id;
 
     /**
-     * @ORM\Id
+     * 
      * @ORM\Column(type="integer")
      */
     protected $timezones_id;
@@ -67,37 +66,31 @@ class Locale
     protected $name;
 
     /**
-     * @ORM\OneToMany(targetEntity="User", mappedBy="locale")
-     * @ORM\JoinColumn(name="locales_id", referencedColumnName="id", nullable=false)
-     */
-    protected $users;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Langauge", inversedBy="locales")
-     * @ORM\JoinColumn(name="langauges_id", referencedColumnName="id", nullable=false)
-     */
-    protected $langauge;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Country", inversedBy="locales")
+     * @ORM\ManyToOne(targetEntity="Country")
      * @ORM\JoinColumn(name="countries_id", referencedColumnName="id", nullable=false)
      */
     protected $country;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Currency", inversedBy="locales")
+     * @ORM\ManyToOne(targetEntity="Language", fetch="EAGER")
+     * @ORM\JoinColumn(name="languages_id", referencedColumnName="id", nullable=false)
+     */
+    protected $language;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Currency")
      * @ORM\JoinColumn(name="currencies_id", referencedColumnName="id", nullable=false)
      */
     protected $currency;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Charset", inversedBy="locales")
+     * @ORM\ManyToOne(targetEntity="Charset")
      * @ORM\JoinColumn(name="charsets_id", referencedColumnName="id", nullable=false)
      */
     protected $charset;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Timezone", inversedBy="locales")
+     * @ORM\ManyToOne(targetEntity="Timezone")
      * @ORM\JoinColumn(name="timezones_id", referencedColumnName="id", nullable=false)
      */
     protected $timezone;
@@ -111,7 +104,6 @@ class Locale
 
     public function __construct()
     {
-        $this->users = new ArrayCollection();
     }
 
     /**
@@ -138,29 +130,6 @@ class Locale
     }
 
     /**
-     * Set the value of langauges_id.
-     *
-     * @param integer $langauges_id
-     * @return \Application\Entity\Locale
-     */
-    public function setLangaugesId($langauges_id)
-    {
-        $this->langauges_id = $langauges_id;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of langauges_id.
-     *
-     * @return integer
-     */
-    public function getLangaugesId()
-    {
-        return $this->langauges_id;
-    }
-
-    /**
      * Set the value of countries_id.
      *
      * @param integer $countries_id
@@ -181,6 +150,29 @@ class Locale
     public function getCountriesId()
     {
         return $this->countries_id;
+    }
+
+    /**
+     * Set the value of languages_id.
+     *
+     * @param integer $languages_id
+     * @return \Application\Entity\Locale
+     */
+    public function setLanguagesId($languages_id)
+    {
+        $this->languages_id = $languages_id;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of languages_id.
+     *
+     * @return integer
+     */
+    public function getLanguagesId()
+    {
+        return $this->languages_id;
     }
 
     /**
@@ -299,52 +291,6 @@ class Locale
     }
 
     /**
-     * Add User entity to collection (one to many).
-     *
-     * @param \Application\Entity\User $user
-     * @return \Application\Entity\Locale
-     */
-    public function addUser(User $user)
-    {
-        $this->users[] = $user;
-
-        return $this;
-    }
-
-    /**
-     * Get User entity collection (one to many).
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getUsers()
-    {
-        return $this->users;
-    }
-
-    /**
-     * Set Langauge entity (many to one).
-     *
-     * @param \Application\Entity\Langauge $langauge
-     * @return \Application\Entity\Locale
-     */
-    public function setLangauge(Langauge $langauge = null)
-    {
-        $this->langauge = $langauge;
-
-        return $this;
-    }
-
-    /**
-     * Get Langauge entity (many to one).
-     *
-     * @return \Application\Entity\Langauge
-     */
-    public function getLangauge()
-    {
-        return $this->langauge;
-    }
-
-    /**
      * Set Country entity (many to one).
      *
      * @param \Application\Entity\Country $country
@@ -365,6 +311,29 @@ class Locale
     public function getCountry()
     {
         return $this->country;
+    }
+
+    /**
+     * Set Language entity (many to one).
+     *
+     * @param \Application\Entity\Language $language
+     * @return \Application\Entity\Locale
+     */
+    public function setLanguage(Language $language = null)
+    {
+        $this->language = $language;
+
+        return $this;
+    }
+
+    /**
+     * Get Language entity (many to one).
+     *
+     * @return \Application\Entity\Language
+     */
+    public function getLanguage()
+    {
+        return $this->language;
     }
 
     /**
@@ -460,7 +429,6 @@ class Locale
             return $this->_inputFilter;
         }
         $factory = new InputFactory();
-
         $filters = array(
             array(
                 'name' => 'id',
@@ -469,13 +437,13 @@ class Locale
                 'validators' => array(),
             ),
             array(
-                'name' => 'langauges_id',
+                'name' => 'countries_id',
                 'required' => true,
                 'filters' => array(),
                 'validators' => array(),
             ),
             array(
-                'name' => 'countries_id',
+                'name' => 'languages_id',
                 'required' => true,
                 'filters' => array(),
                 'validators' => array(),
@@ -511,9 +479,7 @@ class Locale
                 'validators' => array(),
             ),
         );
-
         $this->_inputFilter = $factory->createInputFilter($filters);
-
         // End.
         return $this->_inputFilter;
     }
@@ -527,17 +493,14 @@ class Locale
      */
     public function populate(array $data = array())
     {
-
         foreach ($data as $field => $value) {
             $setter = sprintf('set%s', ucfirst(
-                    str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
+                str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
             ));
-
             if (method_exists($this, $setter)) {
                 $this->{$setter}($value);
             }
         }
-
         // End.
         return true;
     }
@@ -551,21 +514,19 @@ class Locale
      */
     public function getArrayCopy(array $fields = array())
     {
-        $orginalFields = get_object_vars($this);
+        $dataFields = array('id', 'countries_id', 'languages_id', 'currencies_id', 'charsets_id', 'timezones_id', 'is_visible', 'name');
+        $relationFields = array('country', 'currency', 'charset', 'timezone', 'language');
         $copiedFields = array();
-
-        foreach ($orginalFields as $field => $value) {
-            switch (true) {
-                case ('_' == $field[0]):
-                // Field is private
-                case (!in_array($field, $fields) && !empty($fields)):
-                    // Exclude field
-                    continue;
-                    break;
-                default:
-                    $copiedFields[$field] = $value;
+        foreach ($dataFields as $field) {
+            if (!in_array($field, $fields) && !empty($fields)) {
+                continue;
             }
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))));
+            $copiedFields[$field] = $this->{$getter}();
         }
+        // foreach ($relationFields as $field => $relation) {
+            // $copiedFields[$field] = $relation->getArrayCopy();
+        // }
 
         // End.
         return $copiedFields;
@@ -573,9 +534,7 @@ class Locale
 
     public function __sleep()
     {
-        return array('id', 'langauges_id', 'countries_id', 'currencies_id', 'charsets_id', 'timezones_id', 'is_visible', 'name');
+        return array('id', 'countries_id', 'languages_id', 'currencies_id', 'charsets_id', 'timezones_id', 'is_visible', 'name');
     }
-
     // Custom methods //////////////////////////////////////////////////////////
 }
-

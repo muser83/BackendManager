@@ -6,13 +6,15 @@ use Doctrine\ORM\Mapping as ORM;
 use Zend\InputFilter\InputFilter,
     Zend\InputFilter\Factory as InputFactory,
     Zend\InputFilter\InputFilterAwareInterface,
-    Zend\InputFilter\InputFilterInterface;
+    Zend\InputFilter\InputFilterInterface,
+    Zend\Crypt\Password\Bcrypt,
+    Zend\Math\Rand;
 
 /**
  * Application\Entity\User
  *
  * @ORM\Entity()
- * @ORM\Table(name="users", indexes={@ORM\Index(name="fk_users_persons_idx", columns={"persons_id"}), @ORM\Index(name="fk_users_locales1_idx", columns={"locales_id"}), @ORM\Index(name="fk_users_roles1_idx", columns={"roles_id"}), @ORM\Index(name="fk_users_settings1_idx", columns={"settings_id"})}, uniqueConstraints={@ORM\UniqueConstraint(name="identity_UNIQUE", columns={"identity"}), @ORM\UniqueConstraint(name="persons_id_UNIQUE", columns={"persons_id"})})
+ * @ORM\Table(name="users", indexes={@ORM\Index(name="fk_users_persons_idx", columns={"persons_id"}), @ORM\Index(name="fk_users_locales1_idx", columns={"locales_id"}), @ORM\Index(name="fk_users_roles1_idx", columns={"roles_id"}), @ORM\Index(name="fk_users_settings1_idx", columns={"settings_id"})}, uniqueConstraints={@ORM\UniqueConstraint(name="identity_UNIQUE", columns={"identity"}), @ORM\UniqueConstraint(name="persons_id_UNIQUE", columns={"persons_id"}), @ORM\UniqueConstraint(name="settings_id_UNIQUE", columns={"settings_id"})})
  */
 class User
     implements InputFilterAwareInterface
@@ -26,25 +28,25 @@ class User
     protected $id;
 
     /**
-     * @ORM\Id
+     * 
      * @ORM\Column(type="integer")
      */
     protected $roles_id;
 
     /**
-     * @ORM\Id
+     * 
      * @ORM\Column(type="integer")
      */
     protected $locales_id;
 
     /**
-     * @ORM\Id
+     * 
      * @ORM\Column(type="integer")
      */
     protected $persons_id;
 
     /**
-     * @ORM\Id
+     * 
      * @ORM\Column(type="integer")
      */
     protected $settings_id;
@@ -65,17 +67,23 @@ class User
     protected $identity;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * $bcrypt->create('300609');
+     *
+     * @ORM\Column(type="string", length=60)
      */
     protected $credential;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * substr(hash('sha512', '300609', 0, 22);
+     *
+     * @ORM\Column(type="string", length=22)
      */
     protected $salt;
 
     /**
-     * @ORM\Column(type="string", length=25, nullable=true)
+     * hash('sha512', '300609');
+     *
+     * @ORM\Column(type="string", length=128, nullable=true)
      */
     protected $verify_token;
 
@@ -95,25 +103,25 @@ class User
     protected $last_active;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Role", inversedBy="users")
+     * @ORM\ManyToOne(targetEntity="Role", fetch="EAGER")
      * @ORM\JoinColumn(name="roles_id", referencedColumnName="id", nullable=false)
      */
     protected $role;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Locale", inversedBy="users")
+     * @ORM\ManyToOne(targetEntity="Locale", fetch="EAGER")
      * @ORM\JoinColumn(name="locales_id", referencedColumnName="id", nullable=false)
      */
     protected $locale;
 
     /**
-     * @ORM\OneToOne(targetEntity="Person", inversedBy="user")
+     * @ORM\OneToOne(targetEntity="Person", fetch="EAGER")
      * @ORM\JoinColumn(name="persons_id", referencedColumnName="id", nullable=false)
      */
     protected $person;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Setting", inversedBy="users")
+     * @ORM\ManyToOne(targetEntity="Setting", fetch="EAGER")
      * @ORM\JoinColumn(name="settings_id", referencedColumnName="id", nullable=false)
      */
     protected $setting;
@@ -506,7 +514,6 @@ class User
      */
     public function setPerson(Person $person = null)
     {
-        $person->setUser($this);
         $this->person = $person;
 
         return $this;
@@ -569,7 +576,6 @@ class User
             return $this->_inputFilter;
         }
         $factory = new InputFactory();
-
         $filters = array(
             array(
                 'name' => 'id',
@@ -656,9 +662,7 @@ class User
                 'validators' => array(),
             ),
         );
-
         $this->_inputFilter = $factory->createInputFilter($filters);
-
         // End.
         return $this->_inputFilter;
     }
@@ -672,17 +676,14 @@ class User
      */
     public function populate(array $data = array())
     {
-
         foreach ($data as $field => $value) {
             $setter = sprintf('set%s', ucfirst(
                     str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
             ));
-
             if (method_exists($this, $setter)) {
                 $this->{$setter}($value);
             }
         }
-
         // End.
         return true;
     }
@@ -696,22 +697,19 @@ class User
      */
     public function getArrayCopy(array $fields = array())
     {
-        $orginalFields = get_object_vars($this);
+        $dataFields = array('id', 'roles_id', 'locales_id', 'persons_id', 'settings_id', 'is_verified', 'is_active', 'identity', 'credential', 'salt', 'verify_token', 'attempts', 'last_attempt', 'last_active');
+        $relationFields = array('person', 'locale', 'role', 'setting');
         $copiedFields = array();
-
-        foreach ($orginalFields as $field => $value) {
-            switch (true) {
-                case ('_' == $field[0]):
-                // Field is private
-                case (!in_array($field, $fields) && !empty($fields)):
-                    // Exclude field
-                    continue;
-                    break;
-                default:
-                    $copiedFields[$field] = $value;
+        foreach ($dataFields as $field) {
+            if (!in_array($field, $fields) && !empty($fields)) {
+                continue;
             }
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))));
+            $copiedFields[$field] = $this->{$getter}();
         }
-
+        // foreach ($relationFields as $field => $relation) {
+        // $copiedFields[$field] = $relation->getArrayCopy();
+        // }
         // End.
         return $copiedFields;
     }
@@ -722,5 +720,149 @@ class User
     }
 
     // Custom methods //////////////////////////////////////////////////////////
-}
 
+    /**
+     * Salt and crypt the credential.
+     * 
+     * @param Users $identity
+     * @return \Application\Entity\User
+     */
+    public function saltCredential(User $identity)
+    {
+        $salt = $identity->getSalt()
+            ? $identity->getSalt()
+            : md5(Rand::getBytes(Bcrypt::MIN_SALT_SIZE));
+
+        $bcrypt = new Bcrypt();
+        $bcrypt->setCost(15);
+        $bcrypt->setSalt($salt);
+
+        $this->credential = $bcrypt->create($this->credential);
+
+        // End.
+        return $this;
+    }
+
+    /**
+     * COMMENTME
+     * 
+     * @return boolean
+     */
+    public function isLockedOut()
+    {
+        $lockoutTime = $this->getLockoutDateTime()->getTimestamp();
+        $dt = new \DateTime();
+        $now = $dt->getTimestamp();
+
+        if (($this->attempts >= $this->getAttemptsToLockout()) && ($now <= $lockoutTime)) {
+            // End.
+            return true;
+        }
+
+        // End.
+        return false;
+    }
+
+    /**
+     * COMMENTME
+     * 
+     * @return integer
+     */
+    public function increaseAttept()
+    {
+        $this->attempts += 1;
+
+        // End.
+        return $this->attempts;
+    }
+
+    /**
+     * COMMENTME
+     * 
+     * @return InputFilterInterface
+     */
+    public function getAuthenticateInputFilter()
+    {
+        $factory = new InputFactory();
+        $filters = array(
+            array(
+                'name' => 'identity',
+                'required' => true,
+                'filters' => array(),
+                'validators' => array(),
+            ),
+            array(
+                'name' => 'credential',
+                'required' => true,
+                'filters' => array(),
+                'validators' => array(),
+            ),
+            array(
+                'name' => 'verify_token',
+                'required' => true,
+                'filters' => array(),
+                'validators' => array(),
+            ),
+        );
+        $inputFilter = $factory->createInputFilter($filters);
+
+        // End.
+        return $inputFilter;
+    }
+
+    /**
+     * COMMENTME
+     * 
+     * @return \DateTime
+     */
+    public function getLockoutDateTime()
+    {
+        $lockoutTime = 2400;
+        $dt = new \DateTime();
+
+        if (!$this->last_attempt instanceof \DateTime) {
+            $this->last_attempt = $dt;
+        }
+
+        $lastAttemptTime = $this->last_attempt->getTimestamp();
+        $lockoutTime = $lastAttemptTime + ($this->attempts * ($lockoutTime / 1000));
+        $dt->setTimestamp($lockoutTime);
+
+        // End.
+        return $dt;
+    }
+
+    /**
+     * COMMENTME
+     * 
+     * @return boolean Void.
+     */
+    public function getAttemptsToLockout()
+    {
+        // End.
+        return 5; // 25
+    }
+
+    /**
+     * COMMENTME
+     * 
+     * @return array
+     */
+    public function getSecureArrayCopy()
+    {
+        $privateFields = array('credential', 'salt', 'verify_token');
+        $secureFields = array();
+
+        foreach ($this->getArrayCopy() as $field => $value) {
+            if (in_array($field, $privateFields)) {
+                continue;
+            }
+
+            $secureFields[$field] = $value;
+        }
+
+        // End.
+        return $secureFields;
+    }
+
+}

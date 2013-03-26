@@ -17,7 +17,6 @@ use Zend\InputFilter\InputFilter,
 class Message
     implements InputFilterAwareInterface
 {
-
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -26,7 +25,7 @@ class Message
     protected $id;
 
     /**
-     * @ORM\Id
+     * 
      * @ORM\Column(type="integer")
      */
     protected $to_persons_id;
@@ -62,13 +61,13 @@ class Message
     protected $cdate;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Person", inversedBy="messagesRelatedByToPersonsId")
+     * @ORM\ManyToOne(targetEntity="Person", fetch="EAGER")
      * @ORM\JoinColumn(name="to_persons_id", referencedColumnName="id", nullable=false)
      */
     protected $personRelatedByToPersonsId;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Person", inversedBy="messagesRelatedByFromPersonsId")
+     * @ORM\ManyToOne(targetEntity="Person", fetch="EAGER")
      * @ORM\JoinColumn(name="from_persons_id", referencedColumnName="id")
      */
     protected $personRelatedByFromPersonsId;
@@ -82,7 +81,6 @@ class Message
 
     public function __construct()
     {
-        
     }
 
     /**
@@ -339,7 +337,6 @@ class Message
             return $this->_inputFilter;
         }
         $factory = new InputFactory();
-
         $filters = array(
             array(
                 'name' => 'id',
@@ -396,9 +393,7 @@ class Message
                 'validators' => array(),
             ),
         );
-
         $this->_inputFilter = $factory->createInputFilter($filters);
-
         // End.
         return $this->_inputFilter;
     }
@@ -412,17 +407,14 @@ class Message
      */
     public function populate(array $data = array())
     {
-
         foreach ($data as $field => $value) {
             $setter = sprintf('set%s', ucfirst(
-                    str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
+                str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
             ));
-
             if (method_exists($this, $setter)) {
                 $this->{$setter}($value);
             }
         }
-
         // End.
         return true;
     }
@@ -436,21 +428,19 @@ class Message
      */
     public function getArrayCopy(array $fields = array())
     {
-        $orginalFields = get_object_vars($this);
+        $dataFields = array('id', 'to_persons_id', 'from_persons_id', 'is_read', 'is_trash', 'is_deleted', 'subject', 'message', 'cdate');
+        $relationFields = array('person', 'person');
         $copiedFields = array();
-
-        foreach ($orginalFields as $field => $value) {
-            switch (true) {
-                case ('_' == $field[0]):
-                // Field is private
-                case (!in_array($field, $fields) && !empty($fields)):
-                    // Exclude field
-                    continue;
-                    break;
-                default:
-                    $copiedFields[$field] = $value;
+        foreach ($dataFields as $field) {
+            if (!in_array($field, $fields) && !empty($fields)) {
+                continue;
             }
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))));
+            $copiedFields[$field] = $this->{$getter}();
         }
+        // foreach ($relationFields as $field => $relation) {
+            // $copiedFields[$field] = $relation->getArrayCopy();
+        // }
 
         // End.
         return $copiedFields;
@@ -460,7 +450,5 @@ class Message
     {
         return array('id', 'to_persons_id', 'from_persons_id', 'is_read', 'is_trash', 'is_deleted', 'subject', 'message', 'cdate');
     }
-
     // Custom methods //////////////////////////////////////////////////////////
 }
-

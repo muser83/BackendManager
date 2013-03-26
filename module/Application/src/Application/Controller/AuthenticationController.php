@@ -110,6 +110,8 @@ class AuthenticationController
             'identity' => $user->getIdentity()
         ));
 
+        $identity instanceof Entity\User;
+
         if (!$identity) {
             // End.
             return $this->getIvalidLoginResponse();
@@ -137,7 +139,7 @@ class AuthenticationController
             return $this->getIvalidLoginResponse(false);
         }
 
-        if ($identity->getAttempts() >= $identity::ATTEMPTS_TO_LOCKOUT) {
+        if ($identity->getAttempts() >= $identity->getAttemptsToLockout()) {
             $person = $identity->getPersons();
             $message = new Messages(
                 $person, $this->lockoutMessageSubject, sprintf($this->lockoutMessage, $identity->getLockoutDateTime()->format('r'))
@@ -153,8 +155,7 @@ class AuthenticationController
         // Store the identity in a session object.
         $session = new AuthSession();
 //        $session->clear();
-        $session->write($identity);
-
+//        $session->write($identity);
         // End. forward to the system controller.
         return $this->forward()->dispatch('system', array('action' => 'get-user'));
     }
@@ -186,7 +187,7 @@ class AuthenticationController
         $csrf->getHash(true); // Flush csrf token.
 
         $user = new User();
-        $filter = $user->getInputFilter();
+        $filter = $user->getAuthenticateInputFilter();
         $filter->setData($postData);
         $userIsValid = $filter->isValid();
 
@@ -197,7 +198,7 @@ class AuthenticationController
     /**
      * COMMENTME
      * 
-     * @param \Application\Entity\Users $user
+     * @param \Application\Entity\User $user
      * @param boolean $sleep
      * @return \Zend\View\Model\JsonModel
      */
@@ -211,6 +212,7 @@ class AuthenticationController
 
         $responseConfig = array(
             'success' => true,
+            'message' => $this->invalidLoginResponseMessage,
             'user' => $user->getArrayCopy(array('identity', 'credential', 'verify_token'))
         );
 
@@ -226,10 +228,10 @@ class AuthenticationController
     /**
      * COMMENTME
      * 
-     * @param Application\Entity\Users $identity
+     * @param Application\Entity\User $identity
      * @return boolean
      */
-    private function increaseAttept(\Application\Entity\Users $identity)
+    private function increaseAttept(\Application\Entity\User $identity)
     {
         $identity->increaseAttept();
         $identity->setLastAttempt(new \DateTime());

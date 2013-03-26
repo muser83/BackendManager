@@ -18,7 +18,6 @@ use Zend\InputFilter\InputFilter,
 class Setting
     implements InputFilterAwareInterface
 {
-
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -42,12 +41,6 @@ class Setting
     protected $default_action_uri;
 
     /**
-     * @ORM\OneToMany(targetEntity="User", mappedBy="setting")
-     * @ORM\JoinColumn(name="settings_id", referencedColumnName="id", nullable=false)
-     */
-    protected $users;
-
-    /**
      * Instance of InputFilterInterface.
      *
      * @var InputFilter
@@ -56,7 +49,6 @@ class Setting
 
     public function __construct()
     {
-        $this->users = new ArrayCollection();
     }
 
     /**
@@ -152,29 +144,6 @@ class Setting
     }
 
     /**
-     * Add User entity to collection (one to many).
-     *
-     * @param \Application\Entity\User $user
-     * @return \Application\Entity\Setting
-     */
-    public function addUser(User $user)
-    {
-        $this->users[] = $user;
-
-        return $this;
-    }
-
-    /**
-     * Get User entity collection (one to many).
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getUsers()
-    {
-        return $this->users;
-    }
-
-    /**
      * Not used, Only defined to be compatible with InputFilterAwareInterface.
      * 
      * @param \Zend\InputFilter\InputFilterInterface $inputFilter
@@ -198,7 +167,6 @@ class Setting
             return $this->_inputFilter;
         }
         $factory = new InputFactory();
-
         $filters = array(
             array(
                 'name' => 'id',
@@ -225,9 +193,7 @@ class Setting
                 'validators' => array(),
             ),
         );
-
         $this->_inputFilter = $factory->createInputFilter($filters);
-
         // End.
         return $this->_inputFilter;
     }
@@ -241,17 +207,14 @@ class Setting
      */
     public function populate(array $data = array())
     {
-
         foreach ($data as $field => $value) {
             $setter = sprintf('set%s', ucfirst(
-                    str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
+                str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
             ));
-
             if (method_exists($this, $setter)) {
                 $this->{$setter}($value);
             }
         }
-
         // End.
         return true;
     }
@@ -265,21 +228,19 @@ class Setting
      */
     public function getArrayCopy(array $fields = array())
     {
-        $orginalFields = get_object_vars($this);
+        $dataFields = array('id', 'lock_system_after', 'shutdown_system_after', 'default_action_uri');
+        $relationFields = array();
         $copiedFields = array();
-
-        foreach ($orginalFields as $field => $value) {
-            switch (true) {
-                case ('_' == $field[0]):
-                // Field is private
-                case (!in_array($field, $fields) && !empty($fields)):
-                    // Exclude field
-                    continue;
-                    break;
-                default:
-                    $copiedFields[$field] = $value;
+        foreach ($dataFields as $field) {
+            if (!in_array($field, $fields) && !empty($fields)) {
+                continue;
             }
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))));
+            $copiedFields[$field] = $this->{$getter}();
         }
+        // foreach ($relationFields as $field => $relation) {
+            // $copiedFields[$field] = $relation->getArrayCopy();
+        // }
 
         // End.
         return $copiedFields;
@@ -289,7 +250,5 @@ class Setting
     {
         return array('id', 'lock_system_after', 'shutdown_system_after', 'default_action_uri');
     }
-
     // Custom methods //////////////////////////////////////////////////////////
 }
-

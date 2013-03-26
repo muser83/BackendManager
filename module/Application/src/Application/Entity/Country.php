@@ -13,12 +13,11 @@ use Zend\InputFilter\InputFilter,
  * Application\Entity\Country
  *
  * @ORM\Entity()
- * @ORM\Table(name="countries", indexes={@ORM\Index(name="fk_countries_continents1_idx", columns={"continents_id"})}, uniqueConstraints={@ORM\UniqueConstraint(name="name_UNIQUE", columns={"name"}), @ORM\UniqueConstraint(name="iso31662_UNIQUE", columns={"iso31662"}), @ORM\UniqueConstraint(name="iso31663_UNIQUE", columns={"iso31663"}), @ORM\UniqueConstraint(name="tld_UNIQUE", columns={"tld"}), @ORM\UniqueConstraint(name="calling_code_UNIQUE", columns={"calling_code"}), @ORM\UniqueConstraint(name="local_name_UNIQUE", columns={"local_name"})})
+ * @ORM\Table(name="countries", indexes={@ORM\Index(name="fk_countries_continents1_idx", columns={"continents_id"})}, uniqueConstraints={@ORM\UniqueConstraint(name="name_UNIQUE", columns={"name"}), @ORM\UniqueConstraint(name="iso31662_UNIQUE", columns={"iso31662"}), @ORM\UniqueConstraint(name="iso31663_UNIQUE", columns={"iso31663"}), @ORM\UniqueConstraint(name="tld_UNIQUE", columns={"tld"}), @ORM\UniqueConstraint(name="local_name_UNIQUE", columns={"local_name"})})
  */
 class Country
     implements InputFilterAwareInterface
 {
-
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -27,7 +26,7 @@ class Country
     protected $id;
 
     /**
-     * @ORM\Id
+     * 
      * @ORM\Column(type="integer")
      */
     protected $continents_id;
@@ -68,19 +67,7 @@ class Country
     protected $calling_code;
 
     /**
-     * @ORM\OneToMany(targetEntity="Locale", mappedBy="country")
-     * @ORM\JoinColumn(name="countries_id", referencedColumnName="id", nullable=false)
-     */
-    protected $locales;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Province", mappedBy="country")
-     * @ORM\JoinColumn(name="countries_id", referencedColumnName="id", nullable=false)
-     */
-    protected $provinces;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Continent", inversedBy="countries")
+     * @ORM\ManyToOne(targetEntity="Continent")
      * @ORM\JoinColumn(name="continents_id", referencedColumnName="id", nullable=false)
      */
     protected $continent;
@@ -94,8 +81,6 @@ class Country
 
     public function __construct()
     {
-        $this->locales = new ArrayCollection();
-        $this->provinces = new ArrayCollection();
     }
 
     /**
@@ -306,52 +291,6 @@ class Country
     }
 
     /**
-     * Add Locale entity to collection (one to many).
-     *
-     * @param \Application\Entity\Locale $locale
-     * @return \Application\Entity\Country
-     */
-    public function addLocale(Locale $locale)
-    {
-        $this->locales[] = $locale;
-
-        return $this;
-    }
-
-    /**
-     * Get Locale entity collection (one to many).
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getLocales()
-    {
-        return $this->locales;
-    }
-
-    /**
-     * Add Province entity to collection (one to many).
-     *
-     * @param \Application\Entity\Province $province
-     * @return \Application\Entity\Country
-     */
-    public function addProvince(Province $province)
-    {
-        $this->provinces[] = $province;
-
-        return $this;
-    }
-
-    /**
-     * Get Province entity collection (one to many).
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getProvinces()
-    {
-        return $this->provinces;
-    }
-
-    /**
      * Set Continent entity (many to one).
      *
      * @param \Application\Entity\Continent $continent
@@ -398,7 +337,6 @@ class Country
             return $this->_inputFilter;
         }
         $factory = new InputFactory();
-
         $filters = array(
             array(
                 'name' => 'id',
@@ -455,9 +393,7 @@ class Country
                 'validators' => array(),
             ),
         );
-
         $this->_inputFilter = $factory->createInputFilter($filters);
-
         // End.
         return $this->_inputFilter;
     }
@@ -471,17 +407,14 @@ class Country
      */
     public function populate(array $data = array())
     {
-
         foreach ($data as $field => $value) {
             $setter = sprintf('set%s', ucfirst(
-                    str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
+                str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
             ));
-
             if (method_exists($this, $setter)) {
                 $this->{$setter}($value);
             }
         }
-
         // End.
         return true;
     }
@@ -495,21 +428,19 @@ class Country
      */
     public function getArrayCopy(array $fields = array())
     {
-        $orginalFields = get_object_vars($this);
+        $dataFields = array('id', 'continents_id', 'is_visible', 'name', 'local_name', 'iso31662', 'iso31663', 'tld', 'calling_code');
+        $relationFields = array('continent');
         $copiedFields = array();
-
-        foreach ($orginalFields as $field => $value) {
-            switch (true) {
-                case ('_' == $field[0]):
-                // Field is private
-                case (!in_array($field, $fields) && !empty($fields)):
-                    // Exclude field
-                    continue;
-                    break;
-                default:
-                    $copiedFields[$field] = $value;
+        foreach ($dataFields as $field) {
+            if (!in_array($field, $fields) && !empty($fields)) {
+                continue;
             }
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))));
+            $copiedFields[$field] = $this->{$getter}();
         }
+        // foreach ($relationFields as $field => $relation) {
+            // $copiedFields[$field] = $relation->getArrayCopy();
+        // }
 
         // End.
         return $copiedFields;
@@ -519,7 +450,5 @@ class Country
     {
         return array('id', 'continents_id', 'is_visible', 'name', 'local_name', 'iso31662', 'iso31663', 'tld', 'calling_code');
     }
-
     // Custom methods //////////////////////////////////////////////////////////
 }
-

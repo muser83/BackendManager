@@ -18,7 +18,6 @@ use Zend\InputFilter\InputFilter,
 class Currency
     implements InputFilterAwareInterface
 {
-
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -46,12 +45,6 @@ class Currency
     protected $symbol;
 
     /**
-     * @ORM\OneToMany(targetEntity="Locale", mappedBy="currency")
-     * @ORM\JoinColumn(name="currencies_id", referencedColumnName="id", nullable=false)
-     */
-    protected $locales;
-
-    /**
      * Instance of InputFilterInterface.
      *
      * @var InputFilter
@@ -60,7 +53,6 @@ class Currency
 
     public function __construct()
     {
-        $this->locales = new ArrayCollection();
     }
 
     /**
@@ -179,29 +171,6 @@ class Currency
     }
 
     /**
-     * Add Locale entity to collection (one to many).
-     *
-     * @param \Application\Entity\Locale $locale
-     * @return \Application\Entity\Currency
-     */
-    public function addLocale(Locale $locale)
-    {
-        $this->locales[] = $locale;
-
-        return $this;
-    }
-
-    /**
-     * Get Locale entity collection (one to many).
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getLocales()
-    {
-        return $this->locales;
-    }
-
-    /**
      * Not used, Only defined to be compatible with InputFilterAwareInterface.
      * 
      * @param \Zend\InputFilter\InputFilterInterface $inputFilter
@@ -225,7 +194,6 @@ class Currency
             return $this->_inputFilter;
         }
         $factory = new InputFactory();
-
         $filters = array(
             array(
                 'name' => 'id',
@@ -258,9 +226,7 @@ class Currency
                 'validators' => array(),
             ),
         );
-
         $this->_inputFilter = $factory->createInputFilter($filters);
-
         // End.
         return $this->_inputFilter;
     }
@@ -274,17 +240,14 @@ class Currency
      */
     public function populate(array $data = array())
     {
-
         foreach ($data as $field => $value) {
             $setter = sprintf('set%s', ucfirst(
-                    str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
+                str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
             ));
-
             if (method_exists($this, $setter)) {
                 $this->{$setter}($value);
             }
         }
-
         // End.
         return true;
     }
@@ -298,21 +261,19 @@ class Currency
      */
     public function getArrayCopy(array $fields = array())
     {
-        $orginalFields = get_object_vars($this);
+        $dataFields = array('id', 'is_visible', 'name', 'iso4217', 'symbol');
+        $relationFields = array();
         $copiedFields = array();
-
-        foreach ($orginalFields as $field => $value) {
-            switch (true) {
-                case ('_' == $field[0]):
-                // Field is private
-                case (!in_array($field, $fields) && !empty($fields)):
-                    // Exclude field
-                    continue;
-                    break;
-                default:
-                    $copiedFields[$field] = $value;
+        foreach ($dataFields as $field) {
+            if (!in_array($field, $fields) && !empty($fields)) {
+                continue;
             }
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))));
+            $copiedFields[$field] = $this->{$getter}();
         }
+        // foreach ($relationFields as $field => $relation) {
+            // $copiedFields[$field] = $relation->getArrayCopy();
+        // }
 
         // End.
         return $copiedFields;
@@ -322,7 +283,5 @@ class Currency
     {
         return array('id', 'is_visible', 'name', 'iso4217', 'symbol');
     }
-
     // Custom methods //////////////////////////////////////////////////////////
 }
-

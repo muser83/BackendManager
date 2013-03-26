@@ -17,7 +17,6 @@ use Zend\InputFilter\InputFilter,
 class Communication
     implements InputFilterAwareInterface
 {
-
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -73,13 +72,7 @@ class Communication
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
      */
-    protected $faxe;
-
-    /**
-     * @ORM\OneToOne(targetEntity="Person", mappedBy="communication")
-     * @ORM\JoinColumn(name="communications_id", referencedColumnName="id", nullable=false)
-     */
-    protected $person;
+    protected $fax;
 
     /**
      * Instance of InputFilterInterface.
@@ -90,7 +83,6 @@ class Communication
 
     public function __construct()
     {
-        
     }
 
     /**
@@ -324,49 +316,26 @@ class Communication
     }
 
     /**
-     * Set the value of faxe.
+     * Set the value of fax.
      *
-     * @param string $faxe
+     * @param string $fax
      * @return \Application\Entity\Communication
      */
-    public function setFaxe($faxe)
+    public function setFax($fax)
     {
-        $this->faxe = $faxe;
+        $this->fax = $fax;
 
         return $this;
     }
 
     /**
-     * Get the value of faxe.
+     * Get the value of fax.
      *
      * @return string
      */
-    public function getFaxe()
+    public function getFax()
     {
-        return $this->faxe;
-    }
-
-    /**
-     * Set Person entity (one to one).
-     *
-     * @param \Application\Entity\Person $person
-     * @return \Application\Entity\Communication
-     */
-    public function setPerson(Person $person)
-    {
-        $this->person = $person;
-
-        return $this;
-    }
-
-    /**
-     * Get Person entity (one to one).
-     *
-     * @return \Application\Entity\Person
-     */
-    public function getPerson()
-    {
-        return $this->person;
+        return $this->fax;
     }
 
     /**
@@ -393,7 +362,6 @@ class Communication
             return $this->_inputFilter;
         }
         $factory = new InputFactory();
-
         $filters = array(
             array(
                 'name' => 'id',
@@ -456,15 +424,13 @@ class Communication
                 'validators' => array(),
             ),
             array(
-                'name' => 'faxe',
+                'name' => 'fax',
                 'required' => false,
                 'filters' => array(),
                 'validators' => array(),
             ),
         );
-
         $this->_inputFilter = $factory->createInputFilter($filters);
-
         // End.
         return $this->_inputFilter;
     }
@@ -478,17 +444,14 @@ class Communication
      */
     public function populate(array $data = array())
     {
-
         foreach ($data as $field => $value) {
             $setter = sprintf('set%s', ucfirst(
-                    str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
+                str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
             ));
-
             if (method_exists($this, $setter)) {
                 $this->{$setter}($value);
             }
         }
-
         // End.
         return true;
     }
@@ -502,21 +465,19 @@ class Communication
      */
     public function getArrayCopy(array $fields = array())
     {
-        $orginalFields = get_object_vars($this);
+        $dataFields = array('id', 'email', 'facebook', 'twitter', 'url1', 'url2', 'url3', 'phone', 'mobile', 'skype', 'fax');
+        $relationFields = array();
         $copiedFields = array();
-
-        foreach ($orginalFields as $field => $value) {
-            switch (true) {
-                case ('_' == $field[0]):
-                // Field is private
-                case (!in_array($field, $fields) && !empty($fields)):
-                    // Exclude field
-                    continue;
-                    break;
-                default:
-                    $copiedFields[$field] = $value;
+        foreach ($dataFields as $field) {
+            if (!in_array($field, $fields) && !empty($fields)) {
+                continue;
             }
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))));
+            $copiedFields[$field] = $this->{$getter}();
         }
+        // foreach ($relationFields as $field => $relation) {
+            // $copiedFields[$field] = $relation->getArrayCopy();
+        // }
 
         // End.
         return $copiedFields;
@@ -524,9 +485,7 @@ class Communication
 
     public function __sleep()
     {
-        return array('id', 'email', 'facebook', 'twitter', 'url1', 'url2', 'url3', 'phone', 'mobile', 'skype', 'faxe');
+        return array('id', 'email', 'facebook', 'twitter', 'url1', 'url2', 'url3', 'phone', 'mobile', 'skype', 'fax');
     }
-
     // Custom methods //////////////////////////////////////////////////////////
 }
-
