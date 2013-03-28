@@ -31,6 +31,7 @@
 -  Do not overwrite the current controller
 5. Show an error if an controller is dispatched and the system is not started-up.
 -  If the authentication request returns an exception, the report issue shows up.
+6. Use EntityRepositories instead of eager loading.
 
 
 

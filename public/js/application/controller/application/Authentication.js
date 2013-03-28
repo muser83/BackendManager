@@ -119,7 +119,7 @@ Ext.define('App.controller.application.Authentication', {
             });
 
             hash = md5.hash(
-                userModel.get('identity') +
+                userModel.get('identity').toLowerCase() +
                 userModel.get('credential'));
             hash = md5.hash(hash);
             userModel.set('credential', hash);

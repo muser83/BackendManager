@@ -18,6 +18,7 @@ use Zend\InputFilter\InputFilter,
 class Person
     implements InputFilterAwareInterface
 {
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -69,7 +70,7 @@ class Person
     protected $address;
 
     /**
-     * @ORM\OneToOne(targetEntity="Communication", fetch="EAGER")
+     * @ORM\OneToOne(targetEntity="Communication")
      * @ORM\JoinColumn(name="communications_id", referencedColumnName="id", nullable=false)
      */
     protected $communication;
@@ -83,6 +84,7 @@ class Person
 
     public function __construct()
     {
+        
     }
 
     /**
@@ -405,7 +407,7 @@ class Person
     {
         foreach ($data as $field => $value) {
             $setter = sprintf('set%s', ucfirst(
-                str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
+                    str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
             ));
             if (method_exists($this, $setter)) {
                 $this->{$setter}($value);
@@ -435,9 +437,8 @@ class Person
             $copiedFields[$field] = $this->{$getter}();
         }
         // foreach ($relationFields as $field => $relation) {
-            // $copiedFields[$field] = $relation->getArrayCopy();
+        // $copiedFields[$field] = $relation->getArrayCopy();
         // }
-
         // End.
         return $copiedFields;
     }
@@ -446,5 +447,7 @@ class Person
     {
         return array('id', 'addresses_id', 'communications_id', 'firstname', 'middlename', 'lastname', 'gender', 'birthday');
     }
+
     // Custom methods //////////////////////////////////////////////////////////
 }
+

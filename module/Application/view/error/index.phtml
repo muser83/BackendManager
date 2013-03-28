@@ -11,36 +11,39 @@ if ($requestedWith && ('XMLHttpRequest' === $requestedWith)):
 
     $response = array(
         'success' => false,
-        'message' => "An error occurred"
+        'message' => "An error occurred."
     );
 
     if (isset($this->display_exceptions) && $this->display_exceptions) {
-        if (!isset($this->exception) || !$this->exception instanceof Exception) {
+        if (!$this->exception || !$this->exception instanceof \Exception) {
             $response['exception'] = 'No Exception available';
         } else {
-            $response['exception']['file'] = sprintf(
-                '%s:%s', $this->exception->getFile(), $this->exception->getLine()
+            $response['exception'] = array(
+                'message' => $this->exception->getMessage(),
+                'file' => sprintf(
+                    '%s:%s', $this->exception->getFile(), $this->exception->getLine()
+                ),
+                'exception' => get_class($this->exception),
+                'trace' => $this->exception->getTraceAsString(),
+                'previous' => array(),
             );
-            $response['exception']['message'] = $this->exception->getMessage();
-            $response['exception']['trace'] = $this->exception->getTraceAsString();
-            $response['exception']['exception'] = get_class($this->exception);
 
-            if ($this->exception->getPrevious()) {
-                $response['exception']['previous'] = array();
-
-                foreach ($this->exception->getPrevious() as $i => $previous) {
-                    $response['exception']['previous'][$i]['file'] = sprintf(
+            $previous = $this->exception->getPrevious();
+            if ($previous) {
+                $response['exception']['previous'] = array(
+                    'message' => $previous->getMessage(),
+                    'file' => sprintf(
                         '%s:%s', $previous->getFile(), $previous->getLine()
-                    );
-                    $response['exception']['previous'][$i]['message'] = $previous->getMessage();
-                    $response['exception']['previous'][$i]['trace'] = $previous->getTraceAsString;
-                    $response['exception']['previous'][$i]['exception'] = get_class($previous);
-                }
+                    ),
+                    'exception' => get_class($previous),
+                    'trace' => $previous->getTraceAsString(),
+                );
             }
         }
     }
 
     print json_encode($response);
+    die; // Ugly work-around.
 else:
     ?>
     TODO print data in view/error/index

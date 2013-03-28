@@ -18,7 +18,8 @@ use Zend\Mvc\Controller\AbstractActionController,
     Zend\Validator\Csrf as CsrfValidator,
     Doctrine\ORM\EntityManager,
     Application\Entity\User,
-    Application\Entity\Messages;
+    Application\Entity\Message,
+    Application\Entity\Log;
 
 /**
  * Controller description
@@ -36,6 +37,8 @@ class AuthenticationController
     private $lockoutResponseMessage = 'Your account is temporary blocked until %s.';
     private $lockoutMessageSubject = 'Your account is temporary blocked.';
     private $lockoutMessage = 'Your account is temporary blocked until %s.';
+    private $logMessage;
+    private $logUser;
 
     /**
      * Instance of \Doctrine\ORM\EntityManager.
@@ -80,30 +83,33 @@ class AuthenticationController
     }
 
     /**
-     *
+     * COMMENTME
+     * 
+     * @return \Zend\Mvc\Controller\Plugin\Forward
      */
     public function loginAction()
     {
         $request = $this->getRequest();
 
+
         if (!$request->isPost() || (null === $request->getPost('user'))) {
             // End.
-            return $this->getIvalidLoginResponse(false);
+            return $this->getIvalidLoginResponse(false, 'Request for authentication shell.');
         }
 
         $postData = Json::decode(
                 $request->getPost('user', '{}'), Json::TYPE_ARRAY
         );
 
-        // Check if the login attempt is valid.
-        $isValidAttempt = $this->isValidLogin($postData);
-        if (!$isValidAttempt) {
-            // End.
-            return $this->getIvalidLoginResponse();
-        }
-
         $user = new User();
         $user->populate($postData);
+
+        // Check if the login attempt is valid.
+        $isValidAttempt = $this->isValidLogin($user);
+        if (!$isValidAttempt) {
+            // End.
+            return $this->getIvalidLoginResponse(true, 'Invalid post data.');
+        }
 
         $identity = $this->getEntityManager()->getRepository('Application\Entity\User')
             ->findOneBy(array(
@@ -113,8 +119,9 @@ class AuthenticationController
         $identity instanceof Entity\User;
 
         if (!$identity) {
+
             // End.
-            return $this->getIvalidLoginResponse();
+            return $this->getIvalidLoginResponse(true, 'No identity found.');
         }
 
         // Check if the user is locked out.
@@ -126,36 +133,44 @@ class AuthenticationController
             $this->increaseAttept($identity);
 
             // End.
-            return $this->getIvalidLoginResponse();
+            return $this->getIvalidLoginResponse(true, 'User is locked out.', $identity);
         }
 
-        // The user does exists, now check the credential.
         $user->saltCredential($identity);
 
         if ($user->getCredential() !== $identity->getCredential()) {
             $this->increaseAttept($identity);
 
-            // End. the credentials do not match.
-            return $this->getIvalidLoginResponse(false);
+            // End. the credentials doesn't match.
+            return $this->getIvalidLoginResponse(false, 'Invalid authentication credential.', $identity);
         }
 
         if ($identity->getAttempts() >= $identity->getAttemptsToLockout()) {
-            $person = $identity->getPersons();
-            $message = new Messages(
-                $person, $this->lockoutMessageSubject, sprintf($this->lockoutMessage, $identity->getLockoutDateTime()->format('r'))
-            );
+            $person = $identity->getPerson();
+            $subject = $this->lockoutMessageSubject;
+            $messageStr = sprintf($this->lockoutMessage, $identity->getLockoutDateTime()->format('r'));
 
-            $this->entityManager->persist($message);
-            $this->entityManager->flush();
+            $message = new Message();
+            $message->write($person, $subject, $messageStr);
+
+            $this->getEntityManager()->persist($message);
+            $this->getEntityManager()->flush();
         }
 
-        $identity->setAttempts(0);
+        $identity
+            ->setIsActive(true)
+            ->setAttempts(0)
+            ->setLastActive(new \DateTime());
+
+        $this->log('Successful authentication.', $identity);
+
         $this->getEntityManager()->flush();
 
         // Store the identity in a session object.
         $session = new AuthSession();
-//        $session->clear();
-//        $session->write($identity);
+        $session->clear();
+        $session->write($identity);
+
         // End. forward to the system controller.
         return $this->forward()->dispatch('system', array('action' => 'get-user'));
     }
@@ -173,22 +188,39 @@ class AuthenticationController
     /**
      * COMMENTME
      * 
-     * @param array $postData
-     * @return boolean
+     * @param string $message
+     * @param \Application\Entity\User $user
+     * @return \Application\Controller\AuthenticationController
      */
-    private function isValidLogin(array $postData)
+    private function log($message, User $user = null)
     {
-        $csrfToken = isset($postData['verify_token'])
-            ? $postData['verify_token']
-            : null;
+        $em = $this->getEntityManager();
+        $logEvent = $this->getEntityManager()->getReference('Application\Entity\Logevent', 3);
 
+        $log = new Log();
+        $log->write($message, $logEvent, $user);
+
+        $em->persist($log);
+        $em->flush();
+
+        // End.
+        return $this;
+    }
+
+    /**
+     * COMMENTME
+     * 
+     * @param \Application\Entity\User $user
+     * @return type
+     */
+    private function isValidLogin(User $user)
+    {
         $csrf = new CsrfValidator();
-        $csrfIsValid = $csrf->isValid($csrfToken);
+        $csrfIsValid = $csrf->isValid($user->getVerifyToken());
         $csrf->getHash(true); // Flush csrf token.
 
-        $user = new User();
         $filter = $user->getAuthenticateInputFilter();
-        $filter->setData($postData);
+        $filter->setData($user->getArrayCopy());
         $userIsValid = $filter->isValid();
 
         // End.
@@ -202,8 +234,12 @@ class AuthenticationController
      * @param boolean $sleep
      * @return \Zend\View\Model\JsonModel
      */
-    private function getIvalidLoginResponse($sleep = true)
+    private function getIvalidLoginResponse($sleep = true, $logMessage = null, $logUser = null)
     {
+        if (is_string($logMessage)) {
+            $this->log($logMessage, $logUser);
+        }
+
         $csrf = new CsrfValidator();
         $csrfToken = $csrf->getHash(true);
 

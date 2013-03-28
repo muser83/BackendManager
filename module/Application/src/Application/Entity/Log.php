@@ -9,14 +9,15 @@ use Zend\InputFilter\InputFilter,
     Zend\InputFilter\InputFilterInterface;
 
 /**
- * Application\Entity\Address
+ * Application\Entity\Log
  *
  * @ORM\Entity()
- * @ORM\Table(name="addresses", indexes={@ORM\Index(name="fk_addresses_countries1_idx", columns={"countries_id"}), @ORM\Index(name="fk_addresses_provinces1_idx", columns={"provinces_id"})})
+ * @ORM\Table(name="logs", indexes={@ORM\Index(name="fk_logs_users1_idx", columns={"users_id"}), @ORM\Index(name="fk_logs_logevents1_idx", columns={"logevents_id"})})
  */
-class Address
+class Log
     implements InputFilterAwareInterface
 {
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -28,40 +29,39 @@ class Address
      * 
      * @ORM\Column(type="integer")
      */
-    protected $countries_id;
+    protected $logevents_id;
 
     /**
-     * 
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string", length=255)
      */
-    protected $provinces_id;
+    protected $message;
 
     /**
-     * @ORM\Column(type="string", length=100)
+     * @ORM\Column(type="string", length=50)
      */
-    protected $address;
+    protected $ip_address;
 
     /**
-     * @ORM\Column(type="string", length=25, nullable=true)
+     * @ORM\Column(type="string", length=9)
      */
-    protected $postalcode;
+    protected $session;
 
     /**
-     * @ORM\Column(type="string", length=50, nullable=true)
+     * @ORM\Column(type="datetime")
      */
-    protected $city;
+    protected $cdate;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Country")
-     * @ORM\JoinColumn(name="countries_id", referencedColumnName="id", nullable=false)
+     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\JoinColumn(name="users_id", referencedColumnName="id")
      */
-    protected $country;
+    protected $user;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Province")
-     * @ORM\JoinColumn(name="provinces_id", referencedColumnName="id", nullable=false)
+     * @ORM\ManyToOne(targetEntity="Logevent")
+     * @ORM\JoinColumn(name="logevents_id", referencedColumnName="id", nullable=false)
      */
-    protected $province;
+    protected $logevent;
 
     /**
      * Instance of InputFilterInterface.
@@ -72,13 +72,14 @@ class Address
 
     public function __construct()
     {
+        
     }
 
     /**
      * Set the value of id.
      *
      * @param integer $id
-     * @return \Application\Entity\Address
+     * @return \Application\Entity\Log
      */
     public function setId($id)
     {
@@ -98,164 +99,164 @@ class Address
     }
 
     /**
-     * Set the value of countries_id.
+     * Set the value of logevents_id.
      *
-     * @param integer $countries_id
-     * @return \Application\Entity\Address
+     * @param integer $logevents_id
+     * @return \Application\Entity\Log
      */
-    public function setCountriesId($countries_id)
+    public function setLogeventsId($logevents_id)
     {
-        $this->countries_id = $countries_id;
+        $this->logevents_id = $logevents_id;
 
         return $this;
     }
 
     /**
-     * Get the value of countries_id.
+     * Get the value of logevents_id.
      *
      * @return integer
      */
-    public function getCountriesId()
+    public function getLogeventsId()
     {
-        return $this->countries_id;
+        return $this->logevents_id;
     }
 
     /**
-     * Set the value of provinces_id.
+     * Set the value of message.
      *
-     * @param integer $provinces_id
-     * @return \Application\Entity\Address
+     * @param string $message
+     * @return \Application\Entity\Log
      */
-    public function setProvincesId($provinces_id)
+    public function setMessage($message)
     {
-        $this->provinces_id = $provinces_id;
+        $this->message = $message;
 
         return $this;
     }
 
     /**
-     * Get the value of provinces_id.
-     *
-     * @return integer
-     */
-    public function getProvincesId()
-    {
-        return $this->provinces_id;
-    }
-
-    /**
-     * Set the value of address.
-     *
-     * @param string $address
-     * @return \Application\Entity\Address
-     */
-    public function setAddress($address)
-    {
-        $this->address = $address;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of address.
+     * Get the value of message.
      *
      * @return string
      */
-    public function getAddress()
+    public function getMessage()
     {
-        return $this->address;
+        return $this->message;
     }
 
     /**
-     * Set the value of postalcode.
+     * Set the value of ip_address.
      *
-     * @param string $postalcode
-     * @return \Application\Entity\Address
+     * @param string $ip_address
+     * @return \Application\Entity\Log
      */
-    public function setPostalcode($postalcode)
+    public function setIpAddress($ip_address)
     {
-        $this->postalcode = $postalcode;
+        $this->ip_address = $ip_address;
 
         return $this;
     }
 
     /**
-     * Get the value of postalcode.
+     * Get the value of ip_address.
      *
      * @return string
      */
-    public function getPostalcode()
+    public function getIpAddress()
     {
-        return $this->postalcode;
+        return $this->ip_address;
     }
 
     /**
-     * Set the value of city.
+     * Set the value of session.
      *
-     * @param string $city
-     * @return \Application\Entity\Address
+     * @param string $session
+     * @return \Application\Entity\Log
      */
-    public function setCity($city)
+    public function setSession($session)
     {
-        $this->city = $city;
+        $this->session = $session;
 
         return $this;
     }
 
     /**
-     * Get the value of city.
+     * Get the value of session.
      *
      * @return string
      */
-    public function getCity()
+    public function getSession()
     {
-        return $this->city;
+        return $this->session;
     }
 
     /**
-     * Set Country entity (many to one).
+     * Set the value of cdate.
      *
-     * @param \Application\Entity\Country $country
-     * @return \Application\Entity\Address
+     * @param datetime $cdate
+     * @return \Application\Entity\Log
      */
-    public function setCountry(Country $country = null)
+    public function setCdate($cdate)
     {
-        $this->country = $country;
+        $this->cdate = $cdate;
 
         return $this;
     }
 
     /**
-     * Get Country entity (many to one).
+     * Get the value of cdate.
      *
-     * @return \Application\Entity\Country
+     * @return datetime
      */
-    public function getCountry()
+    public function getCdate()
     {
-        return $this->country;
+        return $this->cdate;
     }
 
     /**
-     * Set Province entity (many to one).
+     * Set User entity (many to one).
      *
-     * @param \Application\Entity\Province $province
-     * @return \Application\Entity\Address
+     * @param \Application\Entity\User $user
+     * @return \Application\Entity\Log
      */
-    public function setProvince(Province $province = null)
+    public function setUser(User $user = null)
     {
-        $this->province = $province;
+        $this->user = $user;
 
         return $this;
     }
 
     /**
-     * Get Province entity (many to one).
+     * Get User entity (many to one).
      *
-     * @return \Application\Entity\Province
+     * @return \Application\Entity\User
      */
-    public function getProvince()
+    public function getUser()
     {
-        return $this->province;
+        return $this->user;
+    }
+
+    /**
+     * Set Logevent entity (many to one).
+     *
+     * @param \Application\Entity\Logevent $logevent
+     * @return \Application\Entity\Log
+     */
+    public function setLogevent(Logevent $logevent = null)
+    {
+        $this->logevent = $logevent;
+
+        return $this;
+    }
+
+    /**
+     * Get Logevent entity (many to one).
+     *
+     * @return \Application\Entity\Logevent
+     */
+    public function getLogevent()
+    {
+        return $this->logevent;
     }
 
     /**
@@ -290,32 +291,38 @@ class Address
                 'validators' => array(),
             ),
             array(
-                'name' => 'countries_id',
-                'required' => true,
-                'filters' => array(),
-                'validators' => array(),
-            ),
-            array(
-                'name' => 'provinces_id',
-                'required' => true,
-                'filters' => array(),
-                'validators' => array(),
-            ),
-            array(
-                'name' => 'address',
-                'required' => true,
-                'filters' => array(),
-                'validators' => array(),
-            ),
-            array(
-                'name' => 'postalcode',
+                'name' => 'users_id',
                 'required' => false,
                 'filters' => array(),
                 'validators' => array(),
             ),
             array(
-                'name' => 'city',
-                'required' => false,
+                'name' => 'logevents_id',
+                'required' => true,
+                'filters' => array(),
+                'validators' => array(),
+            ),
+            array(
+                'name' => 'message',
+                'required' => true,
+                'filters' => array(),
+                'validators' => array(),
+            ),
+            array(
+                'name' => 'ip_address',
+                'required' => true,
+                'filters' => array(),
+                'validators' => array(),
+            ),
+            array(
+                'name' => 'session',
+                'required' => true,
+                'filters' => array(),
+                'validators' => array(),
+            ),
+            array(
+                'name' => 'cdate',
+                'required' => true,
                 'filters' => array(),
                 'validators' => array(),
             ),
@@ -336,7 +343,7 @@ class Address
     {
         foreach ($data as $field => $value) {
             $setter = sprintf('set%s', ucfirst(
-                str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
+                    str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
             ));
             if (method_exists($this, $setter)) {
                 $this->{$setter}($value);
@@ -355,8 +362,8 @@ class Address
      */
     public function getArrayCopy(array $fields = array())
     {
-        $dataFields = array('id', 'countries_id', 'provinces_id', 'address', 'postalcode', 'city');
-        $relationFields = array('country', 'province');
+        $dataFields = array('id', 'users_id', 'logevents_id', 'message', 'ip_address', 'session', 'cdate');
+        $relationFields = array('user', 'logevent');
         $copiedFields = array();
         foreach ($dataFields as $field) {
             if (!in_array($field, $fields) && !empty($fields)) {
@@ -366,16 +373,35 @@ class Address
             $copiedFields[$field] = $this->{$getter}();
         }
         // foreach ($relationFields as $field => $relation) {
-            // $copiedFields[$field] = $relation->getArrayCopy();
+        // $copiedFields[$field] = $relation->getArrayCopy();
         // }
-
         // End.
         return $copiedFields;
     }
 
     public function __sleep()
     {
-        return array('id', 'countries_id', 'provinces_id', 'address', 'postalcode', 'city');
+        return array('id', 'users_id', 'logevents_id', 'message', 'ip_address', 'session', 'cdate');
     }
+
     // Custom methods //////////////////////////////////////////////////////////
+
+    public function write($message, Logevent $logevent, User $user = null)
+    {
+        $ipAddress = $_SERVER['REMOTE_ADDR'];
+        $session = crc32(session_id());
+        $cdate = new \DateTime();
+
+        $this->setUser($user)
+            ->setLogevent($logevent)
+            ->setMessage($message)
+            ->setIpAddress($ipAddress)
+            ->setSession($session)
+            ->setCdate($cdate);
+
+        // End.
+        return $this;
+    }
+
 }
+

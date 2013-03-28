@@ -40,7 +40,6 @@ class User
     protected $locales_id;
 
     /**
-     * 
      * @ORM\Column(type="integer")
      */
     protected $persons_id;
@@ -103,25 +102,25 @@ class User
     protected $last_active;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Role", fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity="Role")
      * @ORM\JoinColumn(name="roles_id", referencedColumnName="id", nullable=false)
      */
     protected $role;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Locale", fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity="Locale")
      * @ORM\JoinColumn(name="locales_id", referencedColumnName="id", nullable=false)
      */
     protected $locale;
 
     /**
-     * @ORM\OneToOne(targetEntity="Person", fetch="EAGER")
+     * @ORM\OneToOne(targetEntity="Person")
      * @ORM\JoinColumn(name="persons_id", referencedColumnName="id", nullable=false)
      */
     protected $person;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Setting", fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity="Setting")
      * @ORM\JoinColumn(name="settings_id", referencedColumnName="id", nullable=false)
      */
     protected $setting;
@@ -319,7 +318,7 @@ class User
      */
     public function getIdentity()
     {
-        return $this->identity;
+        return strtolower($this->identity);
     }
 
     /**
@@ -866,3 +865,4 @@ class User
     }
 
 }
+

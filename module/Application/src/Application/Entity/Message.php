@@ -12,11 +12,12 @@ use Zend\InputFilter\InputFilter,
  * Application\Entity\Message
  *
  * @ORM\Entity()
- * @ORM\Table(name="messages", indexes={@ORM\Index(name="fk_messages_persons1_idx", columns={"to_persons_id"}), @ORM\Index(name="fk_messages_persons2_idx", columns={"from_persons_id"})})
+ * @ORM\Table(name="messages", indexes={@ORM\Index(name="fk_messages_persons1_idx", columns={"to_persons_id"})})
  */
 class Message
     implements InputFilterAwareInterface
 {
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -33,17 +34,17 @@ class Message
     /**
      * @ORM\Column(type="boolean", nullable=true)
      */
-    protected $is_read;
+    protected $is_read = false;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
      */
-    protected $is_trash;
+    protected $is_trash = false;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
      */
-    protected $is_deleted;
+    protected $is_deleted = false;
 
     /**
      * @ORM\Column(type="string", length=100)
@@ -61,16 +62,10 @@ class Message
     protected $cdate;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Person", fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity="Person")
      * @ORM\JoinColumn(name="to_persons_id", referencedColumnName="id", nullable=false)
      */
-    protected $personRelatedByToPersonsId;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Person", fetch="EAGER")
-     * @ORM\JoinColumn(name="from_persons_id", referencedColumnName="id")
-     */
-    protected $personRelatedByFromPersonsId;
+    protected $person;
 
     /**
      * Instance of InputFilterInterface.
@@ -81,6 +76,7 @@ class Message
 
     public function __construct()
     {
+        
     }
 
     /**
@@ -268,49 +264,26 @@ class Message
     }
 
     /**
-     * Set Person related by `to_persons_id` entity (many to one).
+     * Set Person entity (many to one).
      *
      * @param \Application\Entity\Person $person
      * @return \Application\Entity\Message
      */
-    public function setPersonRelatedByToPersonsId(Person $person = null)
+    public function setPerson(Person $person = null)
     {
-        $this->personRelatedByToPersonsId = $person;
+        $this->person = $person;
 
         return $this;
     }
 
     /**
-     * Get Person related by `to_persons_id` entity (many to one).
+     * Get Person entity (many to one).
      *
      * @return \Application\Entity\Person
      */
-    public function getPersonRelatedByToPersonsId()
+    public function getPerson()
     {
-        return $this->personRelatedByToPersonsId;
-    }
-
-    /**
-     * Set Person related by `from_persons_id` entity (many to one).
-     *
-     * @param \Application\Entity\Person $person
-     * @return \Application\Entity\Message
-     */
-    public function setPersonRelatedByFromPersonsId(Person $person = null)
-    {
-        $this->personRelatedByFromPersonsId = $person;
-
-        return $this;
-    }
-
-    /**
-     * Get Person related by `from_persons_id` entity (many to one).
-     *
-     * @return \Application\Entity\Person
-     */
-    public function getPersonRelatedByFromPersonsId()
-    {
-        return $this->personRelatedByFromPersonsId;
+        return $this->person;
     }
 
     /**
@@ -347,12 +320,6 @@ class Message
             array(
                 'name' => 'to_persons_id',
                 'required' => true,
-                'filters' => array(),
-                'validators' => array(),
-            ),
-            array(
-                'name' => 'from_persons_id',
-                'required' => false,
                 'filters' => array(),
                 'validators' => array(),
             ),
@@ -409,7 +376,7 @@ class Message
     {
         foreach ($data as $field => $value) {
             $setter = sprintf('set%s', ucfirst(
-                str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
+                    str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
             ));
             if (method_exists($this, $setter)) {
                 $this->{$setter}($value);
@@ -428,8 +395,8 @@ class Message
      */
     public function getArrayCopy(array $fields = array())
     {
-        $dataFields = array('id', 'to_persons_id', 'from_persons_id', 'is_read', 'is_trash', 'is_deleted', 'subject', 'message', 'cdate');
-        $relationFields = array('person', 'person');
+        $dataFields = array('id', 'to_persons_id', 'is_read', 'is_trash', 'is_deleted', 'subject', 'message', 'cdate');
+        $relationFields = array('person');
         $copiedFields = array();
         foreach ($dataFields as $field) {
             if (!in_array($field, $fields) && !empty($fields)) {
@@ -439,16 +406,45 @@ class Message
             $copiedFields[$field] = $this->{$getter}();
         }
         // foreach ($relationFields as $field => $relation) {
-            // $copiedFields[$field] = $relation->getArrayCopy();
+        // $copiedFields[$field] = $relation->getArrayCopy();
         // }
-
         // End.
         return $copiedFields;
     }
 
     public function __sleep()
     {
-        return array('id', 'to_persons_id', 'from_persons_id', 'is_read', 'is_trash', 'is_deleted', 'subject', 'message', 'cdate');
+        return array('id', 'to_persons_id', 'is_read', 'is_trash', 'is_deleted', 'subject', 'message', 'cdate');
     }
+
     // Custom methods //////////////////////////////////////////////////////////
+
+    /**
+     * Write a new message.
+     * 
+     * @param \Application\Entity\Person $person
+     * @param string $subject
+     * @param string $message
+     * @param \DateTime $cdate
+     * @return \Application\Entity\Message
+     */
+    public function write(Person $person, $subject, $message, \DateTime $cdate = null)
+    {
+        if (!$cdate) {
+            $cdate = new \DateTime();
+        }
+
+        $this->setPerson($person)
+            ->setIsRead(false)
+            ->setIsTrash(false)
+            ->setIsDeleted(false)
+            ->setSubject($subject)
+            ->setMessage($message)
+            ->setCdate($cdate);
+
+        // End.
+        return $this;
+    }
+
 }
+

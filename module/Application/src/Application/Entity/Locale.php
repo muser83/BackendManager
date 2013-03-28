@@ -72,7 +72,7 @@ class Locale
     protected $country;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Language", fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity="Language")
      * @ORM\JoinColumn(name="languages_id", referencedColumnName="id", nullable=false)
      */
     protected $language;

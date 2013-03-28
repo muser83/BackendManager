@@ -10,27 +10,20 @@ use Zend\InputFilter\InputFilter,
     Zend\InputFilter\InputFilterInterface;
 
 /**
- * Application\Entity\Province
+ * Application\Entity\Logevent
  *
  * @ORM\Entity()
- * @ORM\Table(name="provinces", indexes={@ORM\Index(name="fk_provinces_countries1_idx", columns={"countries_id"})}, uniqueConstraints={@ORM\UniqueConstraint(name="name_UNIQUE", columns={"name"})})
+ * @ORM\Table(name="logevents", uniqueConstraints={@ORM\UniqueConstraint(name="name_UNIQUE", columns={"name"})})
  */
-class Province
+class Logevent
     implements InputFilterAwareInterface
 {
-
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
-
-    /**
-     * 
-     * @ORM\Column(type="integer")
-     */
-    protected $countries_id;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
@@ -43,12 +36,6 @@ class Province
     protected $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Country")
-     * @ORM\JoinColumn(name="countries_id", referencedColumnName="id", nullable=false)
-     */
-    protected $country;
-
-    /**
      * Instance of InputFilterInterface.
      *
      * @var InputFilter
@@ -57,14 +44,13 @@ class Province
 
     public function __construct()
     {
-        
     }
 
     /**
      * Set the value of id.
      *
      * @param integer $id
-     * @return \Application\Entity\Province
+     * @return \Application\Entity\Logevent
      */
     public function setId($id)
     {
@@ -84,33 +70,10 @@ class Province
     }
 
     /**
-     * Set the value of countries_id.
-     *
-     * @param integer $countries_id
-     * @return \Application\Entity\Province
-     */
-    public function setCountriesId($countries_id)
-    {
-        $this->countries_id = $countries_id;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of countries_id.
-     *
-     * @return integer
-     */
-    public function getCountriesId()
-    {
-        return $this->countries_id;
-    }
-
-    /**
      * Set the value of is_visible.
      *
      * @param boolean $is_visible
-     * @return \Application\Entity\Province
+     * @return \Application\Entity\Logevent
      */
     public function setIsVisible($is_visible)
     {
@@ -133,7 +96,7 @@ class Province
      * Set the value of name.
      *
      * @param string $name
-     * @return \Application\Entity\Province
+     * @return \Application\Entity\Logevent
      */
     public function setName($name)
     {
@@ -150,29 +113,6 @@ class Province
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * Set Country entity (many to one).
-     *
-     * @param \Application\Entity\Country $country
-     * @return \Application\Entity\Province
-     */
-    public function setCountry(Country $country = null)
-    {
-        $this->country = $country;
-
-        return $this;
-    }
-
-    /**
-     * Get Country entity (many to one).
-     *
-     * @return \Application\Entity\Country
-     */
-    public function getCountry()
-    {
-        return $this->country;
     }
 
     /**
@@ -207,12 +147,6 @@ class Province
                 'validators' => array(),
             ),
             array(
-                'name' => 'countries_id',
-                'required' => true,
-                'filters' => array(),
-                'validators' => array(),
-            ),
-            array(
                 'name' => 'is_visible',
                 'required' => false,
                 'filters' => array(),
@@ -241,7 +175,7 @@ class Province
     {
         foreach ($data as $field => $value) {
             $setter = sprintf('set%s', ucfirst(
-                    str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
+                str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
             ));
             if (method_exists($this, $setter)) {
                 $this->{$setter}($value);
@@ -260,8 +194,8 @@ class Province
      */
     public function getArrayCopy(array $fields = array())
     {
-        $dataFields = array('id', 'countries_id', 'is_visible', 'name');
-        $relationFields = array('country');
+        $dataFields = array('id', 'is_visible', 'name');
+        $relationFields = array();
         $copiedFields = array();
         foreach ($dataFields as $field) {
             if (!in_array($field, $fields) && !empty($fields)) {
@@ -271,17 +205,16 @@ class Province
             $copiedFields[$field] = $this->{$getter}();
         }
         // foreach ($relationFields as $field => $relation) {
-        // $copiedFields[$field] = $relation->getArrayCopy();
+            // $copiedFields[$field] = $relation->getArrayCopy();
         // }
+
         // End.
         return $copiedFields;
     }
 
     public function __sleep()
     {
-        return array('id', 'countries_id', 'is_visible', 'name');
+        return array('id', 'is_visible', 'name');
     }
-
     // Custom methods //////////////////////////////////////////////////////////
 }
-
