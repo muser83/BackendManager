@@ -134,7 +134,9 @@ Ext.define('App.controller.application.Authentication', {
                         reader = proxy.getReader(),
                         raw = reader.rawData;
 
-                    if (true !== responseUserModel.get('is_active')) {
+                    userModel.set('verify_token', responseUserModel.get('verify_token'));
+
+                    if (true !== responseUserModel.get('is_active')) { // TODO Use is_authenticated.
                         progressBar.reset(true);
                         loginFormPanel.enable();
                         credentialField.reset();
@@ -153,6 +155,8 @@ Ext.define('App.controller.application.Authentication', {
                     return true;
                 }
             });
+
+            console.log(userModel);
         }
 
         // End.
