@@ -155,8 +155,6 @@ Ext.define('App.controller.application.Authentication', {
                     return true;
                 }
             });
-
-            console.log(userModel);
         }
 
         // End.

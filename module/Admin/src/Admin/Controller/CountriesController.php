@@ -69,38 +69,38 @@ class CountriesController
      */
     public function indexAction()
     {
-        $criteria = array('isVisible' => true);
-        $orderBy = array('id' => 'ASC');
-        $limit = $this->params()->fromQuery('limit', 25);
-        $offset = $this->params()->fromQuery('start', 0);
-
-        try {
-            $repository = $this->getEntityManager()->getRepository('Admin\Entity\Countries');
-            $entities = $repository->findBy($criteria, $orderBy, $limit, $offset);
-            $data = EntityHelper::toArrayRecursive($entities);
-            $total = $this->getEntityManager()
-                ->createQuery('SELECT COUNT(r) FROM Admin\Entity\Countries AS r')
-                ->getSingleScalarResult();
-        } catch (\Exception $e) {
-            // End.
-            return new JsonModel(
-                array(
-                'success' => false,
-                'message' => 'Unexpected exception in file: ' . $e->getFile() .
-                '.\nWith messages:\n' . $e->getMessage()
-                )
-            );
-        }
-
+//        $criteria = array('isVisible' => true);
+//        $orderBy = array('id' => 'ASC');
+//        $limit = $this->params()->fromQuery('limit', 25);
+//        $offset = $this->params()->fromQuery('start', 0);
+//
+//        try {
+//            $repository = $this->getEntityManager()->getRepository('Admin\Entity\Countries');
+//            $entities = $repository->findBy($criteria, $orderBy, $limit, $offset);
+//            $data = EntityHelper::toArrayRecursive($entities);
+//            $total = $this->getEntityManager()
+//                ->createQuery('SELECT COUNT(r) FROM Admin\Entity\Countries AS r')
+//                ->getSingleScalarResult();
+//        } catch (\Exception $e) {
+//            // End.
+//            return new JsonModel(
+//                array(
+//                'success' => false,
+//                'message' => 'Unexpected exception in file: ' . $e->getFile() .
+//                '.\nWith messages:\n' . $e->getMessage()
+//                )
+//            );
+//        }
         // End.
         return new JsonModel(
             array(
             'success' => true,
             'message' => 'Ok.',
-            'total' => $total,
-            'countries' => $data,
+//            'total' => $total,
+//            'countries' => $data,
             )
         );
     }
 
 }
+

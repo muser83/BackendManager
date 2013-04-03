@@ -37,8 +37,6 @@ class AuthenticationController
     private $lockoutResponseMessage = 'Your account is temporary blocked until %s.';
     private $lockoutMessageSubject = 'Your account is temporary blocked.';
     private $lockoutMessage = 'Your account is temporary blocked until %s.';
-    private $logMessage;
-    private $logUser;
 
     /**
      * Instance of \Doctrine\ORM\EntityManager.
@@ -90,7 +88,7 @@ class AuthenticationController
     public function loginAction()
     {
         $request = $this->getRequest();
-
+        $em = $this->getEntityManager();
 
         if (!$request->isPost() || (null === $request->getPost('user'))) {
             // End.
@@ -108,10 +106,10 @@ class AuthenticationController
         $isValidAttempt = $this->isValidLogin($user);
         if (!$isValidAttempt) {
             // End.
-            return $this->getIvalidLoginResponse(true, 'Invalid post data.');
+//            return $this->getIvalidLoginResponse(true, 'Invalid post data.');
         }
 
-        $identity = $this->getEntityManager()->getRepository('Application\Entity\User')
+        $identity = $em->getRepository('Application\Entity\User')
             ->findOneBy(array(
             'identity' => $user->getIdentity()
         ));
@@ -130,7 +128,7 @@ class AuthenticationController
                 $this->lockoutResponseMessage, $identity->getLockoutDateTime()->format('r')
             );
 
-            $this->increaseAttept($identity);
+            $this->increaseAttempt($identity);
 
             // End.
             return $this->getIvalidLoginResponse(true, 'User is locked out.', $identity);
@@ -139,7 +137,7 @@ class AuthenticationController
         $user->saltCredential($identity);
 
         if ($user->getCredential() !== $identity->getCredential()) {
-            $this->increaseAttept($identity);
+            $this->increaseAttempt($identity);
 
             // End. the credentials doesn't match.
             return $this->getIvalidLoginResponse(false, 'Invalid authentication credential.', $identity);
@@ -153,8 +151,8 @@ class AuthenticationController
             $message = new Message();
             $message->write($person, $subject, $messageStr);
 
-            $this->getEntityManager()->persist($message);
-            $this->getEntityManager()->flush();
+            $em->persist($message);
+            $em->flush();
         }
 
         $identity
@@ -164,12 +162,27 @@ class AuthenticationController
 
         $this->log('Successful authentication.', $identity);
 
-        $this->getEntityManager()->flush();
+        $em->flush();
 
+        // Make sure the is_active flag is false, on error.
+        // Create the logout, also in the js controller.
+        // fix system info
+        // Define a last seen date in the user table and check if the identity is still valid after 30? min no see.
+        // Create the session management.
+        // 
+        // Dont use the systemController to response the user data.
+        // On get If an identity exists, return this identity
+        // On Post if an identity exists, remove it and continue.
+        // 
+        // Let the system only return system data like navigation.
+        // Use the user repository.
         // Store the identity in a session object.
         $session = new AuthSession();
         $session->clear();
-        $session->write($identity);
+        $session->write($identity->getArrayCopy());
+
+        // End.
+        return $this->getValidLoginResponse($identity);
 
         // End. forward to the system controller.
         return $this->forward()->dispatch('system', array('action' => 'get-user'));
@@ -186,7 +199,7 @@ class AuthenticationController
     }
 
     /**
-     * COMMENTME
+     * Log authentication messages.
      * 
      * @param string $message
      * @param \Application\Entity\User $user
@@ -195,23 +208,22 @@ class AuthenticationController
     private function log($message, User $user = null)
     {
         $em = $this->getEntityManager();
-        $logEvent = $this->getEntityManager()->getReference('Application\Entity\Logevent', 3);
+        $logEvent = $em->getReference('Application\Entity\Logevent', 3);
 
         $log = new Log();
         $log->write($message, $logEvent, $user);
 
         $em->persist($log);
-        $em->flush();
-
+        $em->flush($log);
         // End.
         return $this;
     }
 
     /**
-     * COMMENTME
+     * Check if the posted login data is valid.
      * 
      * @param \Application\Entity\User $user
-     * @return type
+     * @return boolean Whatever the login data is valid.
      */
     private function isValidLogin(User $user)
     {
@@ -228,18 +240,14 @@ class AuthenticationController
     }
 
     /**
-     * COMMENTME
+     * Return a invalid login attempt JsonModel.
      * 
      * @param \Application\Entity\User $user
-     * @param boolean $sleep
+     * @param boolean $sleep true to sleep for 2 seconds.
      * @return \Zend\View\Model\JsonModel
      */
     private function getIvalidLoginResponse($sleep = true, $logMessage = null, $logUser = null)
     {
-        if (is_string($logMessage)) {
-            $this->log($logMessage, $logUser);
-        }
-
         $csrf = new CsrfValidator();
         $csrfToken = $csrf->getHash(true);
 
@@ -252,26 +260,55 @@ class AuthenticationController
             'user' => $user->getArrayCopy(array('identity', 'credential', 'verify_token'))
         );
 
+        if (is_string($logMessage)) {
+            $this->log($logMessage, $logUser);
+        }
+
         // Sleep for security reasons.
         if ($sleep) {
-            sleep(1);
+            sleep(2);
         }
 
         // Send a authentication shell.
         return new JsonModel($responseConfig);
     }
 
+    private function getValidLoginResponse(User $identity)
+    {
+        $dataMap = array(
+            'id',
+            'locales_id',
+            'persons_id',
+            'settings_id',
+            'is_verified',
+            'is_active',
+            'identity',
+            'locale' => array('language'),
+            'person'
+        );
+
+        $responseConfig = array(
+            'success' => true,
+            'user' => $identity->getArrayCopy($dataMap)
+        );
+
+        // End.
+        return new JsonModel($responseConfig);
+    }
+
     /**
-     * COMMENTME
+     * Increase the login attempt number and update the last login attempt date.
      * 
      * @param Application\Entity\User $identity
      * @return boolean
      */
-    private function increaseAttept(\Application\Entity\User $identity)
+    private function increaseAttempt(User $identity)
     {
-        $identity->increaseAttept();
+        $em = $this->getEntityManager();
+
+        $identity->increaseAttempt();
         $identity->setLastAttempt(new \DateTime());
-        $this->getEntityManager()->flush();
+        $em->flush($identity);
 
         // End.
         return true;

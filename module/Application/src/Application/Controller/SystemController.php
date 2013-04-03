@@ -230,11 +230,14 @@ class SystemController
     public function getUserAction()
     {
         $identity = $this->getIdentity();
+        $identity instanceof \Application\Entity\User;
+
+        $isAuthenticated = $identity->getIsActive();
 
         return new JsonModel(
             array(
             'success' => true,
-            'user' => $identity->getSecureArrayCopy()
+            'user' => array('is_authenticated' => $isAuthenticated)
             )
         );
     }
