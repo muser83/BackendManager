@@ -66,31 +66,37 @@ class Locale
     protected $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Country")
+     * @ORM\OneToMany(targetEntity="User", mappedBy="locale")
+     * @ORM\JoinColumn(name="locales_id", referencedColumnName="id", nullable=false)
+     */
+    protected $users;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Country", inversedBy="locales")
      * @ORM\JoinColumn(name="countries_id", referencedColumnName="id", nullable=false)
      */
     protected $country;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Language")
+     * @ORM\ManyToOne(targetEntity="Language", inversedBy="locales")
      * @ORM\JoinColumn(name="languages_id", referencedColumnName="id", nullable=false)
      */
     protected $language;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Currency")
+     * @ORM\ManyToOne(targetEntity="Currency", inversedBy="locales")
      * @ORM\JoinColumn(name="currencies_id", referencedColumnName="id", nullable=false)
      */
     protected $currency;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Charset")
+     * @ORM\ManyToOne(targetEntity="Charset", inversedBy="locales")
      * @ORM\JoinColumn(name="charsets_id", referencedColumnName="id", nullable=false)
      */
     protected $charset;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Timezone")
+     * @ORM\ManyToOne(targetEntity="Timezone", inversedBy="locales")
      * @ORM\JoinColumn(name="timezones_id", referencedColumnName="id", nullable=false)
      */
     protected $timezone;
@@ -104,6 +110,7 @@ class Locale
 
     public function __construct()
     {
+        $this->users = new ArrayCollection();
     }
 
     /**
@@ -288,6 +295,29 @@ class Locale
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Add User entity to collection (one to many).
+     *
+     * @param \Application\Entity\User $user
+     * @return \Application\Entity\Locale
+     */
+    public function addUser(User $user)
+    {
+        $this->users[] = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get User entity collection (one to many).
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUsers()
+    {
+        return $this->users;
     }
 
     /**
@@ -506,10 +536,10 @@ class Locale
     }
 
     /**
-     * Return all entity fields with values.
-     * Fields started with _ will be excluded.
+     * Return a array with all fields and data.
+     * Default the relations will be ignored.
      * 
-     * @param array $fields This fields will be copied
+     * @param array $fields
      * @return array
      */
     public function getArrayCopy(array $fields = array())
@@ -517,16 +547,30 @@ class Locale
         $dataFields = array('id', 'countries_id', 'languages_id', 'currencies_id', 'charsets_id', 'timezones_id', 'is_visible', 'name');
         $relationFields = array('country', 'currency', 'charset', 'timezone', 'language');
         $copiedFields = array();
-        foreach ($dataFields as $field) {
-            if (!in_array($field, $fields) && !empty($fields)) {
+        foreach ($relationFields as $relationField) {
+            $map = null;
+            if (array_key_exists($relationField, $fields)) {
+                $map = $fields[$relationField];
+                $fields[] = $relationField;
+                unset($fields[$relationField]);
+            }
+            if (!in_array($relationField, $fields)) {
                 continue;
             }
-            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))));
-            $copiedFields[$field] = $this->{$getter}();
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $relationField)))));
+            $relationEntity = $this->{$getter}();
+            $copiedFields[$relationField] = (!is_null($map))
+                ? $relationEntity->getArrayCopy($map)
+                : $relationEntity->getArrayCopy();
+            $fields = array_diff($fields, array($relationField));
         }
-        // foreach ($relationFields as $field => $relation) {
-            // $copiedFields[$field] = $relation->getArrayCopy();
-        // }
+        foreach ($dataFields as $dataField) {
+            if (!in_array($dataField, $fields) && !empty($fields)) {
+                continue;
+            }
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $dataField)))));
+            $copiedFields[$dataField] = $this->{$getter}();
+        }
 
         // End.
         return $copiedFields;

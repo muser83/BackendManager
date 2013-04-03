@@ -26,19 +26,45 @@ class Setting
     protected $id;
 
     /**
+     * If true a load mask will be showed while loading components.
+     *
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    protected $use_loadmask;
+
+    /**
+     * Lock the system after x minutes.
+     *
      * @ORM\Column(type="integer", nullable=true)
      */
     protected $lock_system_after;
 
     /**
+     * Shutdown the system after x minutes.
+     *
      * @ORM\Column(type="integer", nullable=true)
      */
     protected $shutdown_system_after;
 
     /**
+     * Load and show by default x records.
+     *
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    protected $rows_in_grid;
+
+    /**
+     * This uri will be loaded if the application uri is empty.
+     *
      * @ORM\Column(type="string", length=50, nullable=true)
      */
     protected $default_action_uri;
+
+    /**
+     * @ORM\OneToMany(targetEntity="User", mappedBy="setting")
+     * @ORM\JoinColumn(name="settings_id", referencedColumnName="id", nullable=false)
+     */
+    protected $users;
 
     /**
      * Instance of InputFilterInterface.
@@ -49,6 +75,7 @@ class Setting
 
     public function __construct()
     {
+        $this->users = new ArrayCollection();
     }
 
     /**
@@ -72,6 +99,29 @@ class Setting
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Set the value of use_loadmask.
+     *
+     * @param boolean $use_loadmask
+     * @return \Application\Entity\Setting
+     */
+    public function setUseLoadmask($use_loadmask)
+    {
+        $this->use_loadmask = $use_loadmask;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of use_loadmask.
+     *
+     * @return boolean
+     */
+    public function getUseLoadmask()
+    {
+        return $this->use_loadmask;
     }
 
     /**
@@ -121,6 +171,29 @@ class Setting
     }
 
     /**
+     * Set the value of rows_in_grid.
+     *
+     * @param integer $rows_in_grid
+     * @return \Application\Entity\Setting
+     */
+    public function setRowsInGrid($rows_in_grid)
+    {
+        $this->rows_in_grid = $rows_in_grid;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of rows_in_grid.
+     *
+     * @return integer
+     */
+    public function getRowsInGrid()
+    {
+        return $this->rows_in_grid;
+    }
+
+    /**
      * Set the value of default_action_uri.
      *
      * @param string $default_action_uri
@@ -141,6 +214,29 @@ class Setting
     public function getDefaultActionUri()
     {
         return $this->default_action_uri;
+    }
+
+    /**
+     * Add User entity to collection (one to many).
+     *
+     * @param \Application\Entity\User $user
+     * @return \Application\Entity\Setting
+     */
+    public function addUser(User $user)
+    {
+        $this->users[] = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get User entity collection (one to many).
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUsers()
+    {
+        return $this->users;
     }
 
     /**
@@ -175,6 +271,12 @@ class Setting
                 'validators' => array(),
             ),
             array(
+                'name' => 'use_loadmask',
+                'required' => false,
+                'filters' => array(),
+                'validators' => array(),
+            ),
+            array(
                 'name' => 'lock_system_after',
                 'required' => false,
                 'filters' => array(),
@@ -182,6 +284,12 @@ class Setting
             ),
             array(
                 'name' => 'shutdown_system_after',
+                'required' => false,
+                'filters' => array(),
+                'validators' => array(),
+            ),
+            array(
+                'name' => 'rows_in_grid',
                 'required' => false,
                 'filters' => array(),
                 'validators' => array(),
@@ -220,27 +328,41 @@ class Setting
     }
 
     /**
-     * Return all entity fields with values.
-     * Fields started with _ will be excluded.
+     * Return a array with all fields and data.
+     * Default the relations will be ignored.
      * 
-     * @param array $fields This fields will be copied
+     * @param array $fields
      * @return array
      */
     public function getArrayCopy(array $fields = array())
     {
-        $dataFields = array('id', 'lock_system_after', 'shutdown_system_after', 'default_action_uri');
+        $dataFields = array('id', 'use_loadmask', 'lock_system_after', 'shutdown_system_after', 'rows_in_grid', 'default_action_uri');
         $relationFields = array();
         $copiedFields = array();
-        foreach ($dataFields as $field) {
-            if (!in_array($field, $fields) && !empty($fields)) {
+        foreach ($relationFields as $relationField) {
+            $map = null;
+            if (array_key_exists($relationField, $fields)) {
+                $map = $fields[$relationField];
+                $fields[] = $relationField;
+                unset($fields[$relationField]);
+            }
+            if (!in_array($relationField, $fields)) {
                 continue;
             }
-            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))));
-            $copiedFields[$field] = $this->{$getter}();
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $relationField)))));
+            $relationEntity = $this->{$getter}();
+            $copiedFields[$relationField] = (!is_null($map))
+                ? $relationEntity->getArrayCopy($map)
+                : $relationEntity->getArrayCopy();
+            $fields = array_diff($fields, array($relationField));
         }
-        // foreach ($relationFields as $field => $relation) {
-            // $copiedFields[$field] = $relation->getArrayCopy();
-        // }
+        foreach ($dataFields as $dataField) {
+            if (!in_array($dataField, $fields) && !empty($fields)) {
+                continue;
+            }
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $dataField)))));
+            $copiedFields[$dataField] = $this->{$getter}();
+        }
 
         // End.
         return $copiedFields;
@@ -248,7 +370,7 @@ class Setting
 
     public function __sleep()
     {
-        return array('id', 'lock_system_after', 'shutdown_system_after', 'default_action_uri');
+        return array('id', 'use_loadmask', 'lock_system_after', 'shutdown_system_after', 'rows_in_grid', 'default_action_uri');
     }
     // Custom methods //////////////////////////////////////////////////////////
 }

@@ -41,7 +41,19 @@ class Role
     protected $descr;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Role")
+     * @ORM\OneToMany(targetEntity="Role", mappedBy="role")
+     * @ORM\JoinColumn(name="parent_roles_id", referencedColumnName="id")
+     */
+    protected $roles;
+
+    /**
+     * @ORM\OneToMany(targetEntity="User", mappedBy="role")
+     * @ORM\JoinColumn(name="roles_id", referencedColumnName="id", nullable=false)
+     */
+    protected $users;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Role", inversedBy="roles")
      * @ORM\JoinColumn(name="parent_roles_id", referencedColumnName="id")
      */
     protected $role;
@@ -55,6 +67,8 @@ class Role
 
     public function __construct()
     {
+        $this->roles = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     /**
@@ -147,6 +161,52 @@ class Role
     public function getDescr()
     {
         return $this->descr;
+    }
+
+    /**
+     * Add Role entity to collection (one to many).
+     *
+     * @param \Application\Entity\Role $role
+     * @return \Application\Entity\Role
+     */
+    public function addRole(Role $role)
+    {
+        $this->roles[] = $role;
+
+        return $this;
+    }
+
+    /**
+     * Get Role entity collection (one to many).
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getRoles()
+    {
+        return $this->roles;
+    }
+
+    /**
+     * Add User entity to collection (one to many).
+     *
+     * @param \Application\Entity\User $user
+     * @return \Application\Entity\Role
+     */
+    public function addUser(User $user)
+    {
+        $this->users[] = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get User entity collection (one to many).
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUsers()
+    {
+        return $this->users;
     }
 
     /**
@@ -255,10 +315,10 @@ class Role
     }
 
     /**
-     * Return all entity fields with values.
-     * Fields started with _ will be excluded.
+     * Return a array with all fields and data.
+     * Default the relations will be ignored.
      * 
-     * @param array $fields This fields will be copied
+     * @param array $fields
      * @return array
      */
     public function getArrayCopy(array $fields = array())
@@ -266,16 +326,30 @@ class Role
         $dataFields = array('id', 'parent_roles_id', 'is_visible', 'name', 'descr');
         $relationFields = array('role');
         $copiedFields = array();
-        foreach ($dataFields as $field) {
-            if (!in_array($field, $fields) && !empty($fields)) {
+        foreach ($relationFields as $relationField) {
+            $map = null;
+            if (array_key_exists($relationField, $fields)) {
+                $map = $fields[$relationField];
+                $fields[] = $relationField;
+                unset($fields[$relationField]);
+            }
+            if (!in_array($relationField, $fields)) {
                 continue;
             }
-            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))));
-            $copiedFields[$field] = $this->{$getter}();
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $relationField)))));
+            $relationEntity = $this->{$getter}();
+            $copiedFields[$relationField] = (!is_null($map))
+                ? $relationEntity->getArrayCopy($map)
+                : $relationEntity->getArrayCopy();
+            $fields = array_diff($fields, array($relationField));
         }
-        // foreach ($relationFields as $field => $relation) {
-            // $copiedFields[$field] = $relation->getArrayCopy();
-        // }
+        foreach ($dataFields as $dataField) {
+            if (!in_array($dataField, $fields) && !empty($fields)) {
+                continue;
+            }
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $dataField)))));
+            $copiedFields[$dataField] = $this->{$getter}();
+        }
 
         // End.
         return $copiedFields;

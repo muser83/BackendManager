@@ -67,7 +67,25 @@ class Country
     protected $calling_code;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Continent")
+     * @ORM\OneToMany(targetEntity="Address", mappedBy="country")
+     * @ORM\JoinColumn(name="countries_id", referencedColumnName="id", nullable=false)
+     */
+    protected $addresses;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Locale", mappedBy="country")
+     * @ORM\JoinColumn(name="countries_id", referencedColumnName="id", nullable=false)
+     */
+    protected $locales;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Province", mappedBy="country")
+     * @ORM\JoinColumn(name="countries_id", referencedColumnName="id", nullable=false)
+     */
+    protected $provinces;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Continent", inversedBy="countries")
      * @ORM\JoinColumn(name="continents_id", referencedColumnName="id", nullable=false)
      */
     protected $continent;
@@ -81,6 +99,9 @@ class Country
 
     public function __construct()
     {
+        $this->addresses = new ArrayCollection();
+        $this->locales = new ArrayCollection();
+        $this->provinces = new ArrayCollection();
     }
 
     /**
@@ -291,6 +312,75 @@ class Country
     }
 
     /**
+     * Add Address entity to collection (one to many).
+     *
+     * @param \Application\Entity\Address $address
+     * @return \Application\Entity\Country
+     */
+    public function addAddress(Address $address)
+    {
+        $this->addresses[] = $address;
+
+        return $this;
+    }
+
+    /**
+     * Get Address entity collection (one to many).
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getAddresses()
+    {
+        return $this->addresses;
+    }
+
+    /**
+     * Add Locale entity to collection (one to many).
+     *
+     * @param \Application\Entity\Locale $locale
+     * @return \Application\Entity\Country
+     */
+    public function addLocale(Locale $locale)
+    {
+        $this->locales[] = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Get Locale entity collection (one to many).
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getLocales()
+    {
+        return $this->locales;
+    }
+
+    /**
+     * Add Province entity to collection (one to many).
+     *
+     * @param \Application\Entity\Province $province
+     * @return \Application\Entity\Country
+     */
+    public function addProvince(Province $province)
+    {
+        $this->provinces[] = $province;
+
+        return $this;
+    }
+
+    /**
+     * Get Province entity collection (one to many).
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getProvinces()
+    {
+        return $this->provinces;
+    }
+
+    /**
      * Set Continent entity (many to one).
      *
      * @param \Application\Entity\Continent $continent
@@ -420,10 +510,10 @@ class Country
     }
 
     /**
-     * Return all entity fields with values.
-     * Fields started with _ will be excluded.
+     * Return a array with all fields and data.
+     * Default the relations will be ignored.
      * 
-     * @param array $fields This fields will be copied
+     * @param array $fields
      * @return array
      */
     public function getArrayCopy(array $fields = array())
@@ -431,16 +521,30 @@ class Country
         $dataFields = array('id', 'continents_id', 'is_visible', 'name', 'local_name', 'iso31662', 'iso31663', 'tld', 'calling_code');
         $relationFields = array('continent');
         $copiedFields = array();
-        foreach ($dataFields as $field) {
-            if (!in_array($field, $fields) && !empty($fields)) {
+        foreach ($relationFields as $relationField) {
+            $map = null;
+            if (array_key_exists($relationField, $fields)) {
+                $map = $fields[$relationField];
+                $fields[] = $relationField;
+                unset($fields[$relationField]);
+            }
+            if (!in_array($relationField, $fields)) {
                 continue;
             }
-            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))));
-            $copiedFields[$field] = $this->{$getter}();
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $relationField)))));
+            $relationEntity = $this->{$getter}();
+            $copiedFields[$relationField] = (!is_null($map))
+                ? $relationEntity->getArrayCopy($map)
+                : $relationEntity->getArrayCopy();
+            $fields = array_diff($fields, array($relationField));
         }
-        // foreach ($relationFields as $field => $relation) {
-            // $copiedFields[$field] = $relation->getArrayCopy();
-        // }
+        foreach ($dataFields as $dataField) {
+            if (!in_array($dataField, $fields) && !empty($fields)) {
+                continue;
+            }
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $dataField)))));
+            $copiedFields[$dataField] = $this->{$getter}();
+        }
 
         // End.
         return $copiedFields;

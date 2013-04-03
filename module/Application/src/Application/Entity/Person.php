@@ -18,7 +18,6 @@ use Zend\InputFilter\InputFilter,
 class Person
     implements InputFilterAwareInterface
 {
-
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -64,13 +63,25 @@ class Person
     protected $birthday;
 
     /**
-     * @ORM\OneToOne(targetEntity="Address")
+     * @ORM\OneToMany(targetEntity="Message", mappedBy="person")
+     * @ORM\JoinColumn(name="to_persons_id", referencedColumnName="id", nullable=false)
+     */
+    protected $messages;
+
+    /**
+     * @ORM\OneToOne(targetEntity="User", mappedBy="person")
+     * @ORM\JoinColumn(name="id", referencedColumnName="id", nullable=false)
+     */
+    protected $user;
+
+    /**
+     * @ORM\OneToOne(targetEntity="Address", inversedBy="person")
      * @ORM\JoinColumn(name="addresses_id", referencedColumnName="id", nullable=false)
      */
     protected $address;
 
     /**
-     * @ORM\OneToOne(targetEntity="Communication")
+     * @ORM\OneToOne(targetEntity="Communication", inversedBy="person")
      * @ORM\JoinColumn(name="communications_id", referencedColumnName="id", nullable=false)
      */
     protected $communication;
@@ -84,7 +95,7 @@ class Person
 
     public function __construct()
     {
-        
+        $this->messages = new ArrayCollection();
     }
 
     /**
@@ -272,6 +283,52 @@ class Person
     }
 
     /**
+     * Add Message entity to collection (one to many).
+     *
+     * @param \Application\Entity\Message $message
+     * @return \Application\Entity\Person
+     */
+    public function addMessage(Message $message)
+    {
+        $this->messages[] = $message;
+
+        return $this;
+    }
+
+    /**
+     * Get Message entity collection (one to many).
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getMessages()
+    {
+        return $this->messages;
+    }
+
+    /**
+     * Set User entity (one to one).
+     *
+     * @param \Application\Entity\User $user
+     * @return \Application\Entity\Person
+     */
+    public function setUser(User $user)
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get User entity (one to one).
+     *
+     * @return \Application\Entity\User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
      * Set Address entity (one to one).
      *
      * @param \Application\Entity\Address $address
@@ -279,6 +336,7 @@ class Person
      */
     public function setAddress(Address $address = null)
     {
+        $address->setPerson($this);
         $this->address = $address;
 
         return $this;
@@ -302,6 +360,7 @@ class Person
      */
     public function setCommunication(Communication $communication = null)
     {
+        $communication->setPerson($this);
         $this->communication = $communication;
 
         return $this;
@@ -407,7 +466,7 @@ class Person
     {
         foreach ($data as $field => $value) {
             $setter = sprintf('set%s', ucfirst(
-                    str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
+                str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
             ));
             if (method_exists($this, $setter)) {
                 $this->{$setter}($value);
@@ -418,10 +477,10 @@ class Person
     }
 
     /**
-     * Return all entity fields with values.
-     * Fields started with _ will be excluded.
+     * Return a array with all fields and data.
+     * Default the relations will be ignored.
      * 
-     * @param array $fields This fields will be copied
+     * @param array $fields
      * @return array
      */
     public function getArrayCopy(array $fields = array())
@@ -429,16 +488,31 @@ class Person
         $dataFields = array('id', 'addresses_id', 'communications_id', 'firstname', 'middlename', 'lastname', 'gender', 'birthday');
         $relationFields = array('address', 'communication');
         $copiedFields = array();
-        foreach ($dataFields as $field) {
-            if (!in_array($field, $fields) && !empty($fields)) {
+        foreach ($relationFields as $relationField) {
+            $map = null;
+            if (array_key_exists($relationField, $fields)) {
+                $map = $fields[$relationField];
+                $fields[] = $relationField;
+                unset($fields[$relationField]);
+            }
+            if (!in_array($relationField, $fields)) {
                 continue;
             }
-            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))));
-            $copiedFields[$field] = $this->{$getter}();
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $relationField)))));
+            $relationEntity = $this->{$getter}();
+            $copiedFields[$relationField] = (!is_null($map))
+                ? $relationEntity->getArrayCopy($map)
+                : $relationEntity->getArrayCopy();
+            $fields = array_diff($fields, array($relationField));
         }
-        // foreach ($relationFields as $field => $relation) {
-        // $copiedFields[$field] = $relation->getArrayCopy();
-        // }
+        foreach ($dataFields as $dataField) {
+            if (!in_array($dataField, $fields) && !empty($fields)) {
+                continue;
+            }
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $dataField)))));
+            $copiedFields[$dataField] = $this->{$getter}();
+        }
+
         // End.
         return $copiedFields;
     }
@@ -447,7 +521,5 @@ class Person
     {
         return array('id', 'addresses_id', 'communications_id', 'firstname', 'middlename', 'lastname', 'gender', 'birthday');
     }
-
     // Custom methods //////////////////////////////////////////////////////////
 }
-

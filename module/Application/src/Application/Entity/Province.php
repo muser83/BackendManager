@@ -18,7 +18,6 @@ use Zend\InputFilter\InputFilter,
 class Province
     implements InputFilterAwareInterface
 {
-
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -43,7 +42,13 @@ class Province
     protected $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Country")
+     * @ORM\OneToMany(targetEntity="Address", mappedBy="province")
+     * @ORM\JoinColumn(name="provinces_id", referencedColumnName="id", nullable=false)
+     */
+    protected $addresses;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Country", inversedBy="provinces")
      * @ORM\JoinColumn(name="countries_id", referencedColumnName="id", nullable=false)
      */
     protected $country;
@@ -57,7 +62,7 @@ class Province
 
     public function __construct()
     {
-        
+        $this->addresses = new ArrayCollection();
     }
 
     /**
@@ -153,6 +158,29 @@ class Province
     }
 
     /**
+     * Add Address entity to collection (one to many).
+     *
+     * @param \Application\Entity\Address $address
+     * @return \Application\Entity\Province
+     */
+    public function addAddress(Address $address)
+    {
+        $this->addresses[] = $address;
+
+        return $this;
+    }
+
+    /**
+     * Get Address entity collection (one to many).
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getAddresses()
+    {
+        return $this->addresses;
+    }
+
+    /**
      * Set Country entity (many to one).
      *
      * @param \Application\Entity\Country $country
@@ -241,7 +269,7 @@ class Province
     {
         foreach ($data as $field => $value) {
             $setter = sprintf('set%s', ucfirst(
-                    str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
+                str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))
             ));
             if (method_exists($this, $setter)) {
                 $this->{$setter}($value);
@@ -252,10 +280,10 @@ class Province
     }
 
     /**
-     * Return all entity fields with values.
-     * Fields started with _ will be excluded.
+     * Return a array with all fields and data.
+     * Default the relations will be ignored.
      * 
-     * @param array $fields This fields will be copied
+     * @param array $fields
      * @return array
      */
     public function getArrayCopy(array $fields = array())
@@ -263,16 +291,31 @@ class Province
         $dataFields = array('id', 'countries_id', 'is_visible', 'name');
         $relationFields = array('country');
         $copiedFields = array();
-        foreach ($dataFields as $field) {
-            if (!in_array($field, $fields) && !empty($fields)) {
+        foreach ($relationFields as $relationField) {
+            $map = null;
+            if (array_key_exists($relationField, $fields)) {
+                $map = $fields[$relationField];
+                $fields[] = $relationField;
+                unset($fields[$relationField]);
+            }
+            if (!in_array($relationField, $fields)) {
                 continue;
             }
-            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))));
-            $copiedFields[$field] = $this->{$getter}();
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $relationField)))));
+            $relationEntity = $this->{$getter}();
+            $copiedFields[$relationField] = (!is_null($map))
+                ? $relationEntity->getArrayCopy($map)
+                : $relationEntity->getArrayCopy();
+            $fields = array_diff($fields, array($relationField));
         }
-        // foreach ($relationFields as $field => $relation) {
-        // $copiedFields[$field] = $relation->getArrayCopy();
-        // }
+        foreach ($dataFields as $dataField) {
+            if (!in_array($dataField, $fields) && !empty($fields)) {
+                continue;
+            }
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $dataField)))));
+            $copiedFields[$dataField] = $this->{$getter}();
+        }
+
         // End.
         return $copiedFields;
     }
@@ -281,7 +324,5 @@ class Province
     {
         return array('id', 'countries_id', 'is_visible', 'name');
     }
-
     // Custom methods //////////////////////////////////////////////////////////
 }
-

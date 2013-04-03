@@ -3,6 +3,7 @@
 namespace Application\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 use Zend\InputFilter\InputFilter,
     Zend\InputFilter\Factory as InputFactory,
     Zend\InputFilter\InputFilterAwareInterface,
@@ -40,6 +41,7 @@ class User
     protected $locales_id;
 
     /**
+     * 
      * @ORM\Column(type="integer")
      */
     protected $persons_id;
@@ -102,25 +104,31 @@ class User
     protected $last_active;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Role")
+     * @ORM\OneToMany(targetEntity="Log", mappedBy="user")
+     * @ORM\JoinColumn(name="users_id", referencedColumnName="id")
+     */
+    protected $logs;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Role", inversedBy="users")
      * @ORM\JoinColumn(name="roles_id", referencedColumnName="id", nullable=false)
      */
     protected $role;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Locale")
+     * @ORM\ManyToOne(targetEntity="Locale", inversedBy="users")
      * @ORM\JoinColumn(name="locales_id", referencedColumnName="id", nullable=false)
      */
     protected $locale;
 
     /**
-     * @ORM\OneToOne(targetEntity="Person")
+     * @ORM\OneToOne(targetEntity="Person", inversedBy="user")
      * @ORM\JoinColumn(name="persons_id", referencedColumnName="id", nullable=false)
      */
     protected $person;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Setting")
+     * @ORM\ManyToOne(targetEntity="Setting", inversedBy="users")
      * @ORM\JoinColumn(name="settings_id", referencedColumnName="id", nullable=false)
      */
     protected $setting;
@@ -134,7 +142,7 @@ class User
 
     public function __construct()
     {
-        
+        $this->logs = new ArrayCollection();
     }
 
     /**
@@ -318,7 +326,7 @@ class User
      */
     public function getIdentity()
     {
-        return strtolower($this->identity);
+        return $this->identity;
     }
 
     /**
@@ -460,6 +468,29 @@ class User
     }
 
     /**
+     * Add Log entity to collection (one to many).
+     *
+     * @param \Application\Entity\Log $log
+     * @return \Application\Entity\User
+     */
+    public function addLog(Log $log)
+    {
+        $this->logs[] = $log;
+
+        return $this;
+    }
+
+    /**
+     * Get Log entity collection (one to many).
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getLogs()
+    {
+        return $this->logs;
+    }
+
+    /**
      * Set Role entity (many to one).
      *
      * @param \Application\Entity\Role $role
@@ -513,6 +544,7 @@ class User
      */
     public function setPerson(Person $person = null)
     {
+        $person->setUser($this);
         $this->person = $person;
 
         return $this;
@@ -688,10 +720,10 @@ class User
     }
 
     /**
-     * Return all entity fields with values.
-     * Fields started with _ will be excluded.
+     * Return a array with all fields and data.
+     * Default the relations will be ignored.
      * 
-     * @param array $fields This fields will be copied
+     * @param array $fields
      * @return array
      */
     public function getArrayCopy(array $fields = array())
@@ -699,16 +731,31 @@ class User
         $dataFields = array('id', 'roles_id', 'locales_id', 'persons_id', 'settings_id', 'is_verified', 'is_active', 'identity', 'credential', 'salt', 'verify_token', 'attempts', 'last_attempt', 'last_active');
         $relationFields = array('person', 'locale', 'role', 'setting');
         $copiedFields = array();
-        foreach ($dataFields as $field) {
-            if (!in_array($field, $fields) && !empty($fields)) {
+        foreach ($relationFields as $relationField) {
+            $map = null;
+            if (array_key_exists($relationField, $fields)) {
+                $map = $fields[$relationField];
+                $fields[] = $relationField;
+                unset($fields[$relationField]);
+            }
+            if (!in_array($relationField, $fields)) {
                 continue;
             }
-            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))));
-            $copiedFields[$field] = $this->{$getter}();
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $relationField)))));
+            $relationEntity = $this->{$getter}();
+            $copiedFields[$relationField] = (!is_null($map))
+                ? $relationEntity->getArrayCopy($map)
+                : $relationEntity->getArrayCopy();
+            $fields = array_diff($fields, array($relationField));
         }
-        // foreach ($relationFields as $field => $relation) {
-        // $copiedFields[$field] = $relation->getArrayCopy();
-        // }
+        foreach ($dataFields as $dataField) {
+            if (!in_array($dataField, $fields) && !empty($fields)) {
+                continue;
+            }
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $dataField)))));
+            $copiedFields[$dataField] = $this->{$getter}();
+        }
+
         // End.
         return $copiedFields;
     }
@@ -767,7 +814,7 @@ class User
      * 
      * @return integer
      */
-    public function increaseAttept()
+    public function increaseAttempt()
     {
         $this->attempts += 1;
 
@@ -842,27 +889,4 @@ class User
         return 5; // 25
     }
 
-    /**
-     * COMMENTME
-     * 
-     * @return array
-     */
-    public function getSecureArrayCopy()
-    {
-        $privateFields = array('credential', 'salt', 'verify_token');
-        $secureFields = array();
-
-        foreach ($this->getArrayCopy() as $field => $value) {
-            if (in_array($field, $privateFields)) {
-                continue;
-            }
-
-            $secureFields[$field] = $value;
-        }
-
-        // End.
-        return $secureFields;
-    }
-
 }
-

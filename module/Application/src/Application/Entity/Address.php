@@ -52,13 +52,19 @@ class Address
     protected $city;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Country")
+     * @ORM\OneToOne(targetEntity="Person", mappedBy="address")
+     * @ORM\JoinColumn(name="id", referencedColumnName="id", nullable=false)
+     */
+    protected $person;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Country", inversedBy="addresses")
      * @ORM\JoinColumn(name="countries_id", referencedColumnName="id", nullable=false)
      */
     protected $country;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Province")
+     * @ORM\ManyToOne(targetEntity="Province", inversedBy="addresses")
      * @ORM\JoinColumn(name="provinces_id", referencedColumnName="id", nullable=false)
      */
     protected $province;
@@ -213,6 +219,29 @@ class Address
     }
 
     /**
+     * Set Person entity (one to one).
+     *
+     * @param \Application\Entity\Person $person
+     * @return \Application\Entity\Address
+     */
+    public function setPerson(Person $person)
+    {
+        $this->person = $person;
+
+        return $this;
+    }
+
+    /**
+     * Get Person entity (one to one).
+     *
+     * @return \Application\Entity\Person
+     */
+    public function getPerson()
+    {
+        return $this->person;
+    }
+
+    /**
      * Set Country entity (many to one).
      *
      * @param \Application\Entity\Country $country
@@ -347,10 +376,10 @@ class Address
     }
 
     /**
-     * Return all entity fields with values.
-     * Fields started with _ will be excluded.
+     * Return a array with all fields and data.
+     * Default the relations will be ignored.
      * 
-     * @param array $fields This fields will be copied
+     * @param array $fields
      * @return array
      */
     public function getArrayCopy(array $fields = array())
@@ -358,16 +387,30 @@ class Address
         $dataFields = array('id', 'countries_id', 'provinces_id', 'address', 'postalcode', 'city');
         $relationFields = array('country', 'province');
         $copiedFields = array();
-        foreach ($dataFields as $field) {
-            if (!in_array($field, $fields) && !empty($fields)) {
+        foreach ($relationFields as $relationField) {
+            $map = null;
+            if (array_key_exists($relationField, $fields)) {
+                $map = $fields[$relationField];
+                $fields[] = $relationField;
+                unset($fields[$relationField]);
+            }
+            if (!in_array($relationField, $fields)) {
                 continue;
             }
-            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))));
-            $copiedFields[$field] = $this->{$getter}();
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $relationField)))));
+            $relationEntity = $this->{$getter}();
+            $copiedFields[$relationField] = (!is_null($map))
+                ? $relationEntity->getArrayCopy($map)
+                : $relationEntity->getArrayCopy();
+            $fields = array_diff($fields, array($relationField));
         }
-        // foreach ($relationFields as $field => $relation) {
-            // $copiedFields[$field] = $relation->getArrayCopy();
-        // }
+        foreach ($dataFields as $dataField) {
+            if (!in_array($dataField, $fields) && !empty($fields)) {
+                continue;
+            }
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $dataField)))));
+            $copiedFields[$dataField] = $this->{$getter}();
+        }
 
         // End.
         return $copiedFields;

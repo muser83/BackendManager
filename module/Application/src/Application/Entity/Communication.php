@@ -75,6 +75,12 @@ class Communication
     protected $fax;
 
     /**
+     * @ORM\OneToOne(targetEntity="Person", mappedBy="communication")
+     * @ORM\JoinColumn(name="communications_id", referencedColumnName="id", nullable=false)
+     */
+    protected $person;
+
+    /**
      * Instance of InputFilterInterface.
      *
      * @var InputFilter
@@ -339,6 +345,29 @@ class Communication
     }
 
     /**
+     * Set Person entity (one to one).
+     *
+     * @param \Application\Entity\Person $person
+     * @return \Application\Entity\Communication
+     */
+    public function setPerson(Person $person)
+    {
+        $this->person = $person;
+
+        return $this;
+    }
+
+    /**
+     * Get Person entity (one to one).
+     *
+     * @return \Application\Entity\Person
+     */
+    public function getPerson()
+    {
+        return $this->person;
+    }
+
+    /**
      * Not used, Only defined to be compatible with InputFilterAwareInterface.
      * 
      * @param \Zend\InputFilter\InputFilterInterface $inputFilter
@@ -457,10 +486,10 @@ class Communication
     }
 
     /**
-     * Return all entity fields with values.
-     * Fields started with _ will be excluded.
+     * Return a array with all fields and data.
+     * Default the relations will be ignored.
      * 
-     * @param array $fields This fields will be copied
+     * @param array $fields
      * @return array
      */
     public function getArrayCopy(array $fields = array())
@@ -468,16 +497,30 @@ class Communication
         $dataFields = array('id', 'email', 'facebook', 'twitter', 'url1', 'url2', 'url3', 'phone', 'mobile', 'skype', 'fax');
         $relationFields = array();
         $copiedFields = array();
-        foreach ($dataFields as $field) {
-            if (!in_array($field, $fields) && !empty($fields)) {
+        foreach ($relationFields as $relationField) {
+            $map = null;
+            if (array_key_exists($relationField, $fields)) {
+                $map = $fields[$relationField];
+                $fields[] = $relationField;
+                unset($fields[$relationField]);
+            }
+            if (!in_array($relationField, $fields)) {
                 continue;
             }
-            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))));
-            $copiedFields[$field] = $this->{$getter}();
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $relationField)))));
+            $relationEntity = $this->{$getter}();
+            $copiedFields[$relationField] = (!is_null($map))
+                ? $relationEntity->getArrayCopy($map)
+                : $relationEntity->getArrayCopy();
+            $fields = array_diff($fields, array($relationField));
         }
-        // foreach ($relationFields as $field => $relation) {
-            // $copiedFields[$field] = $relation->getArrayCopy();
-        // }
+        foreach ($dataFields as $dataField) {
+            if (!in_array($dataField, $fields) && !empty($fields)) {
+                continue;
+            }
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $dataField)))));
+            $copiedFields[$dataField] = $this->{$getter}();
+        }
 
         // End.
         return $copiedFields;

@@ -34,17 +34,17 @@ class Message
     /**
      * @ORM\Column(type="boolean", nullable=true)
      */
-    protected $is_read = false;
+    protected $is_read;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
      */
-    protected $is_trash = false;
+    protected $is_trash;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
      */
-    protected $is_deleted = false;
+    protected $is_deleted;
 
     /**
      * @ORM\Column(type="string", length=100)
@@ -57,12 +57,12 @@ class Message
     protected $message;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(type="datetime")
      */
     protected $cdate;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Person")
+     * @ORM\ManyToOne(targetEntity="Person", inversedBy="messages")
      * @ORM\JoinColumn(name="to_persons_id", referencedColumnName="id", nullable=false)
      */
     protected $person;
@@ -355,7 +355,7 @@ class Message
             ),
             array(
                 'name' => 'cdate',
-                'required' => false,
+                'required' => true,
                 'filters' => array(),
                 'validators' => array(),
             ),
@@ -387,10 +387,10 @@ class Message
     }
 
     /**
-     * Return all entity fields with values.
-     * Fields started with _ will be excluded.
+     * Return a array with all fields and data.
+     * Default the relations will be ignored.
      * 
-     * @param array $fields This fields will be copied
+     * @param array $fields
      * @return array
      */
     public function getArrayCopy(array $fields = array())
@@ -398,16 +398,31 @@ class Message
         $dataFields = array('id', 'to_persons_id', 'is_read', 'is_trash', 'is_deleted', 'subject', 'message', 'cdate');
         $relationFields = array('person');
         $copiedFields = array();
-        foreach ($dataFields as $field) {
-            if (!in_array($field, $fields) && !empty($fields)) {
+        foreach ($relationFields as $relationField) {
+            $map = null;
+            if (array_key_exists($relationField, $fields)) {
+                $map = $fields[$relationField];
+                $fields[] = $relationField;
+                unset($fields[$relationField]);
+            }
+            if (!in_array($relationField, $fields)) {
                 continue;
             }
-            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $field)))));
-            $copiedFields[$field] = $this->{$getter}();
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $relationField)))));
+            $relationEntity = $this->{$getter}();
+            $copiedFields[$relationField] = (!is_null($map))
+                ? $relationEntity->getArrayCopy($map)
+                : $relationEntity->getArrayCopy();
+            $fields = array_diff($fields, array($relationField));
         }
-        // foreach ($relationFields as $field => $relation) {
-        // $copiedFields[$field] = $relation->getArrayCopy();
-        // }
+        foreach ($dataFields as $dataField) {
+            if (!in_array($dataField, $fields) && !empty($fields)) {
+                continue;
+            }
+            $getter = sprintf('get%s', ucfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $dataField)))));
+            $copiedFields[$dataField] = $this->{$getter}();
+        }
+
         // End.
         return $copiedFields;
     }
@@ -447,4 +462,3 @@ class Message
     }
 
 }
-
