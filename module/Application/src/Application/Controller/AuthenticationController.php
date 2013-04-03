@@ -90,6 +90,11 @@ class AuthenticationController
         $request = $this->getRequest();
         $em = $this->getEntityManager();
 
+        if ($this->hasAuthIdentity()) {
+            // End.
+            return $this->getValidLoginResponse($this->getAuthIdentity());
+        }
+
         if (!$request->isPost() || (null === $request->getPost('user'))) {
             // End.
             return $this->getIvalidLoginResponse(false, 'Request for authentication shell.');
@@ -165,16 +170,9 @@ class AuthenticationController
         $em->flush();
 
         // Make sure the is_active flag is false, on error.
-        // Create the logout, also in the js controller.
-        // fix system info
         // Define a last seen date in the user table and check if the identity is still valid after 30? min no see.
-        // Create the session management.
-        // 
-        // Dont use the systemController to response the user data.
         // On get If an identity exists, return this identity
         // On Post if an identity exists, remove it and continue.
-        // 
-        // Let the system only return system data like navigation.
         // Use the user repository.
         // Store the identity in a session object.
         $session = new AuthSession();
@@ -217,6 +215,38 @@ class AuthenticationController
         $em->flush($log);
         // End.
         return $this;
+    }
+
+    /**
+     * Return \Application\Entity\User or null is the auth session is empty.
+     * 
+     * @return null|\Application\Entity\User
+     */
+    private function getAuthIdentity()
+    {
+        $session = new AuthSession();
+        
+        if ($session->isEmpty()) {
+            // End.
+            return null;
+        }
+        
+        $identity = new User();
+        $identity->populate($session->read());
+        
+        // End.
+        return $identity;
+    }
+
+    /**
+     * Check if the auth session is not empty.
+     * 
+     * @return boolean
+     */
+    private function hasAuthIdentity()
+    {
+        // End.
+        return (null !== $this->getAuthIdentity());
     }
 
     /**
@@ -289,7 +319,7 @@ class AuthenticationController
 
         $responseConfig = array(
             'success' => true,
-            'user' => $identity->getArrayCopy($dataMap)
+            'user' => $identity->getArrayCopy()
         );
 
         // End.
