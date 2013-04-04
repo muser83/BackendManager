@@ -23,11 +23,11 @@ use Zend\Mvc\ModuleRouteListener;
 
 class Module
     implements AutoloaderProviderInterface,
-               ConfigProviderInterface,
-               InitProviderInterface,
-               LocatorRegisteredInterface,
-               BootstrapListenerInterface,
-               ServiceProviderInterface
+    ConfigProviderInterface,
+    InitProviderInterface,
+    LocatorRegisteredInterface,
+    BootstrapListenerInterface,
+    ServiceProviderInterface
 {
 
     /**
@@ -78,7 +78,7 @@ class Module
      */
     public function init(ModuleManagerInterface $manager)
     {
-
+        
     }
 
     /**
@@ -94,7 +94,7 @@ class Module
      */
     public function onBootstrap(EventInterface $e)
     {
-
+//        die('foobar');
     }
 
     /**
@@ -114,8 +114,7 @@ class Module
         // End.
         return array(
             'factories' => array(
-                'Zend\Authentication\AuthenticationService' => function($serviceManager)
-                {
+                'Zend\Authentication\AuthenticationService' => function($serviceManager) {
                     return $serviceManager->get('doctrine.authenticationservice.orm_default');
                 }
             ),
