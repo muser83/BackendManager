@@ -1,5 +1,8 @@
 ## Done
- >10. Use Senca CDN.
+10. Use Sencha CDN.
+11. fix system info
+14. Let the system only return system data like navigation.
+
 
 
 ***
@@ -17,11 +20,9 @@
 6. Make a file uploader, always show all uploaded file for that user.
 7. Bug report and manage service.
 8. Personal messaging service.
-9. System data and settings handler
-10. Create the logout, also in the js controller.
-11. fix system info
-12. Create the session management.
-13. Let the system only return system data like navigation.
+>9. System data and settings handler
+>12. Create the logout, also in the js controller.
+13. Create the session management.
 
 
 
