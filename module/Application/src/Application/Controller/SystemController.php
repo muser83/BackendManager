@@ -193,26 +193,16 @@ class SystemController
      */
     public function indexAction()
     {
-        $identity = $this->getIdentity();
-
-        if (!$identity) {
+        if (!$this->hasAuthIdentity()) {
             // End.
-            return new JsonModel($this->getNoIdentityResponse());
+            return $this->getNoIdentityResponse();
         }
-
-        $localesModel = $identity->getLocales();
-        $settingsModel = $identity->getSettings();
-
-        $identity->excludeFields(array('locales', 'settings'));
-        $userModel = $identity;
-
-        $systemData = (object) $this->skeleton;
-        $systemData->user = $userModel->getSecureArrayCopy();
-        $systemData->locale = $localesModel->getArrayCopy();
-//        $systemData->settings = $settingsModel->getArrayCopy();
-        $systemData->navigation = $this->navigation;
-        $systemData->userMenu = $this->userNavigation;
-        $systemData->toolbars = $this->toolbar;
+        
+        $systemData = array(
+            'navigation' => $this->navigation,
+            'userMenu' => $this->userNavigation,
+            'toolbars' => $this->toolbar
+        );
 
         return new JsonModel(
             array(
@@ -223,43 +213,35 @@ class SystemController
     }
 
     /**
-     * COMMENTME
-     *
-     * @return \Zend\View\Model\JsonModel
-     */
-    public function getUserAction()
-    {
-        $identity = $this->getIdentity();
-        $identity instanceof \Application\Entity\User;
-
-        $isAuthenticated = $identity->getIsActive();
-
-        return new JsonModel(
-            array(
-            'success' => true,
-            'user' => array('is_authenticated' => $isAuthenticated)
-            )
-        );
-    }
-
-    /**
-     * COMMENTME
+     * Return \Application\Entity\User or null is the auth session is empty.
      * 
-     * @return \Application\Entity\Users|null
+     * @return null|\Application\Entity\User
      */
-    private function getIdentity()
+    private function getAuthIdentity()
     {
-        $authSession = new AuthSession();
+        $em = $this->getEntityManager();
+        $session = new AuthSession();
 
-        if ($authSession->isEmpty()) {
+        if ($session->isEmpty()) {
             // End.
             return null;
         }
 
-        $identity = $authSession->read();
+        $identity = $em->merge($session->read());
 
         // End.
         return $identity;
+    }
+
+    /**
+     * Check if the auth session is not empty.
+     * 
+     * @return boolean
+     */
+    private function hasAuthIdentity()
+    {
+        // End.
+        return (null !== $this->getAuthIdentity());
     }
 
     private function getNoIdentityResponse()
@@ -270,7 +252,7 @@ class SystemController
         );
 
         // End.
-        return $responseConfig;
+        return new JsonModel($responseConfig);
     }
 
 }

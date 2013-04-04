@@ -90,14 +90,16 @@ class AuthenticationController
         $request = $this->getRequest();
         $em = $this->getEntityManager();
 
-        if ($this->hasAuthIdentity()) {
-            // End.
-            return $this->getValidLoginResponse($this->getAuthIdentity());
-        }
+        // Remove the invalidResponse message and log manualy
 
         if (!$request->isPost() || (null === $request->getPost('user'))) {
+            if ($this->hasAuthIdentity()) {
+                // End.
+                return $this->getValidLoginResponse($this->getAuthIdentity());
+            }
+
             // End.
-            return $this->getIvalidLoginResponse(false, 'Request for authentication shell.');
+            return $this->getIvalidLoginResponse(false);
         }
 
         $postData = Json::decode(
@@ -108,10 +110,11 @@ class AuthenticationController
         $user->populate($postData);
 
         // Check if the login attempt is valid.
-        $isValidAttempt = $this->isValidLogin($user);
+        $isValidAttempt = $this->isValidAttempt($user);
         if (!$isValidAttempt) {
             // End.
-//            return $this->getIvalidLoginResponse(true, 'Invalid post data.');
+            $this->log('Invalid post data.');
+//            return $this->getIvalidLoginResponse();
         }
 
         $identity = $em->getRepository('Application\Entity\User')
@@ -121,10 +124,10 @@ class AuthenticationController
 
         $identity instanceof Entity\User;
 
-        if (!$identity) {
-
+        if (!$identity instanceof User) {
             // End.
-            return $this->getIvalidLoginResponse(true, 'No identity found.');
+            $this->log('No identity found.');
+            return $this->getIvalidLoginResponse();
         }
 
         // Check if the user is locked out.
@@ -136,7 +139,8 @@ class AuthenticationController
             $this->increaseAttempt($identity);
 
             // End.
-            return $this->getIvalidLoginResponse(true, 'User is locked out.', $identity);
+            $this->log('User is locked out.', $identity);
+            return $this->getIvalidLoginResponse();
         }
 
         $user->saltCredential($identity);
@@ -145,7 +149,8 @@ class AuthenticationController
             $this->increaseAttempt($identity);
 
             // End. the credentials doesn't match.
-            return $this->getIvalidLoginResponse(false, 'Invalid authentication credential.', $identity);
+            $this->log('Invalid authentication credential.', $identity);
+            return $this->getIvalidLoginResponse(false);
         }
 
         if ($identity->getAttempts() >= $identity->getAttemptsToLockout()) {
@@ -167,23 +172,13 @@ class AuthenticationController
 
         $this->log('Successful authentication.', $identity);
 
-        $em->flush();
-
-        // Make sure the is_active flag is false, on error.
-        // Define a last seen date in the user table and check if the identity is still valid after 30? min no see.
-        // On get If an identity exists, return this identity
-        // On Post if an identity exists, remove it and continue.
-        // Use the user repository.
         // Store the identity in a session object.
         $session = new AuthSession();
         $session->clear();
-        $session->write($identity->getArrayCopy());
+        $session->write($identity);
 
         // End.
         return $this->getValidLoginResponse($identity);
-
-        // End. forward to the system controller.
-        return $this->forward()->dispatch('system', array('action' => 'get-user'));
     }
 
     /**
@@ -193,7 +188,26 @@ class AuthenticationController
      */
     public function logoutAction()
     {
-        // Remove the session userObject
+        $em = $this->getEntityManager();
+        $session = new AuthSession();
+
+        if ($session->isEmpty()) {
+            // End.
+            return $this->getValidLogoutResponse();
+        }
+
+        $identity = $em->merge($session->read());
+        $session->clear();
+
+        if (!$session->isEmpty()) {
+            // End.
+            $this->log('Authentication indentity not destroyed.', $identity);
+            return $this->getInvalidLogoutResponse();
+        }
+
+        // End.
+        $this->log('Authentication indentity successful destroyed.', $identity);
+        return $this->getValidLogoutResponse();
     }
 
     /**
@@ -224,16 +238,16 @@ class AuthenticationController
      */
     private function getAuthIdentity()
     {
+        $em = $this->getEntityManager();
         $session = new AuthSession();
-        
+
         if ($session->isEmpty()) {
             // End.
             return null;
         }
-        
-        $identity = new User();
-        $identity->populate($session->read());
-        
+
+        $identity = $em->merge($session->read());
+
         // End.
         return $identity;
     }
@@ -255,7 +269,7 @@ class AuthenticationController
      * @param \Application\Entity\User $user
      * @return boolean Whatever the login data is valid.
      */
-    private function isValidLogin(User $user)
+    private function isValidAttempt(User $user)
     {
         $csrf = new CsrfValidator();
         $csrfIsValid = $csrf->isValid($user->getVerifyToken());
@@ -270,13 +284,12 @@ class AuthenticationController
     }
 
     /**
-     * Return a invalid login attempt JsonModel.
+     * Return a invalid login attempt Json view model.
      * 
-     * @param \Application\Entity\User $user
-     * @param boolean $sleep true to sleep for 2 seconds.
+     * @param boolean $sleep
      * @return \Zend\View\Model\JsonModel
      */
-    private function getIvalidLoginResponse($sleep = true, $logMessage = null, $logUser = null)
+    private function getIvalidLoginResponse($sleep = true)
     {
         $csrf = new CsrfValidator();
         $csrfToken = $csrf->getHash(true);
@@ -290,10 +303,6 @@ class AuthenticationController
             'user' => $user->getArrayCopy(array('identity', 'credential', 'verify_token'))
         );
 
-        if (is_string($logMessage)) {
-            $this->log($logMessage, $logUser);
-        }
-
         // Sleep for security reasons.
         if ($sleep) {
             sleep(2);
@@ -303,6 +312,12 @@ class AuthenticationController
         return new JsonModel($responseConfig);
     }
 
+    /**
+     * Return a valid login attempt Json view model.
+     * 
+     * @param \Application\Entity\User $identity
+     * @return \Zend\View\Model\JsonModel
+     */
     private function getValidLoginResponse(User $identity)
     {
         $dataMap = array(
@@ -320,6 +335,38 @@ class AuthenticationController
         $responseConfig = array(
             'success' => true,
             'user' => $identity->getArrayCopy()
+        );
+
+        // End.
+        return new JsonModel($responseConfig);
+    }
+
+    /**
+     * Return a invalid logout attempt Json view model.
+     * 
+     * @return \Zend\View\Model\JsonModel
+     */
+    private function getInvalidLogoutResponse()
+    {
+        $responseConfig = array(
+            'success' => true,
+            'message' => ''
+        );
+
+        // End.
+        return new JsonModel($responseConfig);
+    }
+
+    /**
+     * Return a valid logout attempt Json view model.
+     * 
+     * @return \Zend\View\Model\JsonModel
+     */
+    private function getValidLogoutResponse()
+    {
+        $responseConfig = array(
+            'success' => true,
+            'message' => ''
         );
 
         // End.
